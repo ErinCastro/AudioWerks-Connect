@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="chart.umd.js"></script>
-    <title>Feedback Dashboard</title>
+    <title>Audiowerks - Feedback Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         * {
             margin: 0;
@@ -14,545 +14,708 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #e8e8e8;
+            font-family: 'Arial', sans-serif;
+            background: #ffffff;
+            color: #333;
         }
 
         .header {
-            background: #0f3460;
+            background: #002244;
+            color: #ffffff;
             padding: 15px 30px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 15px;
+            position: relative;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .avatar {
+        .user-avatar {
             width: 50px;
             height: 50px;
-            border-radius: 50%;
             background: white;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 3px solid white;
+            border: 3px solid #3b82f6;
         }
 
-        .avatar::before {
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            background: #1e3a8a;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .user-icon::before {
             content: '';
-            width: 24px;
-            height: 24px;
-            background: #ccc;
-            border-radius: 50%;
-        }
-
-        .user-details h3 {
-            color: white;
-            font-size: 16px;
-            margin-bottom: 2px;
-            font-weight: normal;
-        }
-
-        .user-details p {
-            color: #ccc;
-            font-size: 14px;
-        }
-
-        .help-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            position: absolute;
+            width: 12px;
+            height: 12px;
             background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0f3460;
-            font-size: 20px;
+            border-radius: 50%;
+            top: 6px;
+            left: 9px;
+        }
+
+        .user-icon::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: white;
+            border-radius: 10px 10px 0 0;
+            bottom: 4px;
+            left: 5px;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .dashboard-header {
+            background: #002244;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 32px;
             font-weight: bold;
         }
 
-        .dashboard-title {
-            background: #0f3460;
-            text-align: center;
-            padding: 40px;
-            color: white;
-            font-size: 36px;
-            font-weight: normal;
+        .dashboard-content {
+            padding: 0 30px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        .main-content {
-            padding: 40px;
-            background: #e8e8e8;
-        }
-
-        .stats-section {
-            display: flex;
-            gap: 40px;
+        .analytics-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
             margin-bottom: 40px;
-            justify-content: center;
         }
 
         .chart-container {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 20px;
             text-align: center;
         }
 
-        .pie-chart {
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            background: conic-gradient(
-                #1f4e79 0deg 45deg,
-                #4a90e2 45deg 118.8deg,
-                #87ceeb 118.8deg 223.2deg,
-                #2d5aa0 223.2deg 360deg
-            );
+        .chart-wrapper {
             position: relative;
+            height: 250px;
         }
 
-        .chart-labels {
-            text-align: left;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .label {
-            margin-bottom: 8px;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
         .stat-card {
-            background: #0f3460;
-            border-radius: 20px;
-            padding: 30px;
+            background: #002244;
             color: white;
+            padding: 25px;
+            border-radius: 15px;
             text-align: center;
-            width: 300px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
         }
 
         .stat-card h3 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: normal;
-        }
-
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .stat-card .change {
-            font-size: 16px;
-        }
-
-        .stat-card .change-detail {
             font-size: 14px;
-            font-style: italic;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-card .service-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .percentage {
+            font-size: 16px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .stat-card .subtitle {
+            font-size: 12px;
             opacity: 0.8;
+            font-style: italic;
         }
 
         .reviews-section {
-            background: #0f3460;
-            padding: 30px;
-            border-radius: 10px 10px 0 0;
+            background: #ffffff;
+            color: #002244;
+            padding: 40px 30px;
+            margin: 0 -30px;
+            text-align: center;
         }
 
         .reviews-section h2 {
-            color: white;
-            font-size: 24px;
-            font-weight: normal;
-        }
-
-        .reviews-container {
-            background: #e8e8e8;
-            padding: 30px;
-            border-radius: 0 0 10px 10px;
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
         }
 
         .reviews-grid {
-            display: flex;
-            gap: 20px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 36px;
             margin-bottom: 30px;
-            overflow-x: auto;
         }
 
         .review-card {
-            background: #0f3460;
-            border-radius: 10px;
-            padding: 20px;
-            color: white;
-            min-width: 220px;
-            flex-shrink: 0;
+            background: #002244;
+            border: 2px solid #002244;
+            color: #ffffff;
+            padding: 28px 18px 20px 18px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 18px rgba(0,34,68,0.08);
+            margin-bottom: 12px;
         }
 
         .review-avatar {
             width: 50px;
             height: 50px;
+            background: #94a3b8;
             border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            margin-bottom: 15px;
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .review-avatar::before {
             content: '';
-            width: 24px;
-            height: 24px;
-            background: rgba(255,255,255,0.7);
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
             border-radius: 50%;
+            top: 10px;
+            left: 15px;
         }
 
-        .review-content h4 {
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: normal;
-            line-height: 1.4;
+        .review-avatar::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            background: white;
+            border-radius: 15px 15px 0 0;
+            bottom: 8px;
+            left: 10px;
+        }
+
+        .review-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+            min-height: 60px;
+            color: #ffffff;
         }
 
         .stars {
             display: flex;
-            gap: 2px;
+            justify-content: center;
+            gap: 3px;
         }
 
         .star {
-            color: #ffd700;
-            font-size: 18px;
+            width: 20px;
+            height: 20px;
+            color: #fbbf24;
+            font-size: 16px;
         }
 
         .star.empty {
-            color: rgba(255,255,255,0.3);
+            color: #64748b;
         }
 
         .add-review-btn {
-            background: #0f3460;
+            background: #002244;
             color: white;
+            border: 2px solid #3b82f6;
             padding: 15px 30px;
-            border: none;
             border-radius: 25px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            display: block;
-            margin: 0 auto;
+            transition: all 0.3s ease;
         }
 
         .add-review-btn:hover {
-            background: #1f4e79;
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .review-nav-btn {
+            background: #002244;
+            color: #fff;
+            border: 2px solid #002244;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border 0.2s;
+            box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+        }
+        .review-nav-btn:hover {
+            background: #b0b6be;
+            color: #002244;
+            border-color: #b0b6be;
+        }
+
+        @media (max-width: 1200px) {
+            .analytics-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .reviews-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                padding: 0 15px;
+            }
+            
+            .reviews-section {
+                margin: 0 -15px;
+                padding: 30px 15px;
+            }
+            
+            .reviews-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .white-divider {
+            border: none;
+            height: 6px;
+            background: #fff;
+            border-radius: 3px;
+            margin: 18px 0 28px 0;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+        }
+
+        .white-divider-full {
+            position: relative;
+            left: 50%;
+            right: 50%;
+            width: 100vw;
+            max-width: 100vw;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .manage-account-link {
+            color: #fff;
+            font-size: 13px;
+            opacity: 0.8;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .manage-account-link:hover {
+            color: #ffc300;
+            opacity: 1;
+        }
+
+        .header-icons {
+            position: absolute;
+            top: 18px;
+            right: 30px;
+            z-index: 120;
+        }
+        .fa-bars {
+            font-size: 2rem;
+            color: #fff;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .fa-bars:hover, .fa-bars.active {
+            color: #ffc300;
+        }
+        .menu-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 30px;
+            background: #fff;
+            color: #1e3a8a;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,71,171,0.10);
+            min-width: 180px;
+            z-index: 200;
+            flex-direction: column;
+            padding: 10px 0;
+        }
+        .menu-popup a {
+            color: #1e3a8a;
+            text-decoration: none;
+            padding: 12px 24px;
+            display: block;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .menu-popup a:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .reviews-title-container {
+            background: #002244;
+            color: #fff;
+            padding: 24px 0 10px 0;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            margin: 0 -30px;
+            margin-bottom: 36px;
+        }
+        .reviews-title-container h2 {
+            margin: 0;
+        }
+        .reviews-title-container .white-divider {
+            background: #fff;
+            margin-bottom: 0;
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="user-info">
-            <div class="avatar"></div>
-            <div class="user-details">
-                <h3 id="dashboard-username"></h3>
-                <p>Manage Account</p>
-            </div>
+    <div class="header-icons">
+      <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+    </div>
+    <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+      <a href="homepage.html">Home</a>
+      <a href="portfolio.html">Portfolio</a>
+      <a href="#booking">Book Here</a>
+      <a href="User.html">User Profile</a>
+      <a href="#equipments">Equipments</a>
+      <a href="feedback.html">Feedback Dashboard</a>
+      <a href="login.html" onclick="logout()">Logout</a>
+    </nav>
+    <div class="header">
+        <div class="user-avatar">
+            <div class="user-icon"></div>
         </div>
-        <div class="help-icon">?</div>
-    </header>
+        <div class="user-info">
+            <h3>@username</h3>
+        </div>
+    </div>
+    <hr class="white-divider">
 
-    <div class="dashboard-title">
-        Feedback Dashboard
+    <div class="dashboard-header">
+        <h1>Feedback Dashboard</h1>
+        <hr class="white-divider white-divider-full">
     </div>
 
-    <main class="main-content">
-        <div class="stats-section">
+    <div class="dashboard-content">
+        <div class="analytics-section">
             <div class="chart-container">
-                <canvas id="pieChart" width="280" height="280"></canvas>
-                <div class="chart-labels">
-                    <div class="label">Metro Manila<br>12.5%</div><br>
-                    <div class="label">Tagaytay<br>37.5%</div><br>
-                    <div class="label">Cavite<br>20.8%</div><br>
-                    <div class="label">Batangas<br>29.2%</div>
+                <h2 class="chart-title">Most Used Equipment</h2>
+                <div class="chart-wrapper">
+                    <canvas id="equipmentChart"></canvas>
                 </div>
             </div>
 
-            <div class="stat-card">
-                <h3>Most Serviced Place</h3>
-                <div class="value" id="most-serviced-place"></div>
-                <div class="change" id="most-serviced-place-change"></div>
-                <div class="change-detail">From Last Month</div>
+            <div class="chart-container">
+                <h2 class="chart-title">Most Serviced Area</h2>
+                <div class="chart-wrapper">
+                    <canvas id="areaChart"></canvas>
+                </div>
             </div>
 
-            <div class="stat-card">
-                <h3>Most Availed Service</h3>
-                <div class="value" id="most-availed-service"></div>
-                <div class="change" id="most-availed-service-change"></div>
-                <div class="change-detail">From Last Month</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Most Requested Services</h3>
+                    <div class="service-name">Lights & Sounds</div>
+                    <div class="percentage">Up to 7%</div>
+                    <div class="subtitle">From Last Month</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Commonly Booked Event Packages</h3>
+                    <div class="service-name">Wedding</div>
+                    <div class="percentage">Up to 45%</div>
+                    <div class="subtitle">From Last Month</div>
+                </div>
+
+                <div class="stat-card" style="grid-column: 1 / -1;">
+                    <h3>Least Requested Services</h3>
+                    <div class="service-name">Low Lying</div>
+                    <div class="percentage">Up to 16%</div>
+                    <div class="subtitle">From Last Month</div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="reviews-section">
+    <div class="reviews-section">
+        <div class="reviews-title-container">
             <h2>Reviews</h2>
         </div>
-        
-        <div class="reviews-container">
-            <div class="reviews-grid" id="reviews-grid"></div>
-            <div class="reviews-pagination" style="text-align:center; margin-top:10px;">
-                <button id="prevReviewsBtn">Previous</button>
-                <button id="nextReviewsBtn">Next</button>
+        <div class="reviews-grid" id="reviewsGrid">
+            <div class="review-card">
+                <div class="review-avatar"></div>
+                <div class="review-text">Excellent Setup!</div>
+                <div class="stars">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                </div>
             </div>
-            <button class="add-review-btn" id="addReviewBtn">Add A Review</button>
-        </div>
-    </main>
 
-    <!-- Modal for adding a review -->
-    <div id="reviewModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-        <div style="background:white; padding:30px; border-radius:10px; max-width:400px; margin:auto;">
-            <h3>Add Your Review</h3>
-            <textarea id="reviewText" rows="4" style="width:100%;" placeholder="Your review"></textarea>
-            <br>
-            <label>Rating:
-                <select id="reviewRating">
-                    <option value="5">★★★★★</option>
-                    <option value="4">★★★★☆</option>
-                    <option value="3">★★★☆☆</option>
-                    <option value="2">★★☆☆☆</option>
-                    <option value="1">★☆☆☆☆</option>
-                </select>
-            </label>
-            <br><br>
-            <button id="submitReviewBtn">Submit</button>
-            <button onclick="document.getElementById('reviewModal').style.display='none'">Cancel</button>
+            <div class="review-card">
+                <div class="review-avatar"></div>
+                <div class="review-text">The service was excellent</div>
+                <div class="stars">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-avatar"></div>
+                <div class="review-text">The supplier was so accommodating for all our request</div>
+                <div class="stars">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-avatar"></div>
+                <div class="review-text">They worked like magic! My event was a success</div>
+                <div class="stars">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                </div>
+            </div>
+
+            <div class="review-card">
+                <div class="review-avatar"></div>
+                <div class="review-text">The team was professional and efficient</div>
+                <div class="stars">
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star">★</span>
+                    <span class="star empty">★</span>
+                </div>
+            </div>
         </div>
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
+            <button id="prevReviewBtn" class="review-nav-btn" style="width: 120px;"><</button>
+            <button id="nextReviewBtn" class="review-nav-btn" style="width: 120px;">></button>
+        </div>
+        <div style="height: 32px;"></div>
+        <button class="review-nav-btn" onclick="addReview()">Add A Review</button>
     </div>
 
-    <script type="module">
-    import supabase from './supabase.js';
-
-    const userId = localStorage.getItem('user_id');
-    const username = localStorage.getItem('username');
-
-    let allReviews = [];
-    let reviewsPerPage = 3; // Change to 4 if you want 4 per page
-    let currentPage = 0;
-
-    // Fetch all reviews once
-    async function loadReviews() {
-        let { data: reviews, error } = await supabase
-            .from('reviews')
-            .select('review_text,rating,users(username)')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            alert('Failed to load reviews');
-            return;
-        }
-        allReviews = reviews;
-        currentPage = 0;
-        renderReviews();
-    }
-
-    function renderReviews() {
-        const reviewsGrid = document.getElementById('reviews-grid');
-        reviewsGrid.innerHTML = '';
-        const start = currentPage * reviewsPerPage;
-        const end = start + reviewsPerPage;
-        const reviewsToShow = allReviews.slice(start, end);
-
-        reviewsToShow.forEach(r => {
-            reviewsGrid.innerHTML += `
-                <div class="review-card">
-                    <div class="review-avatar"></div>
-                    <div class="review-content">
-                        <h4>${r.review_text}</h4>
-                        <div class="stars">
-                            ${'★'.repeat(r.rating)}${'★'.repeat(5 - r.rating).replace(/★/g, '<span class=\"star empty\">★</span>')}
-                        </div>
-                        <div style="font-size:12px; color:#ccc;">by @${r.users?.username || 'user'}</div>
-                    </div>
-                </div>
-            `;
-        });
-
-        // Disable/enable buttons
-        document.getElementById('prevReviewsBtn').disabled = currentPage === 0;
-        document.getElementById('nextReviewsBtn').disabled = end >= allReviews.length;
-    }
-
-    // Pagination button handlers
-    document.getElementById('prevReviewsBtn').onclick = function() {
-        if (currentPage > 0) {
-            currentPage--;
-            renderReviews();
-        }
-    };
-    document.getElementById('nextReviewsBtn').onclick = function() {
-        if ((currentPage + 1) * reviewsPerPage < allReviews.length) {
-            currentPage++;
-            renderReviews();
-        }
-    };
-
-    // Add review logic (same as before)
-    document.getElementById('addReviewBtn').onclick = async function() {
-        if (!userId) {
-            alert('You must be logged in to add a review.');
-            return;
-        }
-        let { data: bookings, error } = await supabase
-            .from('bookings')
-            .select('id')
-            .eq('user_id', userId)
-            .limit(1);
-
-        if (error || !bookings || bookings.length === 0) {
-            alert('You must have a booking to add a review.');
-            return;
-        }
-        document.getElementById('reviewModal').style.display = 'flex';
-    };
-
-    document.getElementById('submitReviewBtn').onclick = async function() {
-        const reviewText = document.getElementById('reviewText').value.trim();
-        const rating = parseInt(document.getElementById('reviewRating').value, 10);
-
-        if (!reviewText) {
-            alert('Review cannot be empty.');
-            return;
-        }
-
-        let { error } = await supabase
-            .from('reviews')
-            .insert([{ user_id: userId, review_text: reviewText, rating }]);
-
-        if (error) {
-            alert('Failed to submit review.');
-            return;
-        }
-
-        document.getElementById('reviewModal').style.display = 'none';
-        document.getElementById('reviewText').value = '';
-        loadReviews();
-    };
-
-    // Initial load
-    loadReviews();
-
-    async function loadPieChartData() {
-        // Fetch all bookings and their locations
-        let { data: bookings, error } = await supabase
-            .from('bookings')
-            .select('location');
-
-        if (error) {
-            alert('Failed to load bookings data');
-            return;
-        }
-
-        // Count bookings per location
-        const locations = ['Metro Manila', 'Tagaytay', 'Cavite', 'Batangas', 'Bulacan'];
-        const counts = locations.map(loc =>
-            bookings.filter(b => b.location === loc).length
-        );
-
-        // Render the chart
-        const ctx = document.getElementById('pieChart').getContext('2d');
-        new Chart(ctx, {
+    <script>
+        // Equipment Pie Chart
+        const equipmentCtx = document.getElementById('equipmentChart').getContext('2d');
+        new Chart(equipmentCtx, {
             type: 'pie',
             data: {
-                labels: locations,
+                labels: ['Speakers', 'Lights', 'Led Wall', 'Mood Lights'],
                 datasets: [{
-                    data: counts,
-                    backgroundColor: [
-                        '#1f4e79', '#232a6d', '#4a90e2', '#87ceeb'
-                    ]
+                    data: [37.5, 29.2, 20.8, 12.5],
+                    backgroundColor: ['#1e3a8a', '#3b82f6', '#60a5fa', '#93c5fd'],
+                    borderWidth: 0
                 }]
             },
-            options: { plugins: { legend: { display: false } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
         });
-    }
 
-    loadPieChartData();
+        // Area Bar Chart
+        const areaCtx = document.getElementById('areaChart').getContext('2d');
+        new Chart(areaCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Tagaytay', 'Bulacan', 'Manila', 'Batangas', 'Cavite'],
+                datasets: [{
+                    data: [15, 9, 12, 10, 7],
+                    backgroundColor: ['#1e3a8a', '#1e3a8a', '#3b82f6', '#1e3a8a', '#60a5fa'],
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 20,
+                        ticks: {
+                            stepSize: 5
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('dashboard-username').textContent = '@' + username;
-    });
+        // Review Pagination Logic
+        const allReviews = [
+            {
+                text: "Excellent Setup!",
+                stars: 4
+            },
+            {
+                text: "The service was excellent",
+                stars: 5
+            },
+            {
+                text: "The supplier was so accommodating for all our request",
+                stars: 5
+            },
+            {
+                text: "They worked like magic! My event was a success",
+                stars: 5
+            },
+            {
+                text: "The team was professional and efficient",
+                stars: 4
+            }
+        ];
+        const reviewsPerPage = 5;
+        let currentPage = 0;
+        const reviewsGrid = document.getElementById('reviewsGrid');
+        const prevBtn = document.getElementById('prevReviewBtn');
+        const nextBtn = document.getElementById('nextReviewBtn');
 
-    async function updateStatCards() {
-        // Fetch all bookings
-        let { data: bookings, error } = await supabase
-            .from('bookings')
-            .select('location,service,created_at');
-
-        if (error) {
-            alert('Failed to load bookings data');
-            return;
+        function renderReviews() {
+            reviewsGrid.innerHTML = '';
+            const start = currentPage * reviewsPerPage;
+            const end = Math.min(start + reviewsPerPage, allReviews.length);
+            for (let i = start; i < end; i++) {
+                const review = allReviews[i];
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+                    <div class="review-avatar"></div>
+                    <div class="review-text">${review.text}</div>
+                    <div class="stars">
+                        ${[...Array(5)].map((_, idx) => `<span class="star${idx < review.stars ? '' : ' empty'}">★</span>`).join('')}
+                    </div>
+                `;
+                reviewsGrid.appendChild(card);
+            }
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = end >= allReviews.length;
         }
 
-        // Most Serviced Place
-        const locationCounts = {};
-        bookings.forEach(b => {
-            locationCounts[b.location] = (locationCounts[b.location] || 0) + 1;
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                renderReviews();
+            }
         });
-        const mostServicedPlace = Object.entries(locationCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
-
-        // Most Availed Service
-        const serviceCounts = {};
-        bookings.forEach(b => {
-            serviceCounts[b.service] = (serviceCounts[b.service] || 0) + 1;
+        nextBtn.addEventListener('click', () => {
+            if ((currentPage + 1) * reviewsPerPage < allReviews.length) {
+                currentPage++;
+                renderReviews();
+            }
         });
-        const mostAvailedService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+        // Initial render
+        renderReviews();
 
-        // (Optional) Calculate change from last month
-        // You can add logic here to compare counts from previous month if you want
+        function addReview() {
+            alert('Add Review functionality would be implemented here!');
+        }
 
-        // Update DOM
-        document.getElementById('most-serviced-place').textContent = mostServicedPlace;
-        document.getElementById('most-availed-service').textContent = mostAvailedService;
-        // You can also update the .change fields if you calculate the change
-    }
-
-    updateStatCards();
+        function toggleMenu(btn) {
+          const menu = document.getElementById('menuPopup');
+          const bars = document.querySelector('.fa-bars');
+          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+          bars.classList.toggle('active');
+        }
+        window.addEventListener('click', function (e) {
+          const menu = document.getElementById('menuPopup');
+          const button = document.querySelector('.fa-bars');
+          if (!menu.contains(e.target) && e.target !== button) {
+            menu.style.display = 'none';
+            button.classList.remove('active');
+          }
+        });
+        function logout() {
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = "login.html";
+        }
     </script>
-
-    <!-- Add these before the closing </body> tag -->
-    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js"></script>
-    <script src="firebase-config.js"></script>
-    <script src="firebase-backend.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('feedbackForm');
-      if (form) {
-        form.addEventListener('submit', function(e) {
-          e.preventDefault();
-          // Collect feedback fields (customize as needed)
-          const feedback = document.getElementById('feedbackText').value;
-          const feedbackObj = { feedback, timestamp: Date.now() };
-          submitFeedback(feedbackObj)
-            .then(() => {
-              const successDiv = document.getElementById('feedbackSuccess');
-              if (successDiv) successDiv.textContent = 'Feedback submitted successfully!';
-            })
-            .catch(error => {
-              const errorDiv = document.getElementById('feedbackError');
-              if (errorDiv) errorDiv.textContent = error.message;
-            });
-        });
-      }
-    });
-    </script>
-
-    <form id="feedbackForm">
-      <textarea id="feedbackText" placeholder="Your feedback" required></textarea>
-      <button type="submit">Submit Feedback</button>
-    </form>
-    <div id="feedbackSuccess" style="color:green;"></div>
-    <div id="feedbackError" style="color:red;"></div>
 </body>
 </html>
