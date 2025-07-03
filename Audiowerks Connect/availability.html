@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Availability - Audiowerks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: #fff;
+      color: #002244;
+      margin: 0;
+    }
+    header {
+      background: #002244;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 0 0 18px;
+      height: 80px;
+      position: relative;
+    }
+    .user-avatar {
+      width: 70px;
+      height: 70px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+      margin-top: 5px;
+    }
+    .user-avatar i {
+      color: #002244;
+      font-size: 2.5rem;
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-right: 24px;
+    }
+    .user-info h3 {
+      font-size: 1.1rem;
+      margin: 0 0 2px 0;
+      font-weight: 400;
+    }
+    .user-info a {
+      color: #fff;
+      font-size: 0.95rem;
+      text-decoration: underline;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .header-icons {
+      position: absolute;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 18px;
+    }
+    .header-icons i {
+      font-size: 2.2rem;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .header-icons i:hover {
+      color: #b0b6be;
+    }
+    .tab-bar {
+      background: #002244;
+      display: flex;
+      align-items: center;
+      padding: 0 0 0 0;
+      height: 56px;
+      border-bottom: 4px solid #fff;
+    }
+    .tab-bar .tab {
+      font-family: 'Georgia', serif;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      background: none;
+      border: none;
+      outline: none;
+      margin: 0 18px 0 36px;
+      cursor: pointer;
+      padding: 0 12px;
+      transition: color 0.2s;
+    }
+    .tab-bar .tab.selected {
+      color: #fff;
+      border-bottom: 0;
+    }
+    .tab-bar .tab-light {
+      background: #b0b6be;
+      color: #fff;
+      border-radius: 22px;
+      font-size: 1.5rem;
+      margin-right: 12px;
+      padding: 4px 32px;
+      font-weight: bold;
+      border: none;
+    }
+    .tab-bar .tab-sound {
+      background: #c6ece7;
+      color: #fff;
+      border-radius: 22px;
+      font-size: 1.5rem;
+      margin-right: 12px;
+      padding: 4px 32px;
+      font-weight: bold;
+      border: none;
+    }
+    .main-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 24px;
+    }
+    .main-table tr {
+      border-bottom: 6px solid #000;
+    }
+    .main-table td {
+      padding: 24px 18px;
+      vertical-align: middle;
+    }
+    .product-img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border: 4px solid #002244;
+      border-radius: 4px;
+      background: #e0e6ef;
+      margin-right: 18px;
+    }
+    .product-title {
+      font-family: 'Georgia', serif;
+      font-size: 2rem;
+      font-weight: bold;
+      margin: 0 0 6px 0;
+      color: #111;
+    }
+    .product-desc {
+      font-family: 'Georgia', serif;
+      font-size: 1.1rem;
+      color: #222;
+      margin: 0;
+    }
+    .product-title.unavailable, .product-desc.unavailable {
+      color: #b0b6be;
+      opacity: 0.7;
+    }
+    .status-section {
+      text-align: center;
+      min-width: 260px;
+    }
+    .status-label {
+      font-family: 'Georgia', serif;
+      font-size: 1.1rem;
+      color: #222;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .status-badge {
+      display: inline-block;
+      font-family: 'Georgia', serif;
+      font-size: 1.5rem;
+      font-weight: bold;
+      padding: 8px 32px;
+      border-radius: 22px;
+      margin-bottom: 10px;
+      margin-top: 2px;
+    }
+    .status-available {
+      background: #c6ece7;
+      color: #fff;
+    }
+    .status-booked {
+      background: #b0b6be;
+      color: #fff;
+    }
+
+    .inventory-info {
+      font-family: 'Georgia', serif;
+      font-size: 0.9rem;
+      color: #666;
+      margin: 8px 0;
+      font-weight: 500;
+    }
+    @media (max-width: 900px) {
+      .main-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .main-table tr {
+        display: block;
+        margin-bottom: 30px;
+      }
+      .status-section {
+        min-width: unset;
+        margin-top: 18px;
+      }
+    }
+    .logo-container img {
+      height: 100px;
+      cursor: pointer;
+    }
+    .logo-container a {
+      display: inline-block;
+    }
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+    .header-center h1 {
+      font-size: 64px;
+      font-weight: bold;
+      color: #0047AB;
+      text-shadow: 2px 2px #ffffff;
+    }
+    .header-center p {
+      font-size: 24px;
+      color: #0047AB;
+      text-shadow: 1px 1px #ffffff;
+    }
+    .header-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .header-icons i {
+      font-size: 28px;
+      color: #000;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .header-icons i:hover {
+      transform: scale(1.2);
+    }
+    .menu-popup {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 1000;
+      min-width: 200px;
+      transition: all 0.3s ease;
+    }
+    .menu-popup a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      border-bottom: 1px solid #eee;
+    }
+    .menu-popup a:hover {
+      background-color: #f0f0f0;
+    }
+    .menu-popup a:last-child {
+      background-color: #191970;
+      color: #fff;
+      border-bottom: none;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .menu-popup a:last-child:hover {
+      background-color: #000080;
+      transform: scale(1.02);
+    }
+    .fa-bars {
+      color: #fff !important;
+      transition: transform 0.3s;
+    }
+    .fa-bars.active {
+      transform: rotate(90deg);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <a href="homepage.html"><img src="images/whitelogo.png" alt="AudioWerks Logo, click to go home" style="height: 100px;" /></a>
+    </div>
+    <div class="header-center">
+      <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
+      <p style="font-size: 1.1rem; color: #0047AB; margin: 0;">Lights and Sounds</p>
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+    </div>
+    <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+      <a href="homepage.html">Home</a>
+      <a href="portfolioo.html">Portfolio</a>
+      <a href="#booking">Book Here</a>
+      <a href="User.html">User Profile</a>
+      <a href="availability.html">Equipments</a>
+      <a href="feedback.html">Feedback Dashboard</a>
+      <a href="login.html" onclick="logout()">Logout</a>
+    </nav>
+  </header>
+  <div class="tab-bar">
+    <button class="tab selected">Equipment</button>
+  </div>
+  <table class="main-table">
+    <tr>
+      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
+        <img src="images/lights-sounds.png" alt="Product" class="product-img">
+        <div>
+          <div class="product-title">Lights & Sounds</div>
+          <div class="product-desc">Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.</div>
+        </div>
+      </td>
+      <td class="status-section">
+        <div class="status-label">This equipment is currently:</div>
+        <div class="status-badge status-available">Available</div>
+        <div class="inventory-info">Inventory: 5 units</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
+        <img src="images/led-wall.png" alt="Product" class="product-img">
+        <div>
+          <div class="product-title">Led Wall</div>
+          <div class="product-desc">Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.</div>
+        </div>
+      </td>
+      <td class="status-section">
+        <div class="status-label">This equipment is currently:</div>
+        <div class="status-badge status-available">Available</div>
+        <div class="inventory-info">Inventory: 2 units</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
+        <img src="images/Stage.png" alt="Product" class="product-img">
+        <div>
+          <div class="product-title unavailable">Stage</div>
+          <div class="product-desc unavailable">Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.</div>
+        </div>
+      </td>
+      <td class="status-section">
+        <div class="status-label">This equipment is currently:</div>
+        <div class="status-badge status-booked">Booked</div>
+        <div class="inventory-info">Inventory: 0 units available</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
+        <img src="images/mood-lights.png" alt="Product" class="product-img">
+        <div>
+          <div class="product-title">Mood Light</div>
+          <div class="product-desc">Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.
+
+          </div>
+        </div>
+      </td>
+      <td class="status-section">
+        <div class="status-label">This equipment is currently:</div>
+        <div class="status-badge status-available">Available</div>
+        <div class="inventory-info">Inventory: 3 units</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
+        <img src="images/string-lights.png" alt="Product" class="product-img">
+        <div>
+          <div class="product-title">String Lights</div>
+          <div class="product-desc">Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.</div>
+        </div>
+      </td>
+      <td class="status-section">
+        <div class="status-label">This equipment is currently:</div>
+        <div class="status-badge status-available">Available</div>
+        <div class="inventory-info">Inventory: 5 units</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
+        <img src="images/low-lying.jpg" alt="Product" class="product-img">
+        <div>
+          <div class="product-title unavailable">Low Lying</div>
+          <div class="product-desc unavailable">Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.</div>
+        </div>
+      </td>
+      <td class="status-section">
+        <div class="status-label">This equipment is currently:</div>
+        <div class="status-badge status-booked">Booked</div>
+        <div class="inventory-info">Inventory: 0 units available</div>
+      </td>
+    </tr>
+  </table>
+  <script>
+    function toggleMenu(btn) {
+      const menu = document.getElementById('menuPopup');
+      const bars = document.querySelector('.fa-bars');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      bars.classList.toggle('active');
+    }
+    window.addEventListener('click', function (e) {
+      const menu = document.getElementById('menuPopup');
+      const button = document.querySelector('.fa-bars');
+      if (!menu.contains(e.target) && e.target !== button) {
+        menu.style.display = 'none';
+        button.classList.remove('active');
+      }
+    });
+    function logout() {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html> 
