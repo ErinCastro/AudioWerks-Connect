@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -459,6 +460,56 @@
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
+    #announcementModal {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(30, 41, 59, 0.35); /* dark overlay */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      animation: fadeIn 0.4s;
+      backdrop-filter: blur(2px);
+    }
+    #announcementModal .popup-content {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(30,41,59,0.18);
+      padding: 36px 44px 32px 44px;
+      min-width: 320px;
+      max-width: 90vw;
+      text-align: center;
+      position: relative;
+      animation: popIn 0.3s;
+    }
+    #announcementModal h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #1e5aa8;
+      letter-spacing: 1px;
+    }
+    #announcementModal .close-btn {
+      position: absolute;
+      top: 16px; right: 18px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #1e5aa8;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    #announcementModal .close-btn:hover {
+      color: #d32f2f;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes popIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -581,6 +632,9 @@
   </footer>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="firebase-config-new.js"></script>
   <script>
     AOS.init();
     // Hamburger menu animation and toggle
@@ -668,6 +722,51 @@
       sessionStorage.clear();
       window.location.href = "login.html";
     }
+    document.addEventListener('DOMContentLoaded', function() {
+      // Fetch all announcements
+      firebase.database().ref('announcements').once('value').then(snap => {
+        const announcements = snap.val();
+        if (announcements) {
+          const seen = JSON.parse(localStorage.getItem('seenAnnouncements') || '[]');
+          const unseen = Object.entries(announcements).filter(([id, a]) => !seen.includes(id));
+          if (unseen.length > 0) showAnnouncementQueue(unseen, seen);
+        }
+      });
+
+      function showAnnouncementQueue(unseen, seen) {
+        if (unseen.length === 0) return;
+        const [current, ...rest] = unseen;
+        const [id, a] = current;
+        showAnnouncementModal(a.text, () => {
+          seen.push(id);
+          localStorage.setItem('seenAnnouncements', JSON.stringify(seen));
+          showAnnouncementQueue(rest, seen);
+        });
+      }
+
+      function showAnnouncementModal(text, onClose) {
+        let modal = document.getElementById('announcementModal');
+        if (!modal) {
+          modal = document.createElement('div');
+          modal.id = 'announcementModal';
+          modal.innerHTML = `
+            <div class="popup-content">
+              <button class="close-btn" id="closeAnnouncementModal">&times;</button>
+              <h3>Announcement</h3>
+              <div id="announcementModalContent" style="font-size:18px;">${text}</div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+        } else {
+          modal.querySelector('#announcementModalContent').textContent = text;
+          modal.style.display = 'flex';
+        }
+        modal.querySelector('#closeAnnouncementModal').onclick = () => {
+          modal.style.display = 'none';
+          if (onClose) onClose();
+        };
+      }
+    });
   </script>
 </body>
 </html>
