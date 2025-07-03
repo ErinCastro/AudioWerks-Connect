@@ -503,26 +503,29 @@
             })
             .then(userCredential => {
               const user = userCredential.user;
-              // 4. Save user profile under users/{uid}
-              const userProfile = firebase.database().ref('users/' + user.uid).set({
-                name: username,
-                phone: '+63' + phone,
-                email: email
+              // Send email verification
+              return user.sendEmailVerification().then(() => {
+                // 4. Save user profile under users/{uid}
+                const userProfile = firebase.database().ref('users/' + user.uid).set({
+                  name: username,
+                  phone: '+63' + phone,
+                  email: email
+                });
+                // 5. Save username mapping for login: users/{username} → { email, phone }
+                const usernameMap = firebase.database().ref('users/' + username).set({
+                  email: email,
+                  phone: '+63' + phone
+                });
+                return Promise.all([userProfile, usernameMap]);
               });
-              // 5. Save username mapping for login: users/{username} → { email, phone }
-              const usernameMap = firebase.database().ref('users/' + username).set({
-                email: email,
-                phone: '+63' + phone
-              });
-              return Promise.all([userProfile, usernameMap]);
             })
             .then(() => {
               localStorage.setItem('userPassword', password);
               submitBtn.classList.remove('loading');
               submitBtn.disabled = false;
               submitBtn.textContent = 'Sign up';
-              alert('Account created successfully!');
-              window.location.href = 'homepage.html';
+              alert('Account created successfully! A verification email has been sent. Please verify your email before logging in.');
+              window.location.href = 'login.html';
             })
             .catch(error => {
               if (error.code === 'auth/email-already-in-use') {

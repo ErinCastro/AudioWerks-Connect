@@ -51,6 +51,7 @@
             text-align: center;
             position: relative;
             z-index: 10;
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             border: none;
             box-shadow: none;
@@ -444,7 +445,7 @@
         </form>
         
         <div class="link-container">
-            <a href="#" class="forgot-password" onclick="forgotPassword()">Forgot Password?</a>
+            <a href="forgot.html" class="forgot-password" onclick="forgotPassword()">Forgot Password?</a>
             <a href="register.html" class="signup-link" onclick="signupRedirect()">Signup !</a>
         </div>
     </div>
@@ -520,12 +521,17 @@
                 })
                 .then((userCredential) => {
                     // Login successful
-                    localStorage.setItem('userPassword', password);
-                    loginBtn.classList.remove('loading');
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = 'Log in';
-                    // Update username mapping for login
                     const user = userCredential.user;
+                    if (!user.emailVerified) {
+                        loginBtn.classList.remove('loading');
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = 'Log in';
+                        loginError.textContent = 'Please verify your email before logging in. Check your inbox for the verification link.';
+                        loginError.style.display = 'block';
+                        return;
+                    }
+                    localStorage.setItem('userPassword', password);
+                    // Update username mapping for login
                     // Fetch user profile from database
                     firebase.database().ref('users/' + user.uid).once('value').then(function(snapshot) {
                         const data = snapshot.val() || {};
@@ -558,13 +564,6 @@
                 });
         }
 
-        function forgotPassword() {
-            alert('Redirecting to password recovery...');
-        }
-
-        function signupRedirect() {
-            alert('Redirecting to signup page...');
-        }
 
         // Form validation with visual feedback
         const inputs = document.querySelectorAll('.form-input');
