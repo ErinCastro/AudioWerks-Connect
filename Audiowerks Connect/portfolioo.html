@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio - Audiowerks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #fff;
+            color: #002244;
+            margin: 0;
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.7);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .logo-container img {
+            height: 70px;
+            cursor: pointer;
+        }
+        .logo-container a {
+            display: inline-block;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+        .header-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header-icons i {
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .header-icons i:hover {
+            transform: scale(1.2);
+        }
+        .menu-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+        .menu-popup a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-popup a:hover {
+            background-color: #f0f0f0;
+        }
+        .menu-popup a:last-child {
+            background-color: #191970;
+            color: #fff;
+            border-bottom: none;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        .menu-popup a:last-child:hover {
+            background-color: #000080;
+            transform: scale(1.02);
+        }
+        .fa-bars {
+            transition: transform 0.3s;
+        }
+        .fa-bars.active {
+            transform: rotate(90deg);
+        }
+        .section-bar {
+            background: #002244;
+            color: #fff;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 10px 0 8px 0;
+            margin-top: 32px;
+            margin-bottom: 0;
+        }
+        .divider {
+            border: none;
+            border-top: 5px solid #002244;
+            margin: 0 0 32px 0;
+            width: 100%;
+        }
+        .about-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 40px;
+            max-width: 1100px;
+            margin: 32px auto 0 auto;
+            padding: 0 32px;
+        }
+        .about-img {
+            width: 350px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #e0e6ef;
+        }
+        .about-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .about-details h2 {
+            font-size: 2rem;
+            margin: 0 0 8px 0;
+            color: #002244;
+        }
+        .about-details p {
+            font-family: 'Georgia', serif;
+            font-size: 1rem;
+            margin: 0;
+            line-height: 1.7;
+            color: #222;
+        }
+        .partners-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 32px;
+            text-align: center;
+        }
+        .partners-list {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin: 32px 0 0 0;
+        }
+        .partner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .partner-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 50%;
+            background: #e0e6ef;
+            margin-bottom: 10px;
+            border: 4px solid #002244;
+        }
+        .partner-label {
+            font-size: 1.1rem;
+            color: #002244;
+            font-weight: 600;
+        }
+        .gallery-section {
+            max-width: 1100px;
+            margin: 0 auto 40px auto;
+            padding: 0 32px;
+            text-align: center;
+        }
+        .gallery-list {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+        .gallery-img {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #e0e6ef;
+        }
+        @media (max-width: 900px) {
+            .about-content, .partners-list, .gallery-list {
+                flex-direction: column;
+                align-items: center;
+            }
+            .about-img, .gallery-img, .partner-img {
+                width: 90vw;
+                max-width: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+      <div class="logo-container">
+        <a href="homepage.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" style="height: 70px;" /></a>
+      </div>
+      <div class="header-center">
+        <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
+        <p style="font-size: 1.1rem; color: #0047AB; margin: 0;">Lights and Sounds</p>
+      </div>
+      <div class="header-icons">
+        <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+      </div>
+      <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+        <a href="homepage.html">Home</a>
+        <a href="portfolioo.html">Portfolio</a>
+        <a href="#booking">Book Here</a>
+        <a href="User.html">User Profile</a>
+        <a href="#equipments">Equipments</a>
+        <a href="feedback.html">Feedback Dashboard</a>
+        <a href="login.html" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+    <div class="section-bar" id="about">About Us</div>
+    <hr class="divider">
+    <div class="about-content">
+        <img src="images/teams.png" alt="Team" class="about-img">
+        <div class="about-details">
+            <p>Established in 2010, audioWerks has over a decade of experience providing professional lights and sound services for events of all sizes. Whether it's weddings, corporate functions, concerts, or private parties, we deliver top-quality audio systems, innovative lighting designs, and reliable technical support to ensure your event shines.
+
+                Based in Bulacan, audioWerks proudly serves clients across many areas, bringing our expertise and equipment wherever your event takes place.
+                
+                Our team of skilled technicians and designers understands that every occasion is unique. We work closely with clients to tailor our services to their vision, using industry-leading equipment and creative expertise to set the perfect mood.
+                
+                At audioWerks, we're passionate about turning ordinary events into extraordinary experiences.</p>
+        </div>
+    </div>
+    <div class="section-bar" id="partners">Our Partners</div>
+    <div class="partners-section">
+        <div class="partners-list">
+            <a href="https://www.facebook.com/share/1Hp3HcJFHK/?mibextid=wwXIfr" class="partner" target="_blank" rel="noopener" style="text-decoration:none;">
+                <img src="images/eventually.png" alt="Event Partner 1" class="partner-img">
+                <div class="partner-label">Eventually Yours</div>
+            </a>
+            <a href="https://www.facebook.com/share/16q6byDWKy/?mibextid=wwXIfr" class="partner" target="_blank" rel="noopener" style="text-decoration:none;">
+                <img src="images/elegant.png" alt="Event Partner 2" class="partner-img">
+                <div class="partner-label">Elegant Events</div>
+            </a>
+        </div>
+    </div>
+    <div class="section-bar" id="gallery">Gallery</div>
+    <div class="gallery-section">
+        <div class="gallery-list">
+            <img src="images/a.jpg" alt="Gallery 1" class="gallery-img">
+            <img src="images/b.jpg" alt="Gallery 2" class="gallery-img">
+            <img src="images/c.jpg" alt="Gallery 3" class="gallery-img">
+            <img src="images/d.jpg" alt="Gallery 4" class="gallery-img">
+            <img src="images/e.jpg" alt="Gallery 5" class="gallery-img">
+            <img src="images/f.jpg" alt="Gallery 6" class="gallery-img">
+            <img src="images/g.jpg" alt="Gallery 7" class="gallery-img">
+        </div>
+    </div>
+    <script>
+      function toggleMenu(btn) {
+        const menu = document.getElementById('menuPopup');
+        const bars = document.querySelector('.fa-bars');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        bars.classList.toggle('active');
+      }
+      window.addEventListener('click', function (e) {
+        const menu = document.getElementById('menuPopup');
+        const button = document.querySelector('.fa-bars');
+        if (!menu.contains(e.target) && e.target !== button) {
+          menu.style.display = 'none';
+          button.classList.remove('active');
+        }
+      });
+      function logout() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "login.html";
+      }
+    </script>
+</body>
+</html> 
