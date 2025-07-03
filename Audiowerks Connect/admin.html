@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - AudioWerks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Copy header and menu styles from homepage.html */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+      background-blend-mode: lighten;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      backdrop-filter: blur(8px);
+    }
+    .logo-container img {
+      height: 120px;
+      cursor: pointer;
+    }
+    .logo-container a {
+      display: inline-block;
+    }
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+    .header-center h1 {
+      font-size: 64px;
+      font-weight: bold;
+      color: #0047AB;
+      text-shadow: 2px 2px #ffffff;
+    }
+    .header-center p {
+      font-size: 24px;
+      color: #0047AB;
+      text-shadow: 1px 1px #ffffff;
+    }
+    .header-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .header-icons i {
+      font-size: 28px;
+      color: #000;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .header-icons i:hover {
+      transform: scale(1.2);
+    }
+    .menu-popup {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 1000;
+      min-width: 200px;
+      transition: all 0.3s ease;
+    }
+    .menu-popup a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      border-bottom: 1px solid #eee;
+    }
+    .menu-popup a:hover {
+      background-color: #f0f0f0;
+    }
+    .menu-popup a:last-child {
+      background-color: #191970;
+      color: #fff;
+      border-bottom: none;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .menu-popup a:last-child:hover {
+      background-color: #000080;
+      transform: scale(1.02);
+    }
+    .admin-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #0047AB;
+      margin-bottom: 15px;
+    }
+
+    .card {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 15px 10px;
+      margin-top: 40px;
+    }
+    @media (max-width: 900px) {
+      header {
+        padding: 10px;
+      }
+      .logo-container img {
+        height: 80px;
+      }
+      .header-center h1 {
+        font-size: 2.2rem;
+      }
+      .header-center p {
+        font-size: 1.1rem;
+      }
+    }
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 2vw;
+      }
+      .logo-container img {
+        height: 60px;
+      }
+      .header-center h1 {
+        font-size: 1.3rem;
+      }
+      .header-center p {
+        font-size: 0.9rem;
+      }
+      .header-icons {
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .menu-popup {
+        min-width: 120px;
+        right: 10px;
+        top: 60px;
+      }
+    }
+    @media (max-width: 480px) {
+      header {
+        padding: 4px 1vw;
+      }
+      .logo-container img {
+        height: 40px;
+      }
+      .header-center h1 {
+        font-size: 1rem;
+      }
+      .header-center p {
+        font-size: 0.7rem;
+      }
+      .menu-popup {
+        min-width: 90px;
+        right: 4px;
+        top: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-container">
+    <a href="admin.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" /></a>
+  </div>
+  <div class="header-center">
+    <h1>Audiowerks</h1>
+    <p>Lights and Sounds</p>
+  </div>
+  <div class="header-icons">
+    <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+  </div>
+  <nav class="menu-popup" id="menuPopup" aria-label="Admin Navigation">
+    <a href="admin.html">Dashboard</a>
+    <a href="#chat">Chat</a>
+    <a href="provider.html">Profile</a>
+    <a href="login.html" onclick="logout()">Logout</a>
+  </nav>
+</header>
+
+<div class="admin-container">
+  <h2>Admin Dashboard</h2>
+
+  <div class="card">
+    <h3>Summary</h3>
+    <p>Total Bookings: 35</p>
+    <p>Confirmed: 20 | Pending: 10 | Cancelled: 5</p>
+  </div>
+
+  <div class="card">
+    <h3>Bookings</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Service</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Juan Dela Cruz</td>
+          <td>July 5, 2025</td>
+          <td>LED Wall</td>
+          <td>Confirmed</td>
+        </tr>
+        <tr>
+          <td>Ana Santos</td>
+          <td>July 10, 2025</td>
+          <td>Stage</td>
+          <td>Pending</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Announcements</h3>
+    <ul>
+      <li>Promo: 10% off in July <button>Edit</button> <button>Delete</button></li>
+    </ul>
+    <input type="text" placeholder="Add new announcement" />
+    <button>Add</button>
+  </div>
+
+  <!-- Remove the Services and Bundles sections from the admin dashboard -->
+
+</div>
+
+<footer>
+  <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="firebase-config-new.js"></script>
+<script src="firebase-backend-new.js"></script>
+<script>
+  // On page load, check if user is admin
+  document.addEventListener('DOMContentLoaded', async function() {
+    const user = await new Promise(resolve => {
+      firebase.auth().onAuthStateChanged(resolve);
+    });
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+    // Get username by searching users for a record with this user's email
+    let username = null;
+    const usersSnap = await firebase.database().ref('users').once('value');
+    const users = usersSnap.val() || {};
+    for (const [uname, udata] of Object.entries(users)) {
+      if (udata.email && udata.email.replace(/^"|"$/g, '') === user.email) {
+        username = uname;
+        break;
+      }
+    }
+    if (!username) {
+      alert('Access Denied: Admins only');
+      window.location.href = 'login.html';
+      return;
+    }
+    // Check if username is in admins
+    const adminSnap = await firebase.database().ref('admins/' + username).once('value');
+    if (!adminSnap.val()) {
+      alert('Access Denied: Admins only');
+      window.location.href = 'login.html';
+      return;
+    }
+    // If admin, load dashboard data
+    loadDashboard();
+  });
+
+  async function loadDashboard() {
+    // Load summary
+    const bookings = await window.getAllBookings() || {};
+    let total = 0, confirmed = 0, pending = 0, cancelled = 0;
+    Object.values(bookings).forEach(b => {
+      total++;
+      if (b.status === 'Confirmed') confirmed++;
+      else if (b.status === 'Pending') pending++;
+      else if (b.status === 'Cancelled') cancelled++;
+    });
+    document.querySelector('.card h3 + p').textContent = `Total Bookings: ${total}`;
+    document.querySelector('.card h3 + p + p').textContent = `Confirmed: ${confirmed} | Pending: ${pending} | Cancelled: ${cancelled}`;
+
+    // Load bookings table
+    const bookingsTbody = document.querySelector('.card:nth-of-type(2) tbody');
+    bookingsTbody.innerHTML = '';
+    Object.entries(bookings).forEach(([id, b]) => {
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-id', id);
+      tr.style.cursor = 'pointer';
+      tr.innerHTML = `<td>${b.customer || ''}</td><td>${b.date || ''}</td><td>${b.service || ''}</td><td>${b.status || ''}</td>`;
+      bookingsTbody.appendChild(tr);
+    });
+
+    // Load announcements
+    const announcements = await window.getAllAnnouncements() || {};
+    const annList = document.querySelector('.card:nth-of-type(3) ul');
+    annList.innerHTML = '';
+    Object.entries(announcements).forEach(([id, a]) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${a.text} <button data-id="${id}" class="edit-ann">Edit</button> <button data-id="${id}" class="del-ann">Delete</button>`;
+      annList.appendChild(li);
+    });
+
+    // Load services
+    const services = await window.getAllServices() || {};
+    const servicesTbody = document.querySelector('.card:nth-of-type(4) tbody');
+    servicesTbody.innerHTML = '';
+    Object.entries(services).forEach(([id, s]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${s.name || ''}</td><td>₱${s.price || ''}</td><td><button data-id="${id}" class="edit-service">Edit</button> <button data-id="${id}" class="del-service">Delete</button></td>`;
+      servicesTbody.appendChild(tr);
+    });
+  }
+
+  async function loadBundles() {
+    const bundles = await window.getAllBundles() || {};
+    const services = await window.getAllServices() || {};
+    // Populate bundles table
+    const bundlesTbody = document.getElementById('bundlesTbody');
+    bundlesTbody.innerHTML = '';
+    Object.entries(bundles).forEach(([id, b]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${b.name || ''}</td><td>₱${b.price || ''}</td><td>${(b.services||[]).join(', ')}</td><td><button class="edit-bundle" data-id="${id}">Edit</button> <button class="del-bundle" data-id="${id}">Delete</button></td>`;
+      bundlesTbody.appendChild(tr);
+    });
+    // Populate services checkboxes for bundle creation
+    const bundleServicesSelect = document.getElementById('bundleServicesSelect');
+    bundleServicesSelect.innerHTML = '';
+    Object.values(services).forEach(s => {
+      const label = document.createElement('label');
+      label.style.marginRight = '8px';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = s.name;
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(' ' + s.name));
+      bundleServicesSelect.appendChild(label);
+    });
+  }
+
+  const origLoadDashboard = loadDashboard;
+  loadDashboard = async function() {
+    await origLoadDashboard();
+    await loadBundles();
+  }
+
+  // TODO: Add event listeners for add/edit/delete actions for announcements and services
+
+  // --- Announcements ---
+  document.addEventListener('click', async function(e) {
+    // Add announcement
+    if (e.target && e.target.textContent === 'Add' && e.target.previousElementSibling && e.target.previousElementSibling.placeholder === 'Add new announcement') {
+      const input = e.target.previousElementSibling;
+      const text = input.value.trim();
+      if (text) {
+        await window.addAnnouncement(text);
+        input.value = '';
+        loadDashboard();
+      }
+    }
+    // Edit announcement
+    if (e.target && e.target.classList.contains('edit-ann')) {
+      const id = e.target.getAttribute('data-id');
+      const currentText = e.target.parentElement.firstChild.textContent.trim();
+      const newText = prompt('Edit announcement:', currentText);
+      if (newText && newText !== currentText) {
+        await window.updateAnnouncement(id, newText);
+        loadDashboard();
+      }
+    }
+    // Delete announcement
+    if (e.target && e.target.classList.contains('del-ann')) {
+      const id = e.target.getAttribute('data-id');
+      if (confirm('Delete this announcement?')) {
+        await window.deleteAnnouncement(id);
+        loadDashboard();
+      }
+    }
+    // Add service
+    if (e.target && e.target.id === 'addServiceBtn') {
+      const name = document.getElementById('serviceName').value.trim();
+      const price = document.getElementById('servicePrice').value.trim();
+      if (name && price) {
+        await window.addService({ name, price });
+        document.getElementById('serviceName').value = '';
+        document.getElementById('servicePrice').value = '';
+        loadDashboard();
+      }
+    }
+    // Edit service
+    if (e.target && e.target.classList.contains('edit-service')) {
+      const id = e.target.getAttribute('data-id');
+      const tr = e.target.closest('tr');
+      const currentName = tr.children[0].textContent.trim();
+      const currentPrice = tr.children[1].textContent.replace('₱','').trim();
+      const newName = prompt('Edit service name:', currentName);
+      if (newName === null) return;
+      const newPrice = prompt('Edit service price:', currentPrice);
+      if (newPrice === null) return;
+      if ((newName !== currentName || newPrice !== currentPrice) && newName && newPrice) {
+        await window.updateService(id, { name: newName, price: newPrice });
+        loadDashboard();
+      }
+    }
+    // Delete service
+    if (e.target && e.target.classList.contains('del-service')) {
+      const id = e.target.getAttribute('data-id');
+      if (confirm('Delete this service?')) {
+        await window.deleteService(id);
+        loadDashboard();
+      }
+    }
+    // Add bundle
+    if (e.target && e.target.id === 'addBundleBtn') {
+      const name = document.getElementById('bundleName').value.trim();
+      const price = document.getElementById('bundlePrice').value.trim();
+      const services = Array.from(document.querySelectorAll('#bundleServicesSelect input[type=checkbox]:checked')).map(cb => cb.value);
+      if (name && price && services.length) {
+        await window.addBundle({ name, price, services });
+        document.getElementById('bundleName').value = '';
+        document.getElementById('bundlePrice').value = '';
+        document.querySelectorAll('#bundleServicesSelect input[type=checkbox]').forEach(cb => cb.checked = false);
+        loadBundles();
+      }
+    }
+    // Edit bundle
+    if (e.target && e.target.classList.contains('edit-bundle')) {
+      const id = e.target.getAttribute('data-id');
+      const bundles = await window.getAllBundles() || {};
+      const bundle = bundles[id];
+      if (!bundle) return;
+      const newName = prompt('Edit bundle name:', bundle.name);
+      if (newName === null) return;
+      const newPrice = prompt('Edit bundle price:', bundle.price);
+      if (newPrice === null) return;
+      // For services, simple prompt for comma-separated list
+      const newServices = prompt('Edit included services (comma separated):', (bundle.services||[]).join(', '));
+      if (newName && newPrice && newServices) {
+        await window.updateBundle(id, { name: newName, price: newPrice, services: newServices.split(',').map(s => s.trim()).filter(Boolean) });
+        loadBundles();
+      }
+    }
+    // Delete bundle
+    if (e.target && e.target.classList.contains('del-bundle')) {
+      const id = e.target.getAttribute('data-id');
+      if (confirm('Delete this bundle?')) {
+        await window.deleteBundle(id);
+        loadBundles();
+      }
+    }
+  });
+
+  // Remove the extra input row and 'Add Service' button above the main add service row
+  // Find and remove the input and button elements with placeholder 'New service name' and 'Price' and the button with text 'Add Service'
+  document.addEventListener('DOMContentLoaded', function() {
+    // Remove the extra add service row if it exists
+    const servicesCard = document.querySelector('.card:nth-of-type(4)');
+    const inputs = servicesCard.querySelectorAll('input');
+    inputs.forEach(input => {
+      if (input.placeholder === 'New service name' || input.placeholder === 'Price') {
+        input.remove();
+      }
+    });
+    const addServiceBtn = Array.from(servicesCard.querySelectorAll('button')).find(btn => btn.textContent === 'Add');
+    if (addServiceBtn) addServiceBtn.remove();
+  });
+
+  // Replace toggleMenu with homepage version
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    bars.classList.toggle('active');
+  }
+
+  function logout() {
+    // clear sessionStorage or tokens if any
+    alert("You have been logged out.");
+  }
+
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (!menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
+  // Modal for booking details
+  function showBookingModal(booking) {
+    let modal = document.getElementById('bookingModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bookingModal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(0,0,0,0.4)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '2000';
+      modal.innerHTML = `<div style="background:#fff;padding:30px 40px;border-radius:10px;min-width:300px;max-width:90vw;box-shadow:0 2px 16px #0003;position:relative;">
+        <button id="closeBookingModal" style="position:absolute;top:10px;right:10px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
+        <h3>Booking Details</h3>
+        <div id="bookingModalContent"></div>
+      </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('#closeBookingModal').onclick = () => { modal.style.display = 'none'; };
+    }
+    // Fill modal content
+    const content = modal.querySelector('#bookingModalContent');
+    content.innerHTML = Object.entries(booking).map(([k,v]) => `<b>${k}:</b> ${v}<br>`).join('');
+    modal.style.display = 'flex';
+  }
+
+  // Booking row click event
+  document.addEventListener('click', function(e) {
+    const tr = e.target.closest('tr[data-id]');
+    if (tr && tr.parentElement.parentElement.parentElement.previousElementSibling && tr.parentElement.parentElement.parentElement.previousElementSibling.textContent.includes('Bookings')) {
+      const bookingId = tr.getAttribute('data-id');
+      window.getAllBookings().then(bookings => {
+        if (bookings && bookings[bookingId]) {
+          showBookingModal(bookings[bookingId]);
+        }
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
