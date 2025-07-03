@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="chart.umd.js"></script>
+    <title>Feedback Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #e8e8e8;
+        }
+
+        .header {
+            background: #0f3460;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid white;
+        }
+
+        .avatar::before {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 50%;
+        }
+
+        .user-details h3 {
+            color: white;
+            font-size: 16px;
+            margin-bottom: 2px;
+            font-weight: normal;
+        }
+
+        .user-details p {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .help-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f3460;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .dashboard-title {
+            background: #0f3460;
+            text-align: center;
+            padding: 40px;
+            color: white;
+            font-size: 36px;
+            font-weight: normal;
+        }
+
+        .main-content {
+            padding: 40px;
+            background: #e8e8e8;
+        }
+
+        .stats-section {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .pie-chart {
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: conic-gradient(
+                #1f4e79 0deg 45deg,
+                #4a90e2 45deg 118.8deg,
+                #87ceeb 118.8deg 223.2deg,
+                #2d5aa0 223.2deg 360deg
+            );
+            position: relative;
+        }
+
+        .chart-labels {
+            text-align: left;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .label {
+            margin-bottom: 8px;
+        }
+
+        .stat-card {
+            background: #0f3460;
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            text-align: center;
+            width: 300px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .change {
+            font-size: 16px;
+        }
+
+        .stat-card .change-detail {
+            font-size: 14px;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .reviews-section {
+            background: #0f3460;
+            padding: 30px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .reviews-section h2 {
+            color: white;
+            font-size: 24px;
+            font-weight: normal;
+        }
+
+        .reviews-container {
+            background: #e8e8e8;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .reviews-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .review-card {
+            background: #0f3460;
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            min-width: 220px;
+            flex-shrink: 0;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .review-avatar::before {
+            content: '';
+            width: 24px;
+            height: 24px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+        }
+
+        .review-content h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+
+        .stars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .star {
+            color: #ffd700;
+            font-size: 18px;
+        }
+
+        .star.empty {
+            color: rgba(255,255,255,0.3);
+        }
+
+        .add-review-btn {
+            background: #0f3460;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .add-review-btn:hover {
+            background: #1f4e79;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="user-info">
+            <div class="avatar"></div>
+            <div class="user-details">
+                <h3 id="dashboard-username"></h3>
+                <p>Manage Account</p>
+            </div>
+        </div>
+        <div class="help-icon">?</div>
+    </header>
+
+    <div class="dashboard-title">
+        Feedback Dashboard
+    </div>
+
+    <main class="main-content">
+        <div class="stats-section">
+            <div class="chart-container">
+                <canvas id="pieChart" width="280" height="280"></canvas>
+                <div class="chart-labels">
+                    <div class="label">Metro Manila<br>12.5%</div><br>
+                    <div class="label">Tagaytay<br>37.5%</div><br>
+                    <div class="label">Cavite<br>20.8%</div><br>
+                    <div class="label">Batangas<br>29.2%</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Most Serviced Place</h3>
+                <div class="value" id="most-serviced-place"></div>
+                <div class="change" id="most-serviced-place-change"></div>
+                <div class="change-detail">From Last Month</div>
+            </div>
+
+            <div class="stat-card">
+                <h3>Most Availed Service</h3>
+                <div class="value" id="most-availed-service"></div>
+                <div class="change" id="most-availed-service-change"></div>
+                <div class="change-detail">From Last Month</div>
+            </div>
+        </div>
+
+        <div class="reviews-section">
+            <h2>Reviews</h2>
+        </div>
+        
+        <div class="reviews-container">
+            <div class="reviews-grid" id="reviews-grid"></div>
+            <div class="reviews-pagination" style="text-align:center; margin-top:10px;">
+                <button id="prevReviewsBtn">Previous</button>
+                <button id="nextReviewsBtn">Next</button>
+            </div>
+            <button class="add-review-btn" id="addReviewBtn">Add A Review</button>
+        </div>
+    </main>
+
+    <!-- Modal for adding a review -->
+    <div id="reviewModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+        <div style="background:white; padding:30px; border-radius:10px; max-width:400px; margin:auto;">
+            <h3>Add Your Review</h3>
+            <textarea id="reviewText" rows="4" style="width:100%;" placeholder="Your review"></textarea>
+            <br>
+            <label>Rating:
+                <select id="reviewRating">
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★☆</option>
+                    <option value="3">★★★☆☆</option>
+                    <option value="2">★★☆☆☆</option>
+                    <option value="1">★☆☆☆☆</option>
+                </select>
+            </label>
+            <br><br>
+            <button id="submitReviewBtn">Submit</button>
+            <button onclick="document.getElementById('reviewModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <script type="module">
+    import supabase from './supabase.js';
+
+    const userId = localStorage.getItem('user_id');
+    const username = localStorage.getItem('username');
+
+    let allReviews = [];
+    let reviewsPerPage = 3; // Change to 4 if you want 4 per page
+    let currentPage = 0;
+
+    // Fetch all reviews once
+    async function loadReviews() {
+        let { data: reviews, error } = await supabase
+            .from('reviews')
+            .select('review_text,rating,users(username)')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            alert('Failed to load reviews');
+            return;
+        }
+        allReviews = reviews;
+        currentPage = 0;
+        renderReviews();
+    }
+
+    function renderReviews() {
+        const reviewsGrid = document.getElementById('reviews-grid');
+        reviewsGrid.innerHTML = '';
+        const start = currentPage * reviewsPerPage;
+        const end = start + reviewsPerPage;
+        const reviewsToShow = allReviews.slice(start, end);
+
+        reviewsToShow.forEach(r => {
+            reviewsGrid.innerHTML += `
+                <div class="review-card">
+                    <div class="review-avatar"></div>
+                    <div class="review-content">
+                        <h4>${r.review_text}</h4>
+                        <div class="stars">
+                            ${'★'.repeat(r.rating)}${'★'.repeat(5 - r.rating).replace(/★/g, '<span class=\"star empty\">★</span>')}
+                        </div>
+                        <div style="font-size:12px; color:#ccc;">by @${r.users?.username || 'user'}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Disable/enable buttons
+        document.getElementById('prevReviewsBtn').disabled = currentPage === 0;
+        document.getElementById('nextReviewsBtn').disabled = end >= allReviews.length;
+    }
+
+    // Pagination button handlers
+    document.getElementById('prevReviewsBtn').onclick = function() {
+        if (currentPage > 0) {
+            currentPage--;
+            renderReviews();
+        }
+    };
+    document.getElementById('nextReviewsBtn').onclick = function() {
+        if ((currentPage + 1) * reviewsPerPage < allReviews.length) {
+            currentPage++;
+            renderReviews();
+        }
+    };
+
+    // Add review logic (same as before)
+    document.getElementById('addReviewBtn').onclick = async function() {
+        if (!userId) {
+            alert('You must be logged in to add a review.');
+            return;
+        }
+        let { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('id')
+            .eq('user_id', userId)
+            .limit(1);
+
+        if (error || !bookings || bookings.length === 0) {
+            alert('You must have a booking to add a review.');
+            return;
+        }
+        document.getElementById('reviewModal').style.display = 'flex';
+    };
+
+    document.getElementById('submitReviewBtn').onclick = async function() {
+        const reviewText = document.getElementById('reviewText').value.trim();
+        const rating = parseInt(document.getElementById('reviewRating').value, 10);
+
+        if (!reviewText) {
+            alert('Review cannot be empty.');
+            return;
+        }
+
+        let { error } = await supabase
+            .from('reviews')
+            .insert([{ user_id: userId, review_text: reviewText, rating }]);
+
+        if (error) {
+            alert('Failed to submit review.');
+            return;
+        }
+
+        document.getElementById('reviewModal').style.display = 'none';
+        document.getElementById('reviewText').value = '';
+        loadReviews();
+    };
+
+    // Initial load
+    loadReviews();
+
+    async function loadPieChartData() {
+        // Fetch all bookings and their locations
+        let { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('location');
+
+        if (error) {
+            alert('Failed to load bookings data');
+            return;
+        }
+
+        // Count bookings per location
+        const locations = ['Metro Manila', 'Tagaytay', 'Cavite', 'Batangas', 'Bulacan'];
+        const counts = locations.map(loc =>
+            bookings.filter(b => b.location === loc).length
+        );
+
+        // Render the chart
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: locations,
+                datasets: [{
+                    data: counts,
+                    backgroundColor: [
+                        '#1f4e79', '#232a6d', '#4a90e2', '#87ceeb'
+                    ]
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
+        });
+    }
+
+    loadPieChartData();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('dashboard-username').textContent = '@' + username;
+    });
+
+    async function updateStatCards() {
+        // Fetch all bookings
+        let { data: bookings, error } = await supabase
+            .from('bookings')
+            .select('location,service,created_at');
+
+        if (error) {
+            alert('Failed to load bookings data');
+            return;
+        }
+
+        // Most Serviced Place
+        const locationCounts = {};
+        bookings.forEach(b => {
+            locationCounts[b.location] = (locationCounts[b.location] || 0) + 1;
+        });
+        const mostServicedPlace = Object.entries(locationCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+        // Most Availed Service
+        const serviceCounts = {};
+        bookings.forEach(b => {
+            serviceCounts[b.service] = (serviceCounts[b.service] || 0) + 1;
+        });
+        const mostAvailedService = Object.entries(serviceCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+        // (Optional) Calculate change from last month
+        // You can add logic here to compare counts from previous month if you want
+
+        // Update DOM
+        document.getElementById('most-serviced-place').textContent = mostServicedPlace;
+        document.getElementById('most-availed-service').textContent = mostAvailedService;
+        // You can also update the .change fields if you calculate the change
+    }
+
+    updateStatCards();
+    </script>
+
+    <!-- Add these before the closing </body> tag -->
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-backend.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('feedbackForm');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          // Collect feedback fields (customize as needed)
+          const feedback = document.getElementById('feedbackText').value;
+          const feedbackObj = { feedback, timestamp: Date.now() };
+          submitFeedback(feedbackObj)
+            .then(() => {
+              const successDiv = document.getElementById('feedbackSuccess');
+              if (successDiv) successDiv.textContent = 'Feedback submitted successfully!';
+            })
+            .catch(error => {
+              const errorDiv = document.getElementById('feedbackError');
+              if (errorDiv) errorDiv.textContent = error.message;
+            });
+        });
+      }
+    });
+    </script>
+
+    <form id="feedbackForm">
+      <textarea id="feedbackText" placeholder="Your feedback" required></textarea>
+      <button type="submit">Submit Feedback</button>
+    </form>
+    <div id="feedbackSuccess" style="color:green;"></div>
+    <div id="feedbackError" style="color:red;"></div>
+</body>
+</html>

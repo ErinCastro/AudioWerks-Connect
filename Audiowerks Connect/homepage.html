@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AudioWerks - Lights and Sounds Services</title>
+  <meta name="description" content="AudioWerks offers premium lights, sounds, and event equipment rentals. Book or inquire today!" />
+  <meta name="keywords" content="AudioWerks, lights, sounds, event, rental, LED, stage, fog, string lights, mood lights" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', Arial, sans-serif;
+    }
+
+    body {
+      background: url('dot-bg.png') center center/cover no-repeat, #f8f9fa;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      scroll-behavior: smooth;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+
+    .logo-container img {
+      height: 120px;
+      cursor: pointer;
+    }
+
+    .logo-container a {
+      display: inline-block;
+    }
+
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+
+    .header-center h1 {
+      font-size: 64px;
+      font-weight: bold;
+      color: #0047AB;
+      text-shadow: 2px 2px #ffffff;
+    }
+
+    .header-center p {
+      font-size: 24px;
+      color: #0047AB;
+      text-shadow: 1px 1px #ffffff;
+    }
+
+    .header-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .header-icons i {
+      font-size: 28px;
+      color: #000;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .header-icons i:hover {
+      transform: scale(1.2);
+    }
+
+    .menu-popup {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 1000;
+      min-width: 200px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-popup a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      border-bottom: 1px solid #eee;
+    }
+
+    .menu-popup a:hover {
+      background-color: #f0f0f0;
+    }
+
+    .menu-popup a:last-child {
+      background-color: #191970;
+      color: #fff;
+      border-bottom: none;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+
+    .menu-popup a:last-child:hover {
+      background-color: #000080;
+      transform: scale(1.02);
+    }
+
+    .section-title {
+      background-color: #000;
+      font-style: italic;
+      color: #bccedf;
+      text-align: center;
+      padding: 10px;
+      font-size: 48px;
+      border-radius: 12px;
+      margin: 20px;
+    }
+
+    /* Updated services-grid and card styles */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 40px;
+      padding: 0 20px 40px;
+    }
+
+    .service-card {
+      background-color: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.13);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+      min-height: 340px;
+    }
+
+    .service-card:focus {
+      outline: 3px solid #ffc300;
+    }
+
+    .service-card:hover {
+      transform: scale(1.04) translateY(-6px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+
+    .service-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      transition: filter 0.3s;
+    }
+
+    .service-card:hover img {
+      filter: brightness(0.85);
+    }
+
+    .service-card .img-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 150px;
+      background: rgba(25,25,112,0.25);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .service-card:hover .img-overlay {
+      opacity: 1;
+    }
+
+    .service-title {
+      background-color: #000;
+      color: #fff;
+      padding: 15px 10px 8px;
+      font-weight: bold;
+      font-size: 20px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 8px #191970;
+    }
+
+    .service-desc {
+      color: #191970;
+      font-size: 1rem;
+      padding: 10px 18px 0;
+      min-height: 48px;
+    }
+
+    .book-now-btn {
+      margin: 18px auto 18px;
+      padding: 10px 28px;
+      background: #ffc300;
+      color: #191970;
+      font-weight: 600;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: block;
+    }
+
+    .book-now-btn:hover, .book-now-btn:focus {
+      background: #191970;
+      color: #ffc300;
+      transform: scale(1.07);
+      outline: none;
+    }
+
+    .carousel-container {
+      max-width: 95%;
+      margin: 0 auto 40px;
+      border: 2px solid #bccedf;
+      border-radius: 16px;
+      overflow: hidden;
+      padding: 10px;
+      background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+      position: relative;
+    }
+
+    .carousel-container::before, .carousel-container::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 60px;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .carousel-container::before {
+      left: 0;
+      background: linear-gradient(to right, #191970 80%, transparent);
+    }
+
+    .carousel-container::after {
+      right: 0;
+      background: linear-gradient(to left, #191970 80%, transparent);
+    }
+
+    .carousel-track {
+      display: flex;
+      width: max-content;
+      animation: scrollLeft 60s linear infinite;
+    }
+
+    .carousel-track img {
+      width: 300px;
+      height: 200px;
+      object-fit: cover;
+      margin-right: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      border: none;
+      font-size: 2rem;
+      padding: 8px 14px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 2;
+      transition: background 0.2s;
+    }
+
+    .carousel-arrow:hover {
+      background: #0047AB;
+    }
+
+    .carousel-arrow.left { left: 10px; }
+    .carousel-arrow.right { right: 10px; }
+
+    .cta-section {
+      background: linear-gradient(to right, #0047AB, #191970);
+      color: white;
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .cta-button {
+      margin-top: 15px;
+      display: inline-block;
+      padding: 12px 30px;
+      background: #ffc300;
+      color: #000;
+      font-weight: bold;
+      border-radius: 25px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .cta-button:hover {
+      background: #e6b800;
+    }
+
+    footer {
+      background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+      color: white;
+      text-align: center;
+      padding: 25px 10px 15px;
+      margin-top: auto;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      position: relative;
+    }
+
+    .footer-social {
+      margin: 10px 0 5px;
+    }
+
+    .footer-social a {
+      color: #bccedf;
+      margin: 0 8px;
+      font-size: 1.5rem;
+      transition: color 0.2s;
+    }
+
+    .footer-social a:hover {
+      color: #ffc300;
+    }
+
+    .footer-contact span {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .footer-note {
+      margin: 8px 0 0;
+      font-size: 1rem;
+      color: #bccedf;
+    }
+
+    .back-to-top {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: #ffc300;
+      color: #191970;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .back-to-top:hover {
+      background: #191970;
+      color: #ffc300;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .services-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 20px;
+      }
+      .service-card img, .service-card .img-overlay {
+        height: 32vw;
+        min-height: 120px;
+        max-height: 180px;
+      }
+      .header-icons {
+        flex-direction: row;
+        justify-content: flex-end;
+      }
+      .header-center h1 {
+        font-size: 36px;
+      }
+      .header-center p {
+        font-size: 18px;
+      }
+      .carousel-track img {
+        width: 80vw;
+        height: auto;
+      }
+      .carousel-container::before, .carousel-container::after {
+        width: 20px;
+      }
+    }
+
+    /* HERO SECTION */
+    .hero-section {
+      position: relative;
+      background: url('images/lights-sounds.png') center/cover no-repeat;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      margin-bottom: 30px;
+    }
+    .hero-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 25, 112, 0.7);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .hero-content h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 8px #000;
+    }
+    .hero-content p {
+      font-size: 1.3rem;
+      margin-bottom: 25px;
+      text-shadow: 1px 1px 6px #000;
+    }
+    .hero-content .cta-button {
+      margin: 0 10px;
+    }
+
+    /* Hamburger Animation */
+    .fa-bars {
+      transition: transform 0.3s;
+    }
+    .fa-bars.active {
+      transform: rotate(90deg);
+    }
+
+    @keyframes scrollLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <a href="#hero"><img src="logo.png" alt="AudioWerks Logo, click to go home" /></a>
+    </div>
+    <div class="header-center">
+      <h1>Audiowerks</h1>
+      <p>Lights and Sounds</p>
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+    </div>
+    <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+      <a href="homepage.html">Home</a>
+      <a href="#booking">Book Here</a>
+      <a href="User.html">User Profile</a>
+      <a href="#equipments">Equipments</a>
+      <a href="#feedback">Feedback Dashboard</a>
+      <a href="login.html" onclick="logout()">Logout</a>
+    </nav>
+  </header>
+
+  <section class="hero-section" id="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>Light Up Your Event with AudioWerks</h1>
+      <p>Premium lights, sounds, and event equipment for unforgettable experiences.</p>
+      <a href="#booking" class="cta-button">Book Now</a>
+    </div>
+  </section>
+
+  <div class="section-title" id="equipments">OUR SERVICES</div>
+  <div class="services-grid">
+    <div class="service-card" data-aos="fade-up" tabindex="0">
+      <img src="images/lights-sounds.png" alt="Professional lights and sounds setup" />
+      <div class="service-title">Lights & Sounds</div>
+      <div class="service-desc">Top-tier lighting and sound systems for any event size.</div>
+      <button class="book-now-btn">Book Now</button>
+    </div>
+    <div class="service-card" data-aos="fade-up" tabindex="0">
+      <img src="images/string-lights.png" alt="String lights for events" />
+      <div class="service-title">String Lights</div>
+      <div class="service-desc">Create magical ambiances with our elegant string lighting.</div>
+      <button class="book-now-btn">Book Now</button>
+    </div>
+    <div class="service-card" data-aos="fade-up" tabindex="0">
+      <img src="images/mood-lights.png" alt="Mood lighting for parties" />
+      <div class="service-title">Mood Lights</div>
+      <div class="service-desc">Set the perfect mood with customizable color and intensity.</div>
+      <button class="book-now-btn">Book Now</button>
+    </div>
+    <div class="service-card" data-aos="fade-up" tabindex="0">
+      <img src="images/led-wall.png" alt="LED wall for events" />
+      <div class="service-title">LED Wall</div>
+      <div class="service-desc">High-resolution LED walls for dynamic visuals and presentations.</div>
+      <button class="book-now-btn">Book Now</button>
+    </div>
+    <div class="service-card" data-aos="fade-up" tabindex="0">
+      <img src="images/stage.png" alt="Stage setup" />
+      <div class="service-title">Stage</div>
+      <div class="service-desc">Sturdy, modular stages for performances, speeches, and more.</div>
+      <button class="book-now-btn">Book Now</button>
+    </div>
+    <div class="service-card" data-aos="fade-up" tabindex="0">
+      <img src="images/low-lying.jpg" alt="Low lying fog machine effect" />
+      <div class="service-title">Low Lying Fog</div>
+      <div class="service-desc">Create dramatic effects with our low-lying fog machines.</div>
+      <button class="book-now-btn">Book Now</button>
+    </div>
+  </div>
+
+  <div class="carousel-container">
+    <div class="carousel-track">
+      <img src="images/slide1.png" alt="Event setup with vibrant lights" />
+      <img src="images/slide2.png" alt="Professional sound system on stage" />
+      <img src="images/led.png" alt="LED wall display at event" />
+      <img src="images/slide4.png" alt="Stage lighting in action" />
+      <img src="images/slide 5.png" alt="Crowd enjoying the event" />
+      <img src="images/slide 6.png" alt="DJ booth with lights" />
+      <img src="images/slide1.png" alt="Event setup with vibrant lights" />
+      <img src="images/slide2.png" alt="Professional sound system on stage" />
+      <img src="images/led.png" alt="LED wall display at event" />
+      <img src="images/slide4.png" alt="Stage lighting in action" />
+      <img src="images/slide 5.png" alt="Crowd enjoying the event" />
+      <img src="images/slide 6.png" alt="DJ booth with lights" />
+    </div>
+  </div>
+
+  <section class="cta-section" id="booking">
+    <h2>Ready to Light Up Your Event?</h2>
+    <p>Contact us now to book our services!</p>
+    <a href="#booking-form" class="cta-button">Book Now</a>
+  </section>
+
+  <section id="booking-form" style="padding:30px 10px;text-align:center;">
+    <h3>Booking Form (Coming Soon)</h3>
+    <p>We're working on an easy way to book online. For now, please <a href="#inquire">inquire here</a>.</p>
+  </section>
+
+  <section id="feedback" style="padding:30px 10px;text-align:center;">
+    <h3>Feedback Dashboard (Coming Soon)</h3>
+    <p>We value your feedback! Stay tuned for our interactive dashboard.</p>
+  </section>
+
+  <footer>
+    <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+    <div class="footer-social">
+      <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+    </div>
+    <div class="footer-contact">
+      <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+    </div>
+    <div class="footer-note">
+      <span>You can also contact us directly on this website.</span>
+    </div>
+    <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+  </footer>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script>
+    AOS.init();
+    // Hamburger menu animation and toggle
+    function toggleMenu(btn) {
+      const menu = document.getElementById('menuPopup');
+      const bars = document.querySelector('.fa-bars');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      bars.classList.toggle('active');
+    }
+    window.addEventListener('click', function (e) {
+      const menu = document.getElementById('menuPopup');
+      const button = document.querySelector('.fa-bars');
+      if (!menu.contains(e.target) && e.target !== button) {
+        menu.style.display = 'none';
+        button.classList.remove('active');
+      }
+    });
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        const targetId = this.getAttribute('href').slice(1);
+        const target = document.getElementById(targetId);
+        if (target) {
+          e.preventDefault();
+          window.scrollTo({
+            top: target.offsetTop - 60,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    // Carousel functionality (auto-scroll only, no arrows)
+     let carouselIndex = 3;
+    let carouselTrack, carouselImages, visibleCount = 3, imgWidth;
+    let autoScroll;
+    function updateCarouselVars() {
+      carouselTrack = document.getElementById('carouselTrack');
+      carouselImages = carouselTrack.querySelectorAll('img');
+      imgWidth = carouselImages[0].offsetWidth + 10;
+    }
+    function updateCarousel(animate = true) {
+      if (animate) carouselTrack.style.transition = 'transform 0.5s';
+      else carouselTrack.style.transition = 'none';
+      carouselTrack.style.transform = `translateX(-${carouselIndex * imgWidth}px)`;
+    }
+    function moveCarousel(dir = 1) {
+      carouselIndex += dir;
+      updateCarousel(true);
+    }
+    function handleTransitionEnd() {
+      // If at a clone, jump to the real slide instantly
+      if (carouselImages[carouselIndex].classList.contains('clone')) {
+        if (carouselIndex < visibleCount) {
+          carouselIndex = carouselImages.length - visibleCount * 2 + carouselIndex;
+          updateCarousel(false);
+        } else if (carouselIndex >= carouselImages.length - visibleCount) {
+          carouselIndex = carouselIndex - (carouselImages.length - visibleCount);
+          updateCarousel(false);
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      updateCarouselVars();
+      updateCarousel(false);
+      autoScroll = setInterval(() => moveCarousel(1), 4000);
+      carouselTrack.addEventListener('mouseenter', () => clearInterval(autoScroll));
+      carouselTrack.addEventListener('mouseleave', () => autoScroll = setInterval(() => moveCarousel(1), 4000));
+      carouselTrack.addEventListener('transitionend', handleTransitionEnd);
+    });
+    window.addEventListener('resize', () => {
+      updateCarouselVars();
+      updateCarousel(false);
+    });
+    // Accessibility: allow keyboard navigation for menu and cards
+    document.querySelectorAll('.service-card, .fa-bars').forEach(el => {
+      el.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.click();
+        }
+      });
+    });
+    function logout() {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
