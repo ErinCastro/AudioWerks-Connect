@@ -6,38 +6,164 @@
     <title>Audiowerks - Feedback Dashboard</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif;
         }
-
         body {
-            font-family: 'Arial', sans-serif;
-            background: #ffffff;
-            color: #333;
-        }
-
-        .header {
-            background: #002244;
-            color: #ffffff;
-            padding: 15px 30px;
+            background: #fff;
+            color: #000;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            padding: 20px;
+            background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+            background-blend-mode: lighten;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .logo-container img {
+            height: 120px;
+            cursor: pointer;
+        }
+        .logo-container a {
+            display: inline-block;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+        .header-center h1 {
+            font-size: 64px;
+            font-weight: bold;
+            color: #0047AB;
+            text-shadow: 2px 2px #ffffff;
+        }
+        .header-center p {
+            font-size: 24px;
+            color: #0047AB;
+            text-shadow: 1px 1px #ffffff;
+        }
+        .header-icons {
+            display: flex;
+            flex-direction: column;
             gap: 15px;
+        }
+        .header-icons i {
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .header-icons i:hover {
+            transform: scale(1.2);
+        }
+        .menu-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+            transition: all 0.3s ease;
+            animation: fadeInMenu 0.2s;
+        }
+        @keyframes fadeInMenu {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .menu-popup a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-popup a:hover {
+            background-color: #f0f0f0;
+        }
+        .menu-popup a:last-child {
+            background-color: #191970;
+            color: #fff;
+            border-bottom: none;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        .menu-popup a:last-child:hover {
+            background-color: #000080;
+            transform: scale(1.02);
+        }
+        .fa-bars {
+            transition: transform 0.3s;
+        }
+        .fa-bars.active {
+            transform: rotate(90deg);
+        }
+        footer {
+            background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 10px 15px;
+            margin-top: auto;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
             position: relative;
         }
-
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            background: white;
+        .footer-social {
+            margin: 10px 0 5px;
+        }
+        .footer-social a {
+            color: #bccedf;
+            margin: 0 8px;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+        .footer-social a:hover {
+            color: #ffc300;
+        }
+        .footer-contact span {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .footer-note {
+            margin: 8px 0 0;
+            font-size: 1rem;
+            color: #bccedf;
+        }
+        .back-to-top {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: #ffc300;
+            color: #191970;
+            border: none;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: background 0.2s, color 0.2s;
+        }
+        .back-to-top:hover {
+            background: #191970;
+            color: #ffc300;
         }
 
         .user-icon {
@@ -495,6 +621,13 @@
             /* No color change */
         }
     </style>
+    <style>
+      header {
+        background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7) !important;
+        background-blend-mode: lighten !important;
+        backdrop-filter: blur(8px) !important;
+      }
+    </style>
 </head>
 <body>
     <header>
@@ -518,15 +651,6 @@
         <a href="login.html" onclick="logout()">Logout</a>
       </nav>
     </header>
-    <div class="header">
-        <div class="user-avatar">
-            <div class="user-icon"></div>
-        </div>
-        <div class="user-info">
-            <h3>@username</h3>
-        </div>
-    </div>
-    <hr class="white-divider">
 
     <div class="dashboard-header">
         <h1>Feedback Dashboard</h1>
@@ -790,9 +914,15 @@
         function toggleMenu(btn) {
           const menu = document.getElementById('menuPopup');
           const bars = document.querySelector('.fa-bars');
-          menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-          bars.classList.toggle('active');
+          if (menu.style.display === 'block') {
+            menu.style.display = 'none';
+            bars.classList.remove('active');
+          } else {
+            menu.style.display = 'block';
+            bars.classList.add('active');
+          }
         }
+        // Close menu on outside click or link click
         window.addEventListener('click', function (e) {
           const menu = document.getElementById('menuPopup');
           const button = document.querySelector('.fa-bars');
@@ -801,9 +931,28 @@
             button.classList.remove('active');
           }
         });
+        document.querySelectorAll('.menu-popup a').forEach(link => {
+          link.addEventListener('click', function() {
+            document.getElementById('menuPopup').style.display = 'none';
+            document.querySelector('.fa-bars').classList.remove('active');
+          });
+        });
         function logout() {
           localStorage.clear();
           sessionStorage.clear();
           window.location.href = "login.html";
         }
     </script>
+    <footer>
+      <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+      </div>
+      <div class="footer-contact">
+        <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+      </div>
+      <div class="footer-note">
+        <span>You can also contact us directly on this website.</span>
+      </div>
+      <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+    </footer>

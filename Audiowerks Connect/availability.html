@@ -6,70 +6,157 @@
   <title>Equipment Availability - Audiowerks</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    body {
-      font-family: 'Georgia', serif;
-      background: #fff;
-      color: #002244;
-      margin: 0;
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
     }
-    header {
-      background: #002244;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 0 0 0 18px;
-      height: 80px;
-      position: relative;
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #ffffff;
+      color: #333;
+    }
+    .header {
+        background: #002244;
+        color: #ffffff;
+        padding: 15px 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
     }
     .user-avatar {
-      width: 70px;
-      height: 70px;
-      background: #fff;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 16px;
-      margin-top: 5px;
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #3b82f6;
     }
-    .user-avatar i {
-      color: #002244;
-      font-size: 2.5rem;
+    .user-icon {
+        width: 30px;
+        height: 30px;
+        background: #1e3a8a;
+        border-radius: 50%;
+        position: relative;
     }
-    .user-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      margin-right: 24px;
+    .user-icon::before {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-radius: 50%;
+        top: 6px;
+        left: 9px;
+    }
+    .user-icon::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 10px;
+        background: white;
+        border-radius: 10px 10px 0 0;
+        bottom: 4px;
+        left: 5px;
     }
     .user-info h3 {
-      font-size: 1.1rem;
-      margin: 0 0 2px 0;
-      font-weight: 400;
+        font-size: 16px;
+        margin-bottom: 3px;
     }
-    .user-info a {
-      color: #fff;
-      font-size: 0.95rem;
-      text-decoration: underline;
-      opacity: 0.85;
-      margin-top: 2px;
+    .user-info p {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+        background-blend-mode: lighten;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .logo-container img {
+        height: 70px;
+        cursor: pointer;
+    }
+    .logo-container a {
+        display: inline-block;
+    }
+    .header-center {
+        text-align: center;
+        flex: 1;
     }
     .header-icons {
-      position: absolute;
-      right: 32px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
     .header-icons i {
-      font-size: 2.2rem;
-      color: #fff;
-      cursor: pointer;
-      transition: color 0.2s;
+        font-size: 28px;
+        color: #000;
+        cursor: pointer;
+        transition: transform 0.2s;
     }
     .header-icons i:hover {
-      color: #b0b6be;
+        transform: scale(1.2);
+    }
+    .menu-popup {
+        display: none;
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        z-index: 1000;
+        min-width: 200px;
+        transition: all 0.3s ease;
+    }
+    .menu-popup a {
+        display: block;
+        padding: 10px 15px;
+        color: #000;
+        text-decoration: none;
+        border-bottom: 1px solid #eee;
+    }
+    .menu-popup a:hover {
+        background-color: #f0f0f0;
+    }
+    .menu-popup a:last-child {
+        background-color: #191970;
+        color: #fff;
+        border-bottom: none;
+        transition: background 0.3s ease, transform 0.2s;
+    }
+    .menu-popup a:last-child:hover {
+        background-color: #000080;
+        transform: scale(1.02);
+    }
+    .fa-bars {
+        transition: transform 0.3s;
+    }
+    .fa-bars.active {
+        transform: rotate(90deg);
+    }
+    .white-divider {
+        border: none;
+        height: 6px;
+        background: #fff;
+        border-radius: 3px;
+        margin: 18px 0 28px 0;
+        width: 100%;
+        box-shadow: 0 2px 8px rgba(30,58,138,0.10);
     }
     .tab-bar {
       background: #002244;
@@ -116,179 +203,193 @@
       font-weight: bold;
       border: none;
     }
-    .main-table {
+    .section-title {
+      text-align: center;
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: #0047AB;
+      margin: 36px 0 18px 0;
+      letter-spacing: 1px;
+    }
+    .main-card, .bundle-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(0,34,68,0.08);
+      padding: 32px 18px 24px 18px;
+      margin: 0 auto 36px auto;
+      max-width: 1100px;
+    }
+    .main-table, .bundle-table {
       width: 100%;
       border-collapse: separate;
-      border-spacing: 0;
-      margin-top: 24px;
+      border-spacing: 0 12px;
+      margin-top: 12px;
     }
-    .main-table tr {
-      border-bottom: 6px solid #000;
+    .main-table th, .bundle-table th {
+      background: #eaf1fb;
+      color: #0047AB;
+      font-weight: 700;
+      padding: 16px 10px;
+      font-size: 1.1rem;
+      border-radius: 10px 10px 0 0;
     }
-    .main-table td {
-      padding: 24px 18px;
+    .main-table td, .bundle-table td {
+      background: #f9f9fb;
+      padding: 18px 12px;
+      font-size: 1.08rem;
       vertical-align: middle;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(30,58,138,0.04);
+    }
+    .main-table tr:hover, .bundle-table tr:hover {
+      background: #e0eaff;
+      transition: background 0.2s;
     }
     .product-img {
-      width: 140px;
-      height: 140px;
+      width: 90px;
+      height: 90px;
       object-fit: cover;
-      border: 4px solid #002244;
-      border-radius: 4px;
-      background: #e0e6ef;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(30,58,138,0.10);
       margin-right: 18px;
+      border: 2px solid #eaf1fb;
+      background: #e0e6ef;
     }
     .product-title {
-      font-family: 'Georgia', serif;
-      font-size: 2rem;
-      font-weight: bold;
-      margin: 0 0 6px 0;
-      color: #111;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #191970;
+      margin-bottom: 4px;
     }
     .product-desc {
-      font-family: 'Georgia', serif;
-      font-size: 1.1rem;
+      font-size: 1rem;
       color: #222;
-      margin: 0;
+      margin-bottom: 0;
     }
     .product-title.unavailable, .product-desc.unavailable {
       color: #b0b6be;
       opacity: 0.7;
     }
-    .status-section {
-      text-align: center;
-      min-width: 260px;
-    }
-    .status-label {
-      font-family: 'Georgia', serif;
-      font-size: 1.1rem;
-      color: #222;
-      margin-bottom: 12px;
-      font-weight: 500;
-    }
     .status-badge {
       display: inline-block;
-      font-family: 'Georgia', serif;
-      font-size: 1.5rem;
-      font-weight: bold;
-      padding: 8px 32px;
-      border-radius: 22px;
-      margin-bottom: 10px;
-      margin-top: 2px;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 7px 22px;
+      border-radius: 18px;
+      margin-top: 6px;
+      margin-bottom: 0;
+      background: #b0b6be;
+      color: #fff;
+      letter-spacing: 1px;
     }
     .status-available {
-      background: #c6ece7;
+      background: #3bdf7c;
       color: #fff;
     }
     .status-booked {
       background: #b0b6be;
       color: #fff;
     }
-
-    .inventory-info {
-      font-family: 'Georgia', serif;
-      font-size: 0.9rem;
-      color: #666;
-      margin: 8px 0;
+    .status-label {
+      font-size: 0.98rem;
+      color: #0047AB;
       font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .inventory-info {
+      font-size: 1rem;
+      color: #0047AB;
+      font-weight: 600;
+    }
+    footer {
+        background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+        color: white;
+        text-align: center;
+        padding: 25px 10px 15px;
+        margin-top: auto;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        position: relative;
+    }
+    .footer-social {
+        margin: 10px 0 5px;
+    }
+    .footer-social a {
+        color: #bccedf;
+        margin: 0 8px;
+        font-size: 1.5rem;
+        transition: color 0.2s;
+    }
+    .footer-social a:hover {
+        color: #ffc300;
+    }
+    .footer-contact span {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    .footer-note {
+        margin: 8px 0 0;
+        font-size: 1rem;
+        color: #bccedf;
+    }
+    .back-to-top {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        background: #ffc300;
+        color: #191970;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: background 0.2s, color 0.2s;
+    }
+    .back-to-top:hover {
+        background: #191970;
+        color: #ffc300;
     }
     @media (max-width: 900px) {
-      .main-table td {
+      .main-card, .bundle-card {
+        padding: 12px 2vw 12px 2vw;
+        max-width: 98vw;
+      }
+      .main-table td, .bundle-table td {
+        font-size: 0.98rem;
+        padding: 12px 4px;
+      }
+      .product-img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+    @media (max-width: 600px) {
+      .main-table, .bundle-table {
         display: block;
+        overflow-x: auto;
         width: 100%;
-        box-sizing: border-box;
       }
-      .main-table tr {
-        display: block;
-        margin-bottom: 30px;
+      .main-table thead, .main-table tbody, .main-table tr,
+      .bundle-table thead, .bundle-table tbody, .bundle-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
       }
-      .status-section {
-        min-width: unset;
-        margin-top: 18px;
+      .main-card, .bundle-card {
+        padding: 6px 0 6px 0;
       }
-    }
-    .logo-container img {
-      height: 100px;
-      cursor: pointer;
-    }
-    .logo-container a {
-      display: inline-block;
-    }
-    .header-center {
-      text-align: center;
-      flex: 1;
-    }
-    .header-center h1 {
-      font-size: 64px;
-      font-weight: bold;
-      color: #0047AB;
-      text-shadow: 2px 2px #ffffff;
-    }
-    .header-center p {
-      font-size: 24px;
-      color: #0047AB;
-      text-shadow: 1px 1px #ffffff;
-    }
-    .header-icons {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .header-icons i {
-      font-size: 28px;
-      color: #000;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .header-icons i:hover {
-      transform: scale(1.2);
-    }
-    .menu-popup {
-      display: none;
-      position: fixed;
-      top: 80px;
-      right: 20px;
-      background-color: #fff;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
-      overflow: hidden;
-      z-index: 1000;
-      min-width: 200px;
-      transition: all 0.3s ease;
-    }
-    .menu-popup a {
-      display: block;
-      padding: 10px 15px;
-      color: #000;
-      text-decoration: none;
-      border-bottom: 1px solid #eee;
-    }
-    .menu-popup a:hover {
-      background-color: #f0f0f0;
-    }
-    .menu-popup a:last-child {
-      background-color: #191970;
-      color: #fff;
-      border-bottom: none;
-      transition: background 0.3s ease, transform 0.2s;
-    }
-    .menu-popup a:last-child:hover {
-      background-color: #000080;
-      transform: scale(1.02);
-    }
-    .fa-bars {
-      color: #fff !important;
-      transition: transform 0.3s;
-    }
-    .fa-bars.active {
-      transform: rotate(90deg);
+      .section-title {
+        font-size: 1.3rem;
+      }
     }
   </style>
 </head>
 <body>
   <header>
     <div class="logo-container">
-      <a href="homepage.html"><img src="images/whitelogo.png" alt="AudioWerks Logo, click to go home" style="height: 100px;" /></a>
+      <a href="homepage.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" style="height: 70px;" /></a>
     </div>
     <div class="header-center">
       <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
@@ -302,7 +403,7 @@
       <a href="portfolioo.html">Portfolio</a>
       <a href="#booking">Book Here</a>
       <a href="User.html">User Profile</a>
-      <a href="availability.html">Equipments</a>
+      <a href="availability.html">Equipment</a>
       <a href="feedback.html">Feedback Dashboard</a>
       <a href="login.html" onclick="logout()">Logout</a>
     </nav>
@@ -310,94 +411,57 @@
   <div class="tab-bar">
     <button class="tab selected">Equipment</button>
   </div>
-  <table class="main-table">
-    <tr>
-      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
-        <img src="images/lights-sounds.png" alt="Product" class="product-img">
-        <div>
-          <div class="product-title">Lights & Sounds</div>
-          <div class="product-desc">Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.</div>
-        </div>
-      </td>
-      <td class="status-section">
-        <div class="status-label">This equipment is currently:</div>
-        <div class="status-badge status-available">Available</div>
-        <div class="inventory-info">Inventory: 5 units</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
-        <img src="images/led-wall.png" alt="Product" class="product-img">
-        <div>
-          <div class="product-title">Led Wall</div>
-          <div class="product-desc">Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.</div>
-        </div>
-      </td>
-      <td class="status-section">
-        <div class="status-label">This equipment is currently:</div>
-        <div class="status-badge status-available">Available</div>
-        <div class="inventory-info">Inventory: 2 units</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
-        <img src="images/Stage.png" alt="Product" class="product-img">
-        <div>
-          <div class="product-title unavailable">Stage</div>
-          <div class="product-desc unavailable">Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.</div>
-        </div>
-      </td>
-      <td class="status-section">
-        <div class="status-label">This equipment is currently:</div>
-        <div class="status-badge status-booked">Booked</div>
-        <div class="inventory-info">Inventory: 0 units available</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
-        <img src="images/mood-lights.png" alt="Product" class="product-img">
-        <div>
-          <div class="product-title">Mood Light</div>
-          <div class="product-desc">Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.
+  <div class="section-title">Equipment Availability</div>
+  <div class="main-card">
+    <table class="main-table" id="servicesTable">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th>Status</th>
+          <th>Available Units</th>
+        </tr>
+      </thead>
+      <tbody id="servicesTbody"></tbody>
+    </table>
+  </div>
+  <div class="section-title" style="margin-top:40px;">Bundles</div>
+  <div class="bundle-card">
+    <table class="bundle-table">
+      <thead>
+        <tr>
+          <th>Bundle Name</th>
+          <th>Price</th>
+          <th>Included Services</th>
+        </tr>
+      </thead>
+      <tbody id="bundlesTbody"></tbody>
+    </table>
+  </div>
+  <footer>
+    <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+    <div class="footer-social">
+      <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+    </div>
+    <div class="footer-contact">
+      <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+    </div>
+    <div class="footer-note">
+      <span>You can also contact us directly on this website.</span>
+    </div>
+    <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+  </footer>
 
-          </div>
-        </div>
-      </td>
-      <td class="status-section">
-        <div class="status-label">This equipment is currently:</div>
-        <div class="status-badge status-available">Available</div>
-        <div class="inventory-info">Inventory: 3 units</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
-        <img src="images/string-lights.png" alt="Product" class="product-img">
-        <div>
-          <div class="product-title">String Lights</div>
-          <div class="product-desc">Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.</div>
-        </div>
-      </td>
-      <td class="status-section">
-        <div class="status-label">This equipment is currently:</div>
-        <div class="status-badge status-available">Available</div>
-        <div class="inventory-info">Inventory: 5 units</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="width: 480px; display: flex; align-items: center; border-right: 6px solid #000;">
-        <img src="images/low-lying.jpg" alt="Product" class="product-img">
-        <div>
-          <div class="product-title unavailable">Low Lying</div>
-          <div class="product-desc unavailable">Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.</div>
-        </div>
-      </td>
-      <td class="status-section">
-        <div class="status-label">This equipment is currently:</div>
-        <div class="status-badge status-booked">Booked</div>
-        <div class="inventory-info">Inventory: 0 units available</div>
-      </td>
-    </tr>
-  </table>
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<!-- Firebase Auth -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<!-- Firebase Database -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
+<!-- Your Firebase config and backend logic -->
+<script src="firebase-config-new.js"></script>
+<script src="firebase-backend-new.js"></script>
+
+  <!-- Dynamic services table script (must come after backend scripts) -->
   <script>
     function toggleMenu(btn) {
       const menu = document.getElementById('menuPopup');
@@ -418,6 +482,63 @@
       sessionStorage.clear();
       window.location.href = "login.html";
     }
+
+    // Dynamically load services and their availability
+    document.addEventListener('DOMContentLoaded', async function() {
+      const coreServices = [
+        { name: 'Lights & Sounds', image: 'images/lights-sounds.png', description: 'Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.' },
+        { name: 'Led Wall', image: 'images/led-wall.png', description: 'Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.' },
+        { name: 'Stage', image: 'images/Stage.png', description: 'Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.' },
+        { name: 'Mood Light', image: 'images/mood-lights.png', description: 'Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.' },
+        { name: 'String Lights', image: 'images/string-lights.png', description: 'Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.' },
+        { name: 'Low Lying', image: 'images/low-lying.jpg', description: 'Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.' }
+      ];
+      const servicesTbody = document.getElementById('servicesTbody');
+      servicesTbody.innerHTML = '';
+      const services = await window.getAllServices() || {};
+      coreServices.forEach(core => {
+        // Try to find a matching service in Firebase (case-insensitive)
+        const found = Object.values(services).find(s => s.name && s.name.toLowerCase() === core.name.toLowerCase());
+        const available = found ? found.available : 0;
+        const status = found ? (found.available > 0 ? 'Available' : 'Booked') : 'Unavailable';
+        const statusClass = found ? (found.available > 0 ? 'status-available' : 'status-booked') : 'status-booked';
+        const desc = found ? (found.description || core.description) : core.description;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="display: flex; align-items: center;">
+            <img src="${core.image}" alt="${core.name}" class="product-img" />
+            <div>
+              <div class="product-title">${core.name}</div>
+              <div class="product-desc">${desc}</div>
+            </div>
+          </td>
+          <td>
+            <div class="status-label">This service is currently:</div>
+            <div class="status-badge ${statusClass}">${status}</div>
+          </td>
+          <td class="inventory-info">${found ? found.available + ' units' : '0 units'}</td>
+        `;
+        servicesTbody.appendChild(tr);
+      });
+
+      // Load bundles
+      const bundlesTbody = document.getElementById('bundlesTbody');
+      bundlesTbody.innerHTML = '';
+      const bundles = await window.getAllBundles ? (await window.getAllBundles()) : {};
+      if (bundles && Object.keys(bundles).length > 0) {
+        Object.values(bundles).forEach(bundle => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="padding:12px 10px;font-weight:bold;">${bundle.name || ''}</td>
+            <td style="padding:12px 10px;">₱${bundle.price || ''}</td>
+            <td style="padding:12px 10px;">${(bundle.services||[]).join(', ')}</td>
+          `;
+          bundlesTbody.appendChild(tr);
+        });
+      } else {
+        bundlesTbody.innerHTML = '<tr><td colspan="3" style="padding:12px 10px;">No bundles found.</td></tr>';
+      }
+    });
   </script>
 </body>
 </html> 

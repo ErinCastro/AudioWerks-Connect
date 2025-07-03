@@ -432,6 +432,7 @@
       <tr>
         <th>Service</th>
         <th>Price</th>
+        <th>Available Units</th>
         <th>Actions</th>
       </tr>
     </thead>
@@ -440,6 +441,7 @@
   <div id="addServiceForm" style="margin-top:10px;">
     <input type="text" id="serviceName" placeholder="Service name" style="margin-right:5px;"/>
     <input type="number" id="servicePrice" placeholder="Service price" style="margin-right:5px; width:100px;"/>
+    <input type="number" id="serviceAvailable" placeholder="Available units" style="margin-right:5px; width:100px;"/>
     <button id="addServiceBtn">Add Service</button>
   </div>
 </div>
@@ -520,13 +522,39 @@
 <script>
 // Services logic
 async function loadServices() {
+  const coreServices = [
+    'Lights & Sounds',
+    'Led Wall',
+    'Stage',
+    'Mood Light',
+    'String Lights',
+    'Low Lying'
+  ];
   const services = await window.getAllServices() || {};
   const servicesTbody = document.getElementById('servicesTbody');
   servicesTbody.innerHTML = '';
+  // Show core services first
+  coreServices.forEach(coreName => {
+    const foundEntry = Object.entries(services).find(([id, s]) => s.name && s.name.toLowerCase() === coreName.toLowerCase());
+    if (foundEntry) {
+      const [id, s] = foundEntry;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${s.name}</td><td>₱${s.price || ''}</td><td>${s.available !== undefined ? s.available : ''}</td><td><button class="edit-service" data-id="${id}">Edit</button></td>`;
+      servicesTbody.appendChild(tr);
+    } else {
+      // Not configured yet
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${coreName}</td><td colspan="2" style="color:#b0b6be;">Not configured</td><td><button class="add-core-service" data-name="${coreName}">Add</button></td>`;
+      servicesTbody.appendChild(tr);
+    }
+  });
+  // Show any extra (custom) services
   Object.entries(services).forEach(([id, s]) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${s.name || ''}</td><td>₱${s.price || ''}</td><td><button class="edit-service" data-id="${id}">Edit</button> <button class="del-service" data-id="${id}">Delete</button></td>`;
-    servicesTbody.appendChild(tr);
+    if (!coreServices.some(core => core.toLowerCase() === (s.name||'').toLowerCase())) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${s.name || ''}</td><td>₱${s.price || ''}</td><td>${s.available !== undefined ? s.available : ''}</td><td><button class="edit-service" data-id="${id}">Edit</button> <button class="del-service" data-id="${id}">Delete</button></td>`;
+      servicesTbody.appendChild(tr);
+    }
   });
 }
 // Bundles logic
@@ -565,10 +593,23 @@ document.addEventListener('click', async function(e) {
   if (e.target && e.target.id === 'addServiceBtn') {
     const name = document.getElementById('serviceName').value.trim();
     const price = document.getElementById('servicePrice').value.trim();
-    if (!name || !price) return;
-    await window.addService({ name, price });
+    const available = document.getElementById('serviceAvailable').value.trim();
+    if (!name || !price || available === '') return;
+    await window.addService({ name, price, available });
     document.getElementById('serviceName').value = '';
     document.getElementById('servicePrice').value = '';
+    document.getElementById('serviceAvailable').value = '';
+    loadServices();
+    loadBundles();
+  }
+  // Add core service from 'Not configured' row
+  if (e.target && e.target.classList.contains('add-core-service')) {
+    const name = e.target.getAttribute('data-name');
+    const price = prompt(`Enter price for ${name}:`);
+    if (price === null) return;
+    const available = prompt(`Enter available units for ${name}:`);
+    if (available === null) return;
+    await window.addService({ name, price, available });
     loadServices();
     loadBundles();
   }
@@ -582,15 +623,31 @@ document.addEventListener('click', async function(e) {
     if (newName === null) return;
     const newPrice = prompt('Edit service price:', service.price);
     if (newPrice === null) return;
-    if (newName && newPrice) {
-      await window.updateService(id, { name: newName, price: newPrice });
+    const newAvailable = prompt('Edit available units:', service.available !== undefined ? service.available : '');
+    if (newAvailable === null) return;
+    if (newName && newPrice && newAvailable !== '') {
+      await window.updateService(id, { name: newName, price: newPrice, available: newAvailable });
       loadServices();
       loadBundles();
     }
   }
-  // Delete service
+  // Delete service (only for non-core)
   if (e.target && e.target.classList.contains('del-service')) {
     const id = e.target.getAttribute('data-id');
+    const services = await window.getAllServices() || {};
+    const service = services[id];
+    const coreServices = [
+      'Lights & Sounds',
+      'Led Wall',
+      'Stage',
+      'Mood Light',
+      'String Lights',
+      'Low Lying'
+    ];
+    if (coreServices.some(core => core.toLowerCase() === (service.name||'').toLowerCase())) {
+      alert('You cannot delete a core service.');
+      return;
+    }
     if (confirm('Delete this service?')) {
       await window.deleteService(id);
       loadServices();
