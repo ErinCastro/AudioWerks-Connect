@@ -37,6 +37,7 @@
       padding: 20px;
       background: rgba(255,255,255,0.7);
       backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border-bottom: 1px solid #ddd;
       box-shadow: 0 2px 12px rgba(0,0,0,0.07);
     }
@@ -470,6 +471,7 @@
       z-index: 2000;
       animation: fadeIn 0.4s;
       backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
     }
     #announcementModal .popup-content {
       background: #fff;
@@ -509,6 +511,435 @@
     @keyframes popIn {
       from { transform: scale(0.95); opacity: 0; }
       to   { transform: scale(1); opacity: 1; }
+    }
+    .floating-chat-head {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 3000;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(135deg, #0047AB 60%, #191970 100%);
+      border-radius: 50%;
+      box-shadow: 0 4px 18px rgba(0,34,68,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .floating-chat-head:hover {
+      box-shadow: 0 8px 32px rgba(0,34,68,0.28);
+      transform: scale(1.07);
+    }
+    .floating-chat-head i {
+      color: #fff;
+      font-size: 2.2rem;
+    }
+    .floating-chat-popup {
+      position: fixed;
+      bottom: 110px;
+      right: 32px;
+      z-index: 3100;
+      width: 340px;
+      max-width: 95vw;
+      height: auto;
+      max-height: 70vh;
+      background: #fff;
+      border-radius: 0 0 18px 18px;
+      box-shadow: 0 8px 32px rgba(0,34,68,0.18);
+      padding: 0;
+      overflow: hidden;
+      display: none;
+      flex-direction: column;
+    }
+    .floating-chat-popup.open {
+      display: flex;
+    }
+    .floating-chat-popup-header {
+      background: #002244;
+      color: #fff;
+      padding: 10px 10px 8px 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .floating-chat-avatar {
+      width: 32px;
+      height: 32px;
+      font-size: 1.2rem;
+      border-width: 2px;
+    }
+    .floating-chat-username {
+      font-size: 1rem;
+    }
+    .floating-chat-header-right {
+      gap: 10px;
+    }
+    .floating-chat-call-btn {
+      background: none !important;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+      color: #fff;
+      font-size: 1.1rem;
+      padding: 2px 5px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .floating-chat-call-btn:hover,
+    .floating-chat-call-btn:focus {
+      background: #00152a !important;
+    }
+    .floating-chat-popup-body {
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 100%;
+      overflow-y: auto;
+      padding: 12px 0 0 0;
+      font-size: 0.98rem;
+      gap: 12px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+    }
+    .floating-chat-bubble {
+      max-width: 95%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 0.98rem;
+      margin-bottom: 2px;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .floating-chat-bubble.right {
+      background: #002244;
+      color: #fff;
+      align-self: flex-end;
+      border: none;
+      border-bottom-right-radius: 8px;
+      margin-right: 18px;
+    }
+    .floating-chat-bubble.right:after {
+      content: '';
+      position: absolute;
+      right: -14px;
+      top: 10px;
+      width: 0; height: 0;
+      border-top: 10px solid transparent;
+      border-left: 14px solid #002244;
+      border-bottom: 0 solid transparent;
+    }
+    .floating-chat-bubble.right:before {
+      content: '';
+      position: absolute;
+      right: -11px;
+      top: 13px;
+      width: 0; height: 0;
+      border-top: 8px solid transparent;
+      border-left: 11px solid #002244;
+      border-bottom: 0 solid transparent;
+    }
+    .floating-chat-bubble.left {
+      background: #fff;
+      color: #002244;
+      border: 2.5px solid #002244;
+      align-self: flex-start;
+      border-bottom-left-radius: 8px;
+      margin-left: 18px;
+    }
+    .floating-chat-bubble.left:after {
+      content: '';
+      position: absolute;
+      left: -14px;
+      top: 10px;
+      width: 0; height: 0;
+      border-top: 10px solid transparent;
+      border-right: 14px solid #002244;
+      border-bottom: 0 solid transparent;
+    }
+    .floating-chat-bubble.left:before {
+      content: '';
+      position: absolute;
+      left: -11px;
+      top: 13px;
+      width: 0; height: 0;
+      border-top: 8px solid transparent;
+      border-right: 11px solid #fff;
+      border-bottom: 0 solid transparent;
+    }
+    .floating-chat-bubble .bubble-reaction {
+      position: absolute;
+      top: -18px;
+      right: 10px;
+      margin: 0;
+      font-size: 1.2rem;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      padding: 2px 6px;
+      z-index: 3;
+      border: 1.5px solid #f7b731;
+    }
+    .floating-chat-bubble .bubble-menu {
+      margin-left: 4px;
+      font-size: 1rem;
+      width: 22px;
+      height: 22px;
+      top: -4px;
+    }
+    .floating-chat-popup-input {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      padding: 8px 8px;
+      background: #002244;
+      border-top: 1.5px solid #2222;
+      flex-wrap: wrap;
+    }
+    .floating-chat-popup-input .input-icons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .floating-chat-popup-input input {
+      flex: 1 1 120px;
+      min-width: 0;
+      padding: 8px 10px;
+      border-radius: 20px;
+      font-size: 0.98rem;
+      margin: 0 8px;
+      background: #fff;
+      color: #002244;
+      border: none;
+      outline: none;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .floating-chat-popup-input .send-btn {
+      flex-shrink: 0;
+    }
+    @media (max-width: 400px) {
+      .floating-chat-popup {
+        width: 98vw;
+        right: 1vw;
+        left: 1vw;
+        min-width: 0;
+      }
+      .floating-chat-popup-input .input-icons {
+        gap: 4px;
+      }
+      .floating-chat-popup-input input {
+        font-size: 0.92rem;
+        margin: 0 4px;
+      }
+    }
+    .floating-chat-popup-input .input-btn,
+    .floating-chat-popup-input .send-btn {
+      background: none !important;
+      border: none !important;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 4px 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none !important;
+      outline: none;
+      transition: background 0.2s;
+    }
+    .floating-chat-popup-input .send-btn {
+      font-size: 1.7rem;
+      padding: 4px 10px;
+      margin-left: 6px;
+    }
+    .floating-chat-popup-input .input-btn:hover,
+    .floating-chat-popup-input .send-btn:hover,
+    .floating-chat-popup-input .input-btn:focus,
+    .floating-chat-popup-input .send-btn:focus {
+      background: #00152a !important;
+    }
+    .floating-chat-bubble .msg-actions {
+      display: none;
+      position: absolute;
+      top: -22px;
+      right: 0;
+      background: rgba(255,255,255,0.97);
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+      z-index: 2;
+      padding: 2px 4px;
+      gap: 2px;
+    }
+    .floating-chat-bubble:hover .msg-actions {
+      display: flex;
+    }
+    .msg-action-btn {
+      background: none;
+      border: none;
+      color: #002244;
+      font-size: 1.1rem;
+      cursor: pointer;
+      margin: 0 2px;
+      border-radius: 50%;
+      padding: 2px 5px;
+      transition: background 0.15s;
+    }
+    .msg-action-btn:hover {
+      background: #e6eaf0;
+    }
+    .floating-chat-bubble.pinned {
+      border: 2.5px solid #f7b731 !important;
+      background: #fffbe6 !important;
+    }
+    .floating-chat-bubble .msg-timestamp {
+      display: inline-block;
+      font-size: 0.85rem;
+      color: #888;
+      text-align: right;
+      margin-top: 6px;
+      margin-right: 2px;
+      font-family: 'Poppins', Arial, sans-serif;
+      opacity: 0.85;
+    }
+    .floating-chat-bubble .read-receipt {
+      display: inline-block;
+      font-size: 1.1em;
+      color: #1e90ff;
+      margin-left: 4px;
+      vertical-align: middle;
+      opacity: 0.85;
+    }
+    .floating-chat-bubble .read-receipt .fa-eye {
+      color: #1e90ff;
+      font-size: 1.1em;
+      vertical-align: middle;
+    }
+    .bubble-edit-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 2px solid #002244;
+      font-size: 0.98rem;
+      font-family: inherit;
+      background: #fff;
+      color: #111;
+      outline: none;
+      margin: 0;
+    }
+    .floating-chat-bubble.right .bubble-edit-input {
+      background: #002244;
+      color: #fff;
+      border: 2px solid #002244;
+    }
+    .pinned-modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 4000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pinned-modal {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 32px 28px 24px 28px;
+      min-width: 260px;
+      max-width: 90vw;
+      max-height: 70vh;
+      overflow-y: auto;
+      position: relative;
+    }
+    .pinned-modal h2 {
+      margin-top: 0;
+      font-size: 1.1rem;
+      color: #002244;
+      font-family: 'Poppins', Arial, sans-serif;
+      margin-bottom: 18px;
+    }
+    .pinned-modal .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      color: #002244;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 2px 8px;
+      transition: background 0.2s;
+    }
+    .pinned-modal .close-btn:hover {
+      background: #e6eaf0;
+    }
+    .pinned-modal .pinned-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .pinned-modal .floating-chat-bubble {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      margin: 0;
+    }
+    .pinned-modal .msg-actions { display: none !important; }
+    #floatingImageModalOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      display: none;
+    }
+    #floatingImageModalOverlay.open {
+      display: flex;
+    }
+    #floatingImageModal {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      padding: 18px 18px 10px 18px;
+      max-width: 96vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    #floatingImageModal img {
+      max-width: 80vw;
+      max-height: 70vh;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.13);
+    }
+    #floatingImageModal .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 1.7rem;
+      color: #002244;
+      cursor: pointer;
+      border-radius: 50%;
+      padding: 2px 8px;
+      transition: background 0.2s;
+    }
+    #floatingImageModal .close-btn:hover {
+      background: #e6eaf0;
     }
   </style>
 </head>
@@ -633,6 +1064,47 @@
     </div>
     <p>&copy; 2025 AudioWerks. All rights reserved.</p>
   </footer>
+
+  <div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
+    <i class="fas fa-comment"></i>
+  </div>
+  <div class="floating-chat-popup" id="floatingChatPopup">
+    <div class="floating-chat-popup-header">
+      <span style="font-weight:700; font-size:1.1rem; letter-spacing:1px;">AudioWerks</span>
+      <div class="floating-chat-header-right">
+        <button class="floating-chat-call-btn" title="Call"><i class="fas fa-phone"></i></button>
+      </div>
+    </div>
+    <div class="floating-chat-popup-body" id="floatingChatPopupBody">
+      <div class="floating-chat-bubble left">
+        Hi there! <span class="bubble-reaction">❤️</span><span class="bubble-menu"><i class="fas fa-ellipsis"></i></span>
+      </div>
+      <div class="floating-chat-bubble right">
+        Hello! How can I help you?<span class="bubble-menu"><i class="fas fa-ellipsis"></i></span>
+      </div>
+      <div class="floating-chat-bubble left">
+        I want to know more about your services.<span class="bubble-menu"><i class="fas fa-ellipsis"></i></span>
+      </div>
+      <div class="floating-chat-bubble right">
+        Sure! We offer lights, sounds, and event equipment rentals.<span class="bubble-menu"><i class="fas fa-ellipsis"></i></span>
+      </div>
+    </div>
+    <div class="floating-chat-popup-input">
+      <div class="input-icons">
+        <button class="input-btn" title="Attach"><i class="fas fa-paperclip"></i></button>
+        <button class="input-btn" title="Pin"><i class="fas fa-thumbtack"></i></button>
+        <button class="input-btn" title="Camera"><i class="fas fa-camera"></i></button>
+      </div>
+      <input type="text" id="floatingChatInput" placeholder="Type your message here..." />
+      <button class="send-btn" id="floatingChatSendBtn"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <div id="floatingPinnedModalContainer"></div>
+  <input type="file" id="floatingAttachmentInput" style="display:none" multiple />
+  <input type="file" id="floatingCameraInput" accept="image/*" capture="environment" style="display:none" multiple />
+
+  <div id="floatingImageModalOverlay"><div id="floatingImageModal"><button class="close-btn" title="Close">&times;</button><img src="" alt="Preview" /></div></div>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -771,6 +1243,354 @@
           if (onClose) onClose();
         };
       }
+    });
+    // Floating chat head logic
+    const chatHead = document.getElementById('floatingChatHead');
+    const chatPopup = document.getElementById('floatingChatPopup');
+    const chatInput = document.getElementById('floatingChatInput');
+    const chatSendBtn = document.getElementById('floatingChatSendBtn');
+    const chatBody = document.getElementById('floatingChatPopupBody');
+    chatHead.addEventListener('click', () => {
+      if (chatPopup.classList.contains('open')) {
+        chatPopup.classList.remove('open');
+      } else {
+        chatPopup.classList.add('open');
+        chatInput.focus();
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+    });
+    document.querySelector('.floating-chat-call-btn').addEventListener('click', () => {
+      alert('Call feature coming soon!');
+    });
+    chatSendBtn.addEventListener('click', sendFloatingChatMsg);
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') sendFloatingChatMsg();
+    });
+    function formatTime(date) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    function createFloatingBubble(text, side = 'right', options = {}) {
+      const div = document.createElement('div');
+      div.className = 'floating-chat-bubble ' + side + (options.pinned ? ' pinned' : '');
+      div.textContent = text;
+
+      // Timestamp
+      const ts = document.createElement('span');
+      ts.className = 'msg-timestamp';
+      ts.textContent = options.timestamp || formatTime(new Date());
+      div.appendChild(ts);
+
+      // Read receipt (for right/sent messages only)
+      let receipt;
+      if (side === 'right') {
+        receipt = document.createElement('span');
+        receipt.className = 'read-receipt';
+        receipt.textContent = '✓';
+        div.appendChild(receipt);
+        // Simulate read after 1.2s
+        setTimeout(() => {
+          receipt.innerHTML = '<i class="fas fa-eye"></i>';
+        }, 1200);
+      }
+
+      // Actions container
+      const actions = document.createElement('span');
+      actions.className = 'msg-actions';
+
+      // Edit (only for right/sender messages)
+      if (side === 'right') {
+        const editBtn = document.createElement('button');
+        editBtn.className = 'msg-action-btn';
+        editBtn.title = 'Edit';
+        editBtn.innerHTML = '<i class="fas fa-pen"></i>';
+        editBtn.onclick = function(e) {
+          e.stopPropagation();
+          const oldText = div.childNodes[0].nodeValue;
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = oldText;
+          input.className = 'bubble-edit-input';
+          div.replaceChild(input, div.childNodes[0]);
+          input.focus();
+          input.setSelectionRange(input.value.length, input.value.length);
+          input.onkeydown = function(ev) {
+            if (ev.key === 'Enter') {
+              div.replaceChild(document.createTextNode(input.value), input);
+            } else if (ev.key === 'Escape') {
+              div.replaceChild(document.createTextNode(oldText), input);
+            }
+          };
+          input.onblur = function() {
+            div.replaceChild(document.createTextNode(input.value), input);
+          };
+        };
+        actions.appendChild(editBtn);
+      }
+
+      // Delete
+      const delBtn = document.createElement('button');
+      delBtn.className = 'msg-action-btn';
+      delBtn.title = 'Delete';
+      delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+      delBtn.onclick = function(e) {
+        e.stopPropagation();
+        div.remove();
+      };
+      actions.appendChild(delBtn);
+
+      // React (heart)
+      const reactBtn = document.createElement('button');
+      reactBtn.className = 'msg-action-btn';
+      reactBtn.title = 'React';
+      reactBtn.innerHTML = '<i class="fas fa-heart"></i>';
+      reactBtn.onclick = function(e) {
+        e.stopPropagation();
+        let reaction = div.querySelector('.bubble-reaction');
+        if (reaction) {
+          reaction.remove();
+        } else {
+          reaction = document.createElement('span');
+          reaction.className = 'bubble-reaction';
+          reaction.textContent = '❤️';
+          div.appendChild(reaction);
+        }
+      };
+      actions.appendChild(reactBtn);
+
+      // Pin
+      const pinBtn = document.createElement('button');
+      pinBtn.className = 'msg-action-btn';
+      pinBtn.title = 'Pin';
+      pinBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
+      pinBtn.onclick = function(e) {
+        e.stopPropagation();
+        div.classList.toggle('pinned');
+      };
+      actions.appendChild(pinBtn);
+
+      div.appendChild(actions);
+      return div;
+    }
+    function sendFloatingChatMsg() {
+      const msg = chatInput.value.trim();
+      if (!msg) return;
+      const msgDiv = createFloatingBubble(msg, 'right', { timestamp: formatTime(new Date()) });
+      chatBody.appendChild(msgDiv);
+      chatInput.value = '';
+      chatBody.scrollTop = chatBody.scrollHeight;
+      // Demo auto-reply
+      setTimeout(() => {
+        const reply = createFloatingBubble('Thank you for your message!', 'left', { timestamp: formatTime(new Date()) });
+        chatBody.appendChild(reply);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 900);
+    }
+    // On page load, update initial bubbles to use new structure
+    window.addEventListener('DOMContentLoaded', () => {
+      const chatBody = document.getElementById('floatingChatPopupBody');
+      const initialMsgs = [
+        { text: 'Hi there!', side: 'left', reaction: true },
+        { text: 'Hello! How can I help you?', side: 'right' },
+        { text: 'I want to know more about your services.', side: 'left' },
+        { text: 'Sure! We offer lights, sounds, and event equipment rentals.', side: 'right' }
+      ];
+      chatBody.innerHTML = '';
+      initialMsgs.forEach((msg, idx) => {
+        const bubble = createFloatingBubble(msg.text, msg.side, { timestamp: formatTime(new Date(Date.now() - (initialMsgs.length-idx)*60000)), pinned: false });
+        if (msg.reaction) {
+          const reaction = document.createElement('span');
+          reaction.className = 'bubble-reaction';
+          reaction.textContent = '❤️';
+          bubble.appendChild(reaction);
+        }
+        chatBody.appendChild(bubble);
+      });
+    });
+    const attachBtn = document.querySelector('.input-btn[title="Attach"]');
+    const pinListBtn = document.querySelector('.input-btn[title="Pin"]');
+    const cameraBtn = document.querySelector('.input-btn[title="Camera"]');
+    const floatingAttachmentInput = document.getElementById('floatingAttachmentInput');
+    const floatingCameraInput = document.getElementById('floatingCameraInput');
+    const floatingPinnedModalContainer = document.getElementById('floatingPinnedModalContainer');
+
+    attachBtn.addEventListener('click', function() {
+      floatingAttachmentInput.value = '';
+      floatingAttachmentInput.click();
+    });
+    cameraBtn.addEventListener('click', function() {
+      floatingCameraInput.value = '';
+      floatingCameraInput.click();
+    });
+    floatingAttachmentInput.addEventListener('change', function(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      Array.from(e.target.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            const div = createFloatingBubble('', 'right', { timestamp: formatTime(new Date()) });
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.style.maxWidth = '180px';
+            img.style.maxHeight = '120px';
+            img.style.display = 'block';
+            img.style.margin = '8px 0';
+            img.style.borderRadius = '10px';
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            img.style.cursor = 'pointer';
+            img.onclick = () => showFloatingImageModal(img.src);
+            div.insertBefore(img, div.querySelector('.msg-timestamp'));
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          const div = createFloatingBubble('', 'right', { timestamp: formatTime(new Date()) });
+          const fileDiv = document.createElement('div');
+          fileDiv.style.display = 'flex';
+          fileDiv.style.alignItems = 'center';
+          fileDiv.style.gap = '8px';
+          fileDiv.style.margin = '8px 0';
+          fileDiv.style.fontSize = '1.05rem';
+          fileDiv.style.color = '#002244';
+          fileDiv.style.background = '#f5f8fa';
+          fileDiv.style.borderRadius = '8px';
+          fileDiv.style.padding = '6px 12px';
+          const url = URL.createObjectURL(file);
+          fileDiv.innerHTML = `<i class='fas fa-file'></i> <a href="${url}" download="${file.name}" target="_blank">${file.name}</a>`;
+          div.insertBefore(fileDiv, div.querySelector('.msg-timestamp'));
+          chatBody.appendChild(div);
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+      });
+    });
+    floatingCameraInput.addEventListener('change', function(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      Array.from(e.target.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            const div = createFloatingBubble('', 'right', { timestamp: formatTime(new Date()) });
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.style.maxWidth = '180px';
+            img.style.maxHeight = '120px';
+            img.style.display = 'block';
+            img.style.margin = '8px 0';
+            img.style.borderRadius = '10px';
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            img.style.cursor = 'pointer';
+            img.onclick = () => showFloatingImageModal(img.src);
+            div.insertBefore(img, div.querySelector('.msg-timestamp'));
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+    pinListBtn.addEventListener('click', function() {
+      // Collect all pinned messages in the current chat
+      const pinnedBubbles = Array.from(document.querySelectorAll('.floating-chat-popup-body .floating-chat-bubble.pinned'));
+      const modal = document.createElement('div');
+      modal.className = 'pinned-modal-overlay';
+      modal.innerHTML = `
+        <div class="pinned-modal">
+          <button class="close-btn" title="Close">&times;</button>
+          <h2>Pinned Messages</h2>
+          <div class="pinned-list">
+            ${pinnedBubbles.length === 0 ? '<div style="color:#888;">No pinned messages.</div>' : ''}
+          </div>
+        </div>
+      `;
+      const pinnedList = modal.querySelector('.pinned-list');
+      pinnedBubbles.forEach(bubble => {
+        // Clone the bubble for display
+        const clone = bubble.cloneNode(true);
+        // Remove actions and reactions for modal
+        const actions = clone.querySelector('.msg-actions');
+        if (actions) actions.remove();
+        const reaction = clone.querySelector('.bubble-reaction');
+        if (reaction) reaction.remove();
+        pinnedList.appendChild(clone);
+      });
+      // Close logic
+      modal.querySelector('.close-btn').onclick = () => floatingPinnedModalContainer.innerHTML = '';
+      modal.onclick = e => { if (e.target === modal) floatingPinnedModalContainer.innerHTML = ''; };
+      floatingPinnedModalContainer.innerHTML = '';
+      floatingPinnedModalContainer.appendChild(modal);
+    });
+    const floatingImageModalOverlay = document.getElementById('floatingImageModalOverlay');
+    const floatingImageModal = document.getElementById('floatingImageModal');
+    const floatingImageModalImg = floatingImageModal.querySelector('img');
+    const floatingImageModalClose = floatingImageModal.querySelector('.close-btn');
+
+    function showFloatingImageModal(src) {
+      floatingImageModalImg.src = src;
+      floatingImageModalOverlay.classList.add('open');
+    }
+    floatingImageModalClose.onclick = () => floatingImageModalOverlay.classList.remove('open');
+    floatingImageModalOverlay.onclick = e => {
+      if (e.target === floatingImageModalOverlay) floatingImageModalOverlay.classList.remove('open');
+    };
+
+    // Update image click logic in file/camera upload
+    function addImageModalClick(img) {
+      img.style.cursor = 'pointer';
+      img.onclick = () => showFloatingImageModal(img.src);
+    }
+    // Patch for existing images in chat (on load)
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.floating-chat-bubble img').forEach(addImageModalClick);
+    });
+    // Patch for new images
+    const oldAttachmentHandler = floatingAttachmentInput.onchange;
+    floatingAttachmentInput.addEventListener('change', function(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      Array.from(e.target.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            const div = createFloatingBubble('', 'right', { timestamp: formatTime(new Date()) });
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.style.maxWidth = '180px';
+            img.style.maxHeight = '120px';
+            img.style.display = 'block';
+            img.style.margin = '8px 0';
+            img.style.borderRadius = '10px';
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            addImageModalClick(img);
+            div.insertBefore(img, div.querySelector('.msg-timestamp'));
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    });
+    floatingCameraInput.addEventListener('change', function(e) {
+      if (!e.target.files || e.target.files.length === 0) return;
+      Array.from(e.target.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function(ev) {
+            const div = createFloatingBubble('', 'right', { timestamp: formatTime(new Date()) });
+            const img = document.createElement('img');
+            img.src = ev.target.result;
+            img.style.maxWidth = '180px';
+            img.style.maxHeight = '120px';
+            img.style.display = 'block';
+            img.style.margin = '8px 0';
+            img.style.borderRadius = '10px';
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+            addImageModalClick(img);
+            div.insertBefore(img, div.querySelector('.msg-timestamp'));
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     });
   </script>
 </body>
