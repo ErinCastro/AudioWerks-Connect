@@ -675,10 +675,12 @@
     let autoScroll;
     function updateCarouselVars() {
       carouselTrack = document.getElementById('carouselTrack');
+      if (!carouselTrack) return; // Prevent error if element is missing
       carouselImages = carouselTrack.querySelectorAll('img');
       imgWidth = carouselImages[0].offsetWidth + 10;
     }
     function updateCarousel(animate = true) {
+      if (!carouselTrack) return; // Prevent error if element is missing
       if (animate) carouselTrack.style.transition = 'transform 0.5s';
       else carouselTrack.style.transition = 'none';
       carouselTrack.style.transform = `translateX(-${carouselIndex * imgWidth}px)`;

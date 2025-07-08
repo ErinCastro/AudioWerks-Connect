@@ -1,7 +1,5 @@
 // Initialize Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+// Removed duplicate firebase.initializeApp(firebaseConfig); to avoid multiple initializations.
 
 // Auth reference
 const auth = firebase.auth();
