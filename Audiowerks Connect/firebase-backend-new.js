@@ -1,10 +1,8 @@
-// Initialize Firebase
-// Removed duplicate firebase.initializeApp(firebaseConfig); to avoid multiple initializations.
-
+// Firebase is already initialized in firebase-config-new.js
 // Auth reference
 const auth = firebase.auth();
 // Database reference
-const db = firebase.database();
+let db = firebase.database();
 
 // Register a new user
 function register(email, password) {
