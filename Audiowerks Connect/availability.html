@@ -475,6 +475,25 @@
 
 <!-- Your chat and page logic (must be after all above) -->
 <script>
+  // Hamburger menu animation and toggle
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    if (menu && bars) {
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      bars.classList.toggle('active');
+    }
+  }
+
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (menu && button && !menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
   // --- CONFIG: Set your admin UID here ---
   const ADMIN_UID = 'FpAT19tEbYbIhbPbAi3TGNTutOT2NIptGOOVYPX6vP2kAo31JRNeMtl1'; // TODO: Replace with your actual admin UID
   // --- END CONFIG ---
