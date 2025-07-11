@@ -462,89 +462,6 @@
       0% { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
-    #announcementModal {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(30, 41, 59, 0.35); /* dark overlay */
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      animation: fadeIn 0.4s;
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-    }
-    #announcementModal .popup-content {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(30,41,59,0.18);
-      padding: 36px 44px 32px 44px;
-      min-width: 320px;
-      max-width: 90vw;
-      text-align: center;
-      position: relative;
-      animation: popIn 0.3s;
-    }
-    #announcementModal h3 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: #1e5aa8;
-      letter-spacing: 1px;
-    }
-    #announcementModal .close-btn {
-      position: absolute;
-      top: 16px; right: 18px;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #1e5aa8;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-    #announcementModal .close-btn:hover {
-      color: #d32f2f;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes popIn {
-      from { transform: scale(0.95); opacity: 0; }
-      to   { transform: scale(1); opacity: 1; }
-    }
-
-    .pinned-modal .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 18px;
-      background: none;
-      border: none;
-      font-size: 1.3rem;
-      color: #002244;
-      cursor: pointer;
-      border-radius: 50%;
-      padding: 2px 8px;
-      transition: background 0.2s;
-    }
-
-    .pinned-modal .close-btn:hover {
-      background: #e6eaf0;
-    }
-
-    .pinned-modal .pinned-list {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .pinned-modal .floating-chat-bubble {
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-      margin: 0;
-    }
-
-    .pinned-modal .msg-actions { display: none !important; }
-
     #floatingImageModalOverlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -596,10 +513,62 @@
     #floatingImageModal .close-btn:hover {
       background: #e6eaf0;
     }
+
+    /* Announcement Popup Modal CSS */
+.announcement-modal {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(30, 41, 59, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  animation: fadeIn 0.3s;
+  backdrop-filter: blur(2px);
+}
+.announcement-modal-content {
+  background: #fffbe6;
+  border: 3px solid #0047AB;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(30,41,59,0.18);
+  padding: 36px 44px 32px 44px;
+  min-width: 320px;
+  max-width: 90vw;
+  text-align: center;
+  position: relative;
+  animation: popIn 0.2s;
+}
+.announcement-modal-content h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #1e5aa8;
+  letter-spacing: 1px;
+}
+.announcement-modal-close {
+  position: absolute;
+  top: 16px; right: 18px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #1e5aa8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.announcement-modal-close:hover {
+  color: #d32f2f;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes popIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
   </style>
 </head>
 <body>
-  <div id="announcementModal" style="display: none;"></div>
   <header>
     <div class="logo-container">
       <a href="#hero"><img src="logo.png" alt="AudioWerks Logo, click to go home" /></a>
@@ -630,6 +599,44 @@
       <a href="#booking" class="cta-button">Book Now</a>
     </div>
   </section>
+
+  <!-- Announcements Section (after hero section) -->
+<div id="homepageAnnouncements" style="max-width:600px;margin:32px auto 0 auto;"></div>
+
+<script>
+function renderHomepageAnnouncements(announcements) {
+  const container = document.getElementById('homepageAnnouncements');
+  if (!container) return;
+  if (!announcements || Object.keys(announcements).length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  let html = '<div style="background:#fffbe6;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:24px 20px 18px 20px;">';
+  html += '<h3 style="color:#0047AB;margin-bottom:12px;font-size:1.2rem;">📢 Latest Announcements</h3>';
+  Object.entries(announcements)
+    .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0))
+    .slice(0, 5)
+    .forEach(([id, ann]) => {
+      const date = ann.timestamp ? new Date(ann.timestamp).toLocaleString() : '';
+      html += `
+        <div style="background:#fff;border-radius:8px;margin-bottom:10px;padding:12px 14px;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+          <div style="font-weight:bold;color:#191970;margin-bottom:3px;">${ann.author || 'Admin'}</div>
+          <div style="color:#333;margin-bottom:6px;">${ann.text}</div>
+          <div style="font-size:0.9rem;color:#666;">${date}</div>
+        </div>
+      `;
+    });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// Fetch and render announcements on homepage
+if (typeof firebase !== 'undefined') {
+  firebase.database().ref('announcements').on('value', snap => {
+    renderHomepageAnnouncements(snap.val());
+  });
+}
+</script>
 
   <div class="section-title" id="equipments">OUR SERVICES</div>
   <div class="services-grid">
@@ -753,6 +760,27 @@
       <img src="" alt="Preview" />
     </div>
   </div>
+
+  <!-- Announcement Popup Modal HTML (place at end of <body>) -->
+<div id="announcementPopup" class="announcement-modal" style="display:none;">
+  <div class="announcement-modal-content">
+    <button class="announcement-modal-close" id="announcementPopupClose" aria-label="Close">&times;</button>
+    <h3 id="announcementPopupTitle">Announcement</h3>
+    <div id="announcementPopupBody">This is an announcement!</div>
+  </div>
+</div>
+
+<script>
+function showAnnouncementPopup(title, message) {
+  document.getElementById('announcementPopupTitle').textContent = title || 'Announcement';
+  document.getElementById('announcementPopupBody').textContent = message || '';
+  document.getElementById('announcementPopup').style.display = 'flex';
+}
+function hideAnnouncementPopup() {
+  document.getElementById('announcementPopup').style.display = 'none';
+}
+document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopup;
+</script>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
@@ -904,51 +932,59 @@
       }
 
       try {
-      // Fetch all announcements
-      firebase.database().ref('announcements').once('value').then(snap => {
-        const announcements = snap.val();
-        if (announcements) {
-          const seen = JSON.parse(localStorage.getItem('seenAnnouncements') || '[]');
-          const unseen = Object.entries(announcements).filter(([id, a]) => !seen.includes(id));
-          if (unseen.length > 0) showAnnouncementQueue(unseen, seen);
-        }
-        }).catch(error => {
-          console.warn('Failed to fetch announcements:', error);
-      });
+      // Replace the real-time announcement logic to always show the latest announcement
+      // firebase.database().ref('announcements').on('value', snap => {
+      //   const announcements = snap.val();
+      //   console.log('Fetched announcements:', announcements); // Debug log
+      //   if (announcements) {
+      //     // Sort by timestamp (oldest first for natural reading order)
+      //     const all = Object.entries(announcements)
+      //       .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+      //     showAnnouncementQueue(all);
+      //   }
+      // });
 
-      function showAnnouncementQueue(unseen, seen) {
-        if (unseen.length === 0) return;
-        const [current, ...rest] = unseen;
-        const [id, a] = current;
-        showAnnouncementModal(a.text, () => {
-          seen.push(id);
-          localStorage.setItem('seenAnnouncements', JSON.stringify(seen));
-          showAnnouncementQueue(rest, seen);
-        });
-      }
+      // function showAnnouncementModal(text, onClose) {
+      //   console.log('showAnnouncementModal called with:', text); // Debug log
+      //   let modal = document.getElementById('announcementModal');
+      //   if (!modal) {
+      //     modal = document.createElement('div');
+      //     modal.id = 'announcementModal';
+      //     modal.innerHTML = `
+      //       <div class="popup-content">
+      //         <button class="close-btn" id="closeAnnouncementModal" disabled>&times;</button>
+      //         <h3>Announcement</h3>
+      //         <div id="announcementModalContent" style="font-size:18px;">${text}</div>
+      //       </div>
+      //     `;
+      //     document.body.appendChild(modal);
+      //   } else {
+      //     const contentDiv = modal.querySelector('#announcementModalContent');
+      //     if (contentDiv) {
+      //       contentDiv.textContent = text;
+      //     }
+      //     modal.style.display = 'flex';
+      //   }
+      //   const closeBtn = modal.querySelector('#closeAnnouncementModal');
+      //   if (closeBtn) {
+      //     closeBtn.disabled = true;
+      //     setTimeout(() => {
+      //       closeBtn.disabled = false;
+      //       closeBtn.onclick = () => {
+      //         modal.style.display = 'none';
+      //         if (onClose) onClose();
+      //       };
+      //     }, 10000); // 10 seconds before you can close
+      //   }
+      // }
+      // window.showAnnouncementModal = showAnnouncementModal;
 
-      function showAnnouncementModal(text, onClose) {
-        let modal = document.getElementById('announcementModal');
-        if (!modal) {
-          modal = document.createElement('div');
-          modal.id = 'announcementModal';
-          modal.innerHTML = `
-            <div class="popup-content">
-              <button class="close-btn" id="closeAnnouncementModal">&times;</button>
-              <h3>Announcement</h3>
-              <div id="announcementModalContent" style="font-size:18px;">${text}</div>
-            </div>
-          `;
-          document.body.appendChild(modal);
-        } else {
-          modal.querySelector('#announcementModalContent').textContent = text;
-          modal.style.display = 'flex';
-        }
-        modal.querySelector('#closeAnnouncementModal').onclick = () => {
-          modal.style.display = 'none';
-          if (onClose) onClose();
-        };
-        }
+      // function showAnnouncementQueue(announcements) {
+      //   if (!announcements || announcements.length === 0) return;
+      //   const [current, ...rest] = announcements;
+      //   const [id, a] = current;
+      //   showAnnouncementModal(a.text, () => showAnnouncementQueue(rest));
+      // }
       } catch (error) {
         console.warn('Firebase initialization failed:', error);
       }

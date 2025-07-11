@@ -393,6 +393,13 @@
       background-color: #002244; /* Deep Navy Blue */
       color: white;
     }
+    .header-icons {
+      z-index: 2000;
+    }
+    .header-icons i {
+      pointer-events: auto;
+      z-index: 2001;
+    }
   </style>
 </head>
 <body>
@@ -426,6 +433,7 @@
       <thead>
         <tr>
           <th>Service</th>
+          <th>Description</th>
           <th>Status</th>
           <th>Available Units</th>
         </tr>
@@ -501,7 +509,7 @@
 
   var chatHead, chatPopup, chatInput, chatSendBtn, chatBody, db, currentUser, isAdminUser;
 
-  function initializeChat() {
+  async function initializeChat() {
     try {
       console.log('Initializing chat...');
       chatHead = document.getElementById('floatingChatHead');
@@ -1395,6 +1403,82 @@
     });
   }
 
+  // Announcement functions
+  function showAnnouncementModal() {
+    const modal = document.getElementById('announcementModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      document.getElementById('announcementText').focus();
+    }
+  }
+
+  function closeAnnouncementModal() {
+    const modal = document.getElementById('announcementModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.getElementById('announcementText').value = '';
+    }
+  }
+
+  function submitAnnouncement() {
+    const text = document.getElementById('announcementText').value.trim();
+    if (!text) {
+      alert('Please enter an announcement.');
+      return;
+    }
+    
+    if (!currentUser || !db) {
+      alert('Please log in to post announcements.');
+      return;
+    }
+
+    const announcement = {
+      text: text,
+      author: currentUser.displayName || currentUser.email,
+      authorId: currentUser.uid,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    db.ref('announcements').push(announcement).then(() => {
+      closeAnnouncementModal();
+      alert('Announcement posted successfully!');
+    }).catch(error => {
+      console.error('Failed to post announcement:', error);
+      alert('Failed to post announcement. Please try again.');
+    });
+  }
+
+  function loadAnnouncements() {
+    if (!db) return;
+    
+    db.ref('announcements').orderByChild('timestamp').limitToLast(5).on('value', snap => {
+      const announcements = snap.val();
+      const container = document.getElementById('announcementsContainer');
+      
+      if (!announcements || Object.keys(announcements).length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '<div style="background: #f8f9fa; border-radius: 15px; padding: 20px; margin-bottom: 20px; border-left: 5px solid #0047AB;">';
+      html += '<h3 style="color: #0047AB; margin-bottom: 15px; font-size: 1.3rem;">📢 Latest Announcements</h3>';
+      
+      Object.entries(announcements).reverse().forEach(([id, announcement]) => {
+        const date = new Date(announcement.timestamp).toLocaleString();
+        html += `
+          <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #191970; margin-bottom: 5px;">${announcement.author}</div>
+            <div style="color: #333; margin-bottom: 8px;">${announcement.text}</div>
+            <div style="font-size: 0.9rem; color: #666;">${date}</div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      container.innerHTML = html;
+    });
+  }
+
   // Initialize chat when DOM is loaded
   window.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing chat...');
@@ -1415,6 +1499,7 @@
     }, 100);
     
     initializeChat();
+    loadAnnouncements();
     
     // Test Firebase Storage
     /*
@@ -1445,6 +1530,73 @@
     }, 2000);
     */
   });
+</script>
+
+<script>
+function toggleMenu(btn) {
+  const menu = document.getElementById('menuPopup');
+  const bars = document.querySelector('.fa-bars');
+  if (menu && bars) {
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    bars.classList.toggle('active');
+  }
+}
+</script>
+<script>
+// Hardcoded descriptions for each service
+const hardcodedDescriptions = {
+  'Lights & Sounds': 'Top-tier lighting and sound systems for any event size.',
+  'String Lights': 'Create magical ambiances with our elegant string lighting.',
+  'Mood Lights': 'Set the perfect mood with customizable color and intensity.',
+  'LED Wall': 'High-resolution LED walls for dynamic visuals and presentations.',
+  'Stage': 'Sturdy, modular stages for performances, speeches, and more.',
+  'Low Lying Fog': 'Create dramatic effects with our low-lying fog machines.'
+  // Add more as needed
+};
+</script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  (async () => {
+    // Load services
+    const servicesTbody = document.getElementById('servicesTbody');
+    servicesTbody.innerHTML = '';
+    const services = await window.getAllServices ? (await window.getAllServices()) : {};
+    if (services && Object.keys(services).length > 0) {
+      Object.values(services).forEach(service => {
+        const desc = hardcodedDescriptions[service.name] || '';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="padding:12px 10px;font-weight:bold;">${service.name || ''}</td>
+          <td>${desc}</td>
+          <td><span class="status-badge ${service.available > 0 ? 'status-available' : 'status-booked'}">${service.available > 0 ? 'Available' : 'Booked'}</span></td>
+          <td class="inventory-info">${service.available !== undefined ? service.available + ' units' : '0 units'}</td>
+        `;
+        servicesTbody.appendChild(tr);
+      });
+    } else {
+      servicesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No services found.</td></tr>';
+    }
+
+    // Load bundles
+    const bundlesTbody = document.getElementById('bundlesTbody');
+    bundlesTbody.innerHTML = '';
+    const bundles = await window.getAllBundles ? (await window.getAllBundles()) : {};
+    if (bundles && Object.keys(bundles).length > 0) {
+      Object.values(bundles).forEach(bundle => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="padding:12px 10px;font-weight:bold;">${bundle.name || ''}</td>
+          <td style="padding:12px 10px;">₱${bundle.price || ''}</td>
+          <td style="padding:12px 10px;">${(bundle.services||[]).join(', ')}</td>
+          <td class="inventory-info">${bundle.available !== undefined ? bundle.available + ' units' : '0 units'}</td>
+        `;
+        bundlesTbody.appendChild(tr);
+      });
+    } else {
+      bundlesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No bundles found.</td></tr>';
+    }
+  })();
+});
 </script>
 
 <!-- Floating Chat HTML (copied from homepage.html) -->
@@ -1479,6 +1631,21 @@
     <img src="" alt="Preview" />
   </div>
 </div>
+
+<!-- Announcement Modal -->
+<div id="announcementModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+  <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+    <h2 style="color: #0047AB; margin-bottom: 20px; text-align: center;">📢 Add Announcement</h2>
+    <textarea id="announcementText" placeholder="Enter your announcement here..." style="width: 100%; height: 120px; padding: 15px; border: 2px solid #e0e6ef; border-radius: 10px; font-size: 16px; resize: vertical; margin-bottom: 20px;"></textarea>
+    <div style="display: flex; gap: 15px; justify-content: center;">
+      <button onclick="submitAnnouncement()" style="background: #0047AB; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Post Announcement</button>
+      <button onclick="closeAnnouncementModal()" style="background: #b0b6be; color: white; border: none; padding: 12px 25px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Announcements Display -->
+<div id="announcementsContainer" style="margin: 20px auto; max-width: 1100px; padding: 0 20px;"></div>
 
 </body>
 </html>

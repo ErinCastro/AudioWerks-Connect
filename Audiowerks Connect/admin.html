@@ -275,6 +275,93 @@
       background: #ffeaea;
       color: #b71c1c;
     }
+    .admin-announcements-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,34,68,0.07);
+      padding: 24px 28px 18px 28px;
+      max-width: 500px;
+      margin: 32px auto 0 auto;
+    }
+    .admin-announcements-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #0047AB;
+      margin-bottom: 12px;
+    }
+    .admin-announcement-add-btn {
+      background: #ffc300;
+      color: #191970;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .admin-announcement-add-btn:hover {
+      background: #ffdb4d;
+    }
+    .admin-announcements-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 10px 0;
+    }
+    .admin-announcements-list li {
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.08rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .admin-announcement-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-left: 8px;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .admin-announcement-actions .edit-btn { color: #1976d2; }
+    .admin-announcement-actions .edit-btn:hover { color: #0047AB; }
+    .admin-announcement-actions .delete-btn { color: #d32f2f; }
+    .admin-announcement-actions .delete-btn:hover { color: #b71c1c; }
+    .admin-announcement-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .admin-announcement-input-row textarea {
+      flex: 1;
+      border-radius: 8px;
+      border: 1.5px solid #b0b6be;
+      padding: 8px 12px;
+      font-size: 1rem;
+      resize: none;
+    }
+    .admin-announcement-input-row button {
+      background: #0047AB;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .admin-announcement-input-row .cancel-btn {
+      background: #b0b6be;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -307,6 +394,12 @@
     <p>Confirmed: 20 | Pending: 10 | Cancelled: 5</p>
   </div>
 
+  <!-- Bookings Pie Chart -->
+  <div class="card">
+    <h3>Bookings by Status</h3>
+    <div id="piechart" style="width: 100%; height: 250px;"></div>
+  </div>
+
   <div class="card">
     <h3>Bookings</h3>
     <table>
@@ -326,23 +419,36 @@
         <!-- Bookings will be loaded here dynamically -->
       </tbody>
     </table>
-  </div>
-
-  <div class="card">
-    <h3>Announcements</h3>
-    <ul id="announcementList">
-      <li>Promo: 10% off in July 
-        <button class="ann-action-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></button>
-        <button class="ann-action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>
-      </li>
-    </ul>
-    <div class="announcement-add-row">
-      <input type="text" placeholder="Add new announcement" />
-      <button>Add</button>
+    <!-- New: Download CSV button and live preview table -->
+    <button id="downloadCsvBtn" style="margin:16px 0;">Download CSV</button>
+    <h4 style="margin-top:20px;">Live Preview of All Bookings</h4>
+    <div style="overflow-x:auto;">
+      <table id="livePreviewTable" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr id="livePreviewHeader"></tr>
+        </thead>
+        <tbody id="livePreviewBody"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- Remove the Services and Bundles sections from the admin dashboard -->
+  <!-- Replace the old Announcements section with this polished version -->
+<div class="admin-announcements-card">
+  <div class="admin-announcements-header">
+    <span>📢 Announcements</span>
+    <button class="admin-announcement-add-btn" onclick="showAdminAnnouncementInput()">
+      <i class="fas fa-plus"></i> Add
+    </button>
+  </div>
+  <ul id="adminAnnouncementsList" class="admin-announcements-list"></ul>
+  <div id="adminAnnouncementInputRow" class="admin-announcement-input-row" style="display:none;">
+    <textarea id="adminAnnouncementInput" placeholder="Type announcement..." maxlength="200"></textarea>
+    <button onclick="submitAdminAnnouncement()">Post</button>
+    <button onclick="hideAdminAnnouncementInput()" class="cancel-btn">Cancel</button>
+  </div>
+</div>
+
+<!-- Remove the Services and Bundles sections from the admin dashboard -->
 
 </div>
 
@@ -355,6 +461,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <script src="firebase-config-new.js"></script>
 <script src="firebase-backend-new.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script>
   // On page load, check if user is admin
   document.addEventListener('DOMContentLoaded', async function() {
@@ -411,18 +518,16 @@
 
     // Load bookings table
     const bookingsTbody = document.getElementById('bookingsTableBody');
-    bookingsTbody.innerHTML = '';
+    if (bookingsTbody) bookingsTbody.innerHTML = '';
     // Fetch users for username lookup
     const usersSnap = await firebase.database().ref('users').once('value');
     const users = usersSnap.val() || {};
     Object.entries(bookings).forEach(([id, b]) => {
-      // Try to find username by UID first, then by email as fallback
+      // Set customerName to username if possible
       let username = '';
       if (b.customerUid && users[b.customerUid] && users[b.customerUid].name) {
-        // Direct UID lookup
         username = users[b.customerUid].name;
-      } else if (b.customer && b.customer !== 'Guest') {
-        // Fallback to email lookup
+      } else if (b.customer) {
         for (const [uname, udata] of Object.entries(users)) {
           if (udata.email && udata.email.replace(/^"|"$/g, '') === b.customer) {
             username = uname;
@@ -430,7 +535,9 @@
           }
         }
       }
-      const displayName = username || b.customerName || b.customer || 'Guest';
+      b.customerName = username;
+      // If no username found, show 'Unknown User' instead of 'Guest'
+      const displayName = username || b.customerName || b.customer || 'Unknown User';
       const tr = document.createElement('tr');
       tr.setAttribute('data-id', id);
       tr.innerHTML = `
@@ -453,28 +560,97 @@
           <button class="delete-booking" data-id="${id}" style="background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Delete</button>
         </td>
       `;
-      bookingsTbody.appendChild(tr);
+      if (bookingsTbody) bookingsTbody.appendChild(tr);
     });
 
     // Load announcements
     const announcements = await window.getAllAnnouncements() || {};
-    const annList = document.querySelector('.card:nth-of-type(3) ul');
-    annList.innerHTML = '';
+    const annList = document.getElementById('announcementList');
+    if (annList) annList.innerHTML = '';
     Object.entries(announcements).forEach(([id, a]) => {
       const li = document.createElement('li');
       li.innerHTML = `${a.text} <button data-id="${id}" class="ann-action-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></button> <button data-id="${id}" class="ann-action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>`;
-      annList.appendChild(li);
+      if (annList) annList.appendChild(li);
     });
 
     // Load services
     const services = await window.getAllServices() || {};
     const servicesTbody = document.querySelector('.card:nth-of-type(4) tbody');
-    servicesTbody.innerHTML = '';
+    if (servicesTbody) servicesTbody.innerHTML = '';
     Object.entries(services).forEach(([id, s]) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${s.name || ''}</td><td>₱${s.price || ''}</td><td><button data-id="${id}" class="edit-service">Edit</button> <button data-id="${id}" class="del-service">Delete</button></td>`;
-      servicesTbody.appendChild(tr);
+      if (servicesTbody) servicesTbody.appendChild(tr);
     });
+
+    // Count bookings by status
+    let statusCounts = { Pending: 0, Confirmed: 0, Cancelled: 0, Completed: 0 };
+    Object.values(bookings).forEach(b => {
+      if (statusCounts[b.status] !== undefined) statusCounts[b.status]++;
+    });
+    // Render pie chart using Google Charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      const data = google.visualization.arrayToDataTable([
+        ['Status', 'Count'],
+        ...Object.entries(statusCounts)
+      ]);
+      const options = {
+        pieHole: 0.4,
+        legend: { position: 'bottom' },
+        colors: ['#FF9800', '#4CAF50', '#F44336', '#2196F3']
+      };
+      const chart = new google.visualization.PieChart(document.getElementById('piechart'));
+      chart.draw(data, options);
+    }
+    // --- Live Preview Table and CSV Download ---
+    const livePreviewHeader = document.getElementById('livePreviewHeader');
+    const livePreviewBody = document.getElementById('livePreviewBody');
+    if (livePreviewHeader) livePreviewHeader.innerHTML = '';
+    if (livePreviewBody) livePreviewBody.innerHTML = '';
+    // Get all unique keys for header
+    const allKeys = new Set();
+    Object.values(bookings).forEach(b => Object.keys(b).forEach(k => allKeys.add(k)));
+    const headerKeys = Array.from(allKeys);
+    if (livePreviewHeader) {
+      headerKeys.forEach(k => {
+        const th = document.createElement('th');
+        th.textContent = k;
+        livePreviewHeader.appendChild(th);
+      });
+    }
+    Object.values(bookings).forEach(b => {
+      if (livePreviewBody) {
+        const trPreview = document.createElement('tr');
+        headerKeys.forEach(k => {
+          const td = document.createElement('td');
+          td.textContent = b[k] !== undefined ? b[k] : '';
+          trPreview.appendChild(td);
+        });
+        livePreviewBody.appendChild(trPreview);
+      }
+    });
+    // --- CSV Download ---
+    const downloadBtn = document.getElementById('downloadCsvBtn');
+    if (downloadBtn) {
+      downloadBtn.onclick = function() {
+        const rows = [headerKeys];
+        Object.values(bookings).forEach(b => {
+          rows.push(headerKeys.map(k => b[k] !== undefined ? b[k] : ''));
+        });
+        const csvContent = rows.map(e => e.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'bookings.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+    }
   }
 
   async function loadBundles() {
@@ -482,15 +658,15 @@
     const services = await window.getAllServices() || {};
     // Populate bundles table
     const bundlesTbody = document.getElementById('bundlesTbody');
-    bundlesTbody.innerHTML = '';
+    if (bundlesTbody) bundlesTbody.innerHTML = '';
     Object.entries(bundles).forEach(([id, b]) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${b.name || ''}</td><td>₱${b.price || ''}</td><td>${(b.services||[]).join(', ')}</td><td><button class="edit-bundle" data-id="${id}">Edit</button> <button class="del-bundle" data-id="${id}">Delete</button></td>`;
-      bundlesTbody.appendChild(tr);
+      if (bundlesTbody) bundlesTbody.appendChild(tr);
     });
     // Populate services checkboxes for bundle creation
     const bundleServicesSelect = document.getElementById('bundleServicesSelect');
-    bundleServicesSelect.innerHTML = '';
+    if (bundleServicesSelect) bundleServicesSelect.innerHTML = '';
     Object.values(services).forEach(s => {
       const label = document.createElement('label');
       label.style.marginRight = '8px';
@@ -499,7 +675,7 @@
       cb.value = s.name;
       label.appendChild(cb);
       label.appendChild(document.createTextNode(' ' + s.name));
-      bundleServicesSelect.appendChild(label);
+      if (bundleServicesSelect) bundleServicesSelect.appendChild(label);
     });
   }
 
@@ -744,7 +920,7 @@
     }
 
     // Get customer name from users node if available
-    let customerDisplayName = booking.customerName || booking.customer || 'Guest';
+    let customerDisplayName = booking.customerName || booking.customer || 'Unknown User';
     if (booking.customerUid) {
       try {
         const userSnap = await firebase.database().ref(`users/${booking.customerUid}`).once('value');
@@ -818,6 +994,105 @@
       });
     }
   });
+</script>
+
+<script>
+let editingAnnouncementId = null;
+let isAdminLoggedIn = false;
+
+function showAdminAnnouncementInput(text = '', id = null) {
+  if (!isAdminLoggedIn) return;
+  document.getElementById('adminAnnouncementInputRow').style.display = 'flex';
+  document.getElementById('adminAnnouncementInput').value = text;
+  editingAnnouncementId = id;
+  document.getElementById('adminAnnouncementInput').focus();
+}
+function hideAdminAnnouncementInput() {
+  document.getElementById('adminAnnouncementInputRow').style.display = 'none';
+  document.getElementById('adminAnnouncementInput').value = '';
+  editingAnnouncementId = null;
+}
+function submitAdminAnnouncement() {
+  if (!isAdminLoggedIn) return;
+  const text = document.getElementById('adminAnnouncementInput').value.trim();
+  if (!text) return alert('Please enter an announcement.');
+  if (!window.db || !window.currentUser) return alert('Not logged in.');
+  const ref = window.db.ref('announcements');
+  if (editingAnnouncementId) {
+    ref.child(editingAnnouncementId).update({ text }).then(hideAdminAnnouncementInput);
+  } else {
+    ref.push({
+      text,
+      author: window.currentUser.displayName || window.currentUser.email,
+      authorId: window.currentUser.uid,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(hideAdminAnnouncementInput);
+  }
+}
+function deleteAdminAnnouncement(id) {
+  if (!isAdminLoggedIn) return;
+  if (confirm('Delete this announcement?')) {
+    window.db.ref('announcements').child(id).remove();
+  }
+}
+function editAdminAnnouncement(id, text) {
+  if (!isAdminLoggedIn) return;
+  showAdminAnnouncementInput(text, id);
+}
+function updateAnnouncementUIState() {
+  const addBtn = document.querySelector('.admin-announcement-add-btn');
+  const inputRow = document.getElementById('adminAnnouncementInputRow');
+  if (!isAdminLoggedIn) {
+    if (addBtn) addBtn.disabled = true;
+    if (inputRow) inputRow.style.display = 'none';
+    // Hide all edit/delete buttons
+    document.querySelectorAll('.edit-btn, .delete-btn').forEach(btn => {
+      btn.style.display = 'none';
+    });
+    // Show friendly message
+    const list = document.getElementById('adminAnnouncementsList');
+    if (list && list.children.length === 0) {
+      list.innerHTML = '<li style="color:#888;text-align:center;">Log in as admin to manage announcements.</li>';
+    }
+  } else {
+    if (addBtn) addBtn.disabled = false;
+    // Show all edit/delete buttons
+    document.querySelectorAll('.edit-btn, .delete-btn').forEach(btn => {
+      btn.style.display = '';
+    });
+  }
+}
+function loadAdminAnnouncements() {
+  if (!window.db) return;
+  window.db.ref('announcements').orderByChild('timestamp').on('value', snap => {
+    const announcements = snap.val() || {};
+    const list = document.getElementById('adminAnnouncementsList');
+    list.innerHTML = '';
+    Object.entries(announcements)
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .forEach(([id, ann]) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${ann.text}</span>
+          <span class="admin-announcement-actions">
+            <button class="edit-btn" title="Edit" onclick="editAdminAnnouncement('${id}', ${JSON.stringify(ann.text)})"><i class="fas fa-pencil-alt"></i></button>
+            <button class="delete-btn" title="Delete" onclick="deleteAdminAnnouncement('${id}')"><i class="fas fa-trash"></i></button>
+          </span>
+        `;
+        list.appendChild(li);
+      });
+    updateAnnouncementUIState();
+  });
+}
+// Listen for auth state changes and update UI accordingly
+if (window.firebase && firebase.auth) {
+  firebase.auth().onAuthStateChanged(function(user) {
+    window.currentUser = user;
+    isAdminLoggedIn = !!user;
+    updateAnnouncementUIState();
+  });
+}
+window.addEventListener('DOMContentLoaded', loadAdminAnnouncements);
 </script>
 
 </body>
