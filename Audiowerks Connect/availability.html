@@ -386,14 +386,13 @@
       }
     }
 
+    /* --- FLOATING CHAT STYLES START --- */
+    /* --- FLOATING CHAT STYLES END --- */
 
-
-
-
-
-
-
-
+    .header {
+      background-color: #002244; /* Deep Navy Blue */
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -462,74 +461,61 @@
     <p>&copy; 2025 AudioWerks. All rights reserved.</p>
   </footer>
 
-<!-- Firebase App (the core Firebase SDK) -->
+<!-- Firebase libraries -->
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
-<!-- Firebase Auth -->
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
-<!-- Firebase Database -->
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
-<!-- Your Firebase config and backend logic -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<!-- Remove this line if you don't want storage -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-storage-compat.js"></script>
+
+<!-- Your Firebase config (must initializeApp) -->
 <script src="firebase-config-new.js"></script>
+
+<!-- Your backend helpers (optional, but after config) -->
 <script src="firebase-backend-new.js"></script>
 
-  <!-- Dynamic services table script (must come after backend scripts) -->
-  <script>
-    function toggleMenu(btn) {
-      const menu = document.getElementById('menuPopup');
-      const bars = document.querySelector('.fa-bars');
+<!-- Your chat and page logic (must be after all above) -->
+<script>
+  // Hamburger menu animation and toggle
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    if (menu && bars) {
       menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
       bars.classList.toggle('active');
     }
-    window.addEventListener('click', function (e) {
-      const menu = document.getElementById('menuPopup');
-      const button = document.querySelector('.fa-bars');
-      if (!menu.contains(e.target) && e.target !== button) {
-        menu.style.display = 'none';
-        button.classList.remove('active');
-      }
-    });
-    function logout() {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.href = "login.html";
-    }
+  }
 
-    // Dynamically load services and their availability
-    document.addEventListener('DOMContentLoaded', async function() {
-      const coreServices = [
-        { name: 'Lights & Sounds', image: 'images/lights-sounds.png', description: 'Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.' },
-        { name: 'Led Wall', image: 'images/led-wall.png', description: 'Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.' },
-        { name: 'Stage', image: 'images/Stage.png', description: 'Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.' },
-        { name: 'Mood Light', image: 'images/mood-lights.png', description: 'Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.' },
-        { name: 'String Lights', image: 'images/string-lights.png', description: 'Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.' },
-        { name: 'Low Lying', image: 'images/low-lying.jpg', description: 'Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.' }
-      ];
-      const servicesTbody = document.getElementById('servicesTbody');
-      servicesTbody.innerHTML = '';
-      const services = await window.getAllServices() || {};
-      coreServices.forEach(core => {
-        // Try to find a matching service in Firebase (case-insensitive)
-        const found = Object.values(services).find(s => s.name && s.name.toLowerCase() === core.name.toLowerCase());
-        const available = found ? found.available : 0;
-        const status = found ? (found.available > 0 ? 'Available' : 'Booked') : 'Unavailable';
-        const statusClass = found ? (found.available > 0 ? 'status-available' : 'status-booked') : 'status-booked';
-        const desc = found ? (found.description || core.description) : core.description;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="display: flex; align-items: center;">
-            <img src="${core.image}" alt="${core.name}" class="product-img" />
-            <div>
-              <div class="product-title">${core.name}</div>
-              <div class="product-desc">${desc}</div>
-            </div>
-          </td>
-          <td>
-            <div class="status-label">This service is currently:</div>
-            <div class="status-badge ${statusClass}">${status}</div>
-          </td>
-          <td class="inventory-info">${found ? found.available + ' units' : '0 units'}</td>
-        `;
-        servicesTbody.appendChild(tr);
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (menu && button && !menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
+  // --- CONFIG: Set your admin UID here ---
+  const ADMIN_UID = 'FpAT19tEbYbIhbPbAi3TGNTutOT2NIptGOOVYPX6vP2kAo31JRNeMtl1'; // TODO: Replace with your actual admin UID
+  // --- END CONFIG ---
+
+  var chatHead, chatPopup, chatInput, chatSendBtn, chatBody, db, currentUser, isAdminUser;
+
+  function initializeChat() {
+    try {
+      console.log('Initializing chat...');
+      chatHead = document.getElementById('floatingChatHead');
+      chatPopup = document.getElementById('floatingChatPopup');
+      chatInput = document.getElementById('floatingChatInput');
+      chatSendBtn = document.getElementById('floatingChatSendBtn');
+      chatBody = document.getElementById('floatingChatPopupBody');
+
+      console.log('Chat elements found:', {
+        chatHead: !!chatHead,
+        chatPopup: !!chatPopup,
+        chatInput: !!chatInput,
+        chatSendBtn: !!chatSendBtn,
+        chatBody: !!chatBody
       });
 
       // Load bundles
@@ -550,423 +536,403 @@
       } else {
         bundlesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No bundles found.</td></tr>';
       }
-    });
-  </script>
 
-
-  <!-- Floating Chat HTML -->
-  <div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
-    <i class="fas fa-comment"></i>
-  </div>
-  <div class="floating-chat-popup" id="floatingChatPopup">
-    <div class="floating-chat-popup-header">
-      <span style="font-weight:700; font-size:1.1rem; letter-spacing:1px;">AudioWerks</span>
-      <div class="floating-chat-header-right">
-        <button class="floating-chat-call-btn" title="Call"><i class="fas fa-phone"></i></button>
-      </div>
-    </div>
-    <div class="floating-chat-popup-body" id="floatingChatPopupBody"></div>
-    <div class="floating-chat-popup-input">
-      <div class="input-icons">
-        <button class="input-btn" title="Attach"><i class="fas fa-paperclip"></i></button>
-        <button class="input-btn" title="Pin"><i class="fas fa-thumbtack"></i></button>
-        <button class="input-btn" title="Camera"><i class="fas fa-camera"></i></button>
-      </div>
-      <input type="text" id="floatingChatInput" placeholder="Type your message here..." />
-      <button class="send-btn" id="floatingChatSendBtn" title="Send Message"><i class="fas fa-paper-plane"></i></button>
-    </div>
-  </div>
-  <div id="floatingPinnedModalContainer" style="display: none;"></div>
-  <input type="file" id="floatingAttachmentInput" style="display:none" multiple />
-  <input type="file" id="floatingCameraInput" accept="image/*" capture="environment" style="display:none" multiple />
-  <div id="floatingImageModalOverlay">
-    <div id="floatingImageModal">
-      <button class="close-btn" title="Close">&times;</button>
-      <img src="" alt="Preview" />
-    </div>
-  </div>
-
-
-
-  <script>
-    // Floating chat functionality with error handling
-    let chatHead, chatPopup, chatInput, chatSendBtn, chatBody, currentUser, isAdminUser;
-
-    function initializeChat() {
-      try {
-        console.log('Initializing chat...');
-        chatHead = document.getElementById('floatingChatHead');
-        chatPopup = document.getElementById('floatingChatPopup');
-        chatInput = document.getElementById('floatingChatInput');
-        chatSendBtn = document.getElementById('floatingChatSendBtn');
-        chatBody = document.getElementById('floatingChatPopupBody');
-
-        console.log('Chat elements found:', {
-          chatHead: !!chatHead,
-          chatPopup: !!chatPopup,
-          chatInput: !!chatInput,
-          chatSendBtn: !!chatSendBtn,
-          chatBody: !!chatBody
+      if (chatHead) {
+        console.log('Chat head styles:', {
+          position: window.getComputedStyle(chatHead).position,
+          zIndex: window.getComputedStyle(chatHead).zIndex,
+          display: window.getComputedStyle(chatHead).display,
+          pointerEvents: window.getComputedStyle(chatHead).pointerEvents,
+          cursor: window.getComputedStyle(chatHead).cursor
         });
-
-        if (chatHead) {
-          console.log('Chat head styles:', {
-            position: window.getComputedStyle(chatHead).position,
-            zIndex: window.getComputedStyle(chatHead).zIndex,
-            display: window.getComputedStyle(chatHead).display,
-            pointerEvents: window.getComputedStyle(chatHead).pointerEvents,
-            cursor: window.getComputedStyle(chatHead).cursor
-          });
-        }
-
-        if (!chatHead || !chatPopup || !chatInput || !chatSendBtn || !chatBody) {
-          console.warn('Chat elements not found, skipping chat initialization');
-          return;
-        }
-
-        if (typeof firebase === 'undefined') {
-          console.warn('Firebase not available for chat');
-          chatBody.innerHTML = '<p>Chat temporarily unavailable.</p>';
-          return;
-        }
-
-        // Test Firebase Storage availability
-        try {
-          const testRef = firebase.storage().ref('test');
-          console.log('Firebase Storage is available');
-        } catch (error) {
-          console.error('Firebase Storage not available:', error);
-        }
-
-        db = firebase.database();
-        currentUser = null;
-        isAdminUser = false;
-
-        function determineUserRole(user) {
-          if (!user) return Promise.resolve();
-          return firebase.database().ref('admins/' + user.uid).once('value').then(snap => {
-            isAdminUser = !!snap.val();
-            window.isAdminUser = isAdminUser;
-          }).catch(error => {
-            console.warn('Failed to determine user role:', error);
-            isAdminUser = false;
-            window.isAdminUser = false;
-          });
-        }
-
-        firebase.auth().onAuthStateChanged(user => {
-          currentUser = user;
-          if (user) {
-            determineUserRole(user).then(() => {
-              db.ref('chat-messages').on('value', snap => {
-                const messages = snap.val() || {};
-                renderFloatingChatMessages(messages);
-              });
-            });
-          } else {
-            chatBody.innerHTML = '<p>Please log in to chat.</p>';
-          }
-        });
-
-        // Chat event listeners
-        console.log('Adding click listener to chat head...');
-        chatHead.addEventListener('click', (e) => {
-          console.log('Chat head clicked!', e);
-          chatPopup.classList.toggle('open');
-          if (chatPopup.classList.contains('open')) {
-            chatInput.focus();
-            chatBody.scrollTop = chatBody.scrollHeight;
-            updateDbReadReceipts();
-          }
-        });
-
-        chatBody.addEventListener('scroll', function() {
-          if (chatBody.scrollTop + chatBody.clientHeight >= chatBody.scrollHeight - 10) {
-            updateDbReadReceipts();
-          }
-        });
-
-        chatSendBtn.addEventListener('click', sendFloatingChatMsg);
-        chatInput.addEventListener('keypress', function(e) {
-          if (e.key === 'Enter') {
-            sendFloatingChatMsg();
-          }
-        });
-
-        // Initialize file upload handlers
-        initializeFileUploads();
-
-      } catch (error) {
-        console.error('Chat initialization failed:', error);
       }
-    }
 
-    function updateDbReadReceipts() {
-      if (!currentUser || !chatPopup.classList.contains('open') || !db) return;
-      
+      if (!chatHead || !chatPopup || !chatInput || !chatSendBtn || !chatBody) {
+        console.warn('Chat elements not found, skipping chat initialization');
+        return;
+      }
+
+      // --- ADDED: Make sure chat head is visible ---
+      chatHead.style.display = 'flex'; // Or 'block', 'flex' is common for icon containers
+
+      if (typeof firebase === 'undefined') {
+        console.warn('Firebase not available for chat');
+        chatBody.innerHTML = '<p>Chat temporarily unavailable.</p>';
+        return;
+      }
+
+      // Test Firebase Storage availability
       try {
-        const myRole = isAdminUser ? 'admin' : 'client';
-        const updates = {};
-        const messagesRef = db.ref('chat-messages');
+        const testRef = firebase.storage().ref('test');
+        console.log('Firebase Storage is available');
+      } catch (error) {
+        console.error('Firebase Storage not available:', error);
+      }
 
-        messagesRef.once('value').then(snap => {
-          const allMessages = snap.val() || {};
-          Object.entries(allMessages).forEach(([msgId, msg]) => {
-            const msgIsFromOther = msg.uid !== currentUser.uid;
-            const iHaveNotRead = !(msg.readBy && msg.readBy[currentUser.uid]);
+      db = firebase.database();
+      currentUser = null;
+      isAdminUser = false;
 
-            if (msgIsFromOther && iHaveNotRead) {
-              updates[`${msgId}/readBy/${currentUser.uid}`] = true;
-              updates[`${msgId}/readBy/${myRole}`] = true;
-            }
-          });
-
-          if (Object.keys(updates).length > 0) {
-            messagesRef.update(updates);
-          }
+      function determineUserRole(user) {
+        if (!user) return Promise.resolve();
+        return firebase.database().ref('admins/' + user.uid).once('value').then(snap => {
+          isAdminUser = !!snap.val();
+          window.isAdminUser = isAdminUser;
         }).catch(error => {
-          console.warn('Failed to update read receipts:', error);
+          console.warn('Failed to determine user role:', error);
+          isAdminUser = false;
+          window.isAdminUser = false;
         });
-      } catch (error) {
-        console.warn('Read receipts update failed:', error);
       }
-    }
 
-    function formatTime(date) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function createFloatingBubble(text, side = 'right', options = {}) {
-      const div = document.createElement('div');
-      div.className = 'floating-chat-bubble ' + side + (options.pinned ? ' pinned' : '');
-      
-      // Handle text content (only if there's text and no attachment, or if it's a non-image attachment)
-      if (text && text.trim() && (!options.attachment || options.attachment.type !== 'image')) {
-        const textNode = document.createTextNode(text);
-        div.appendChild(textNode);
-      }
-      
-      // Handle attachments
-      if (options.attachment) {
-        console.log('Creating attachment element:', options.attachment);
-        const attachment = options.attachment;
-        
-        if (attachment.type === 'image') {
-          // Create image element
-          const img = document.createElement('img');
-          img.src = attachment.url;
-          img.alt = attachment.name;
-          img.style.maxWidth = '180px';
-          img.style.maxHeight = '120px';
-          img.style.display = 'block';
-          img.style.margin = '8px 0';
-          img.style.borderRadius = '10px';
-          img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-          img.style.cursor = 'pointer';
-          img.onclick = () => window.showFloatingImageModal?.(attachment.url);
-          div.appendChild(img);
+      firebase.auth().onAuthStateChanged(user => {
+        currentUser = user;
+        if (user) {
+          determineUserRole(user).then(() => {
+            db.ref('chat-messages').on('value', snap => {
+              const messages = snap.val() || {};
+              renderFloatingChatMessages(messages);
+              updateFloatingChatNotif(messages);
+            });
+          });
         } else {
-          // Create file element
-          const fileDiv = document.createElement('div');
-          fileDiv.style.display = 'flex';
-          fileDiv.style.alignItems = 'center';
-          fileDiv.style.gap = '8px';
-          fileDiv.style.margin = '8px 0';
-          fileDiv.style.fontSize = '1.05rem';
-          fileDiv.style.color = '#002244';
-          fileDiv.style.background = '#f5f8fa';
-          fileDiv.style.borderRadius = '8px';
-          fileDiv.style.padding = '6px 12px';
-          fileDiv.innerHTML = `<i class='fas fa-file'></i> <a href="${attachment.url}" download="${attachment.name}" target="_blank">${attachment.name}</a>`;
-          div.appendChild(fileDiv);
+          chatBody.innerHTML = '<p>Please log in to chat.</p>';
         }
-      }
+      });
 
-      const ts = document.createElement('span');
-      ts.className = 'msg-timestamp';
-      ts.textContent = options.timestamp || formatTime(new Date());
-      div.appendChild(ts);
-
-      if (side === 'right') {
-        const receipt = document.createElement('span');
-        receipt.className = 'read-receipt';
-        const otherPartyRole = isAdminUser ? 'client' : 'admin';
-        if (options.readBy && options.readBy[otherPartyRole]) {
-          receipt.innerHTML = '<i class="fas fa-eye"></i>';
-        } else {
-          receipt.textContent = '✓';
+      // Chat event listeners
+      console.log('Adding click listener to chat head...');
+      chatHead.addEventListener('click', (e) => {
+        console.log('Chat head clicked!', e);
+        chatPopup.classList.toggle('open');
+        if (chatPopup.classList.contains('open')) {
+          chatInput.focus();
+          chatBody.scrollTop = chatBody.scrollHeight;
+          updateDbReadReceipts();
         }
-        div.appendChild(receipt);
-      }
+      });
 
-      // Actions container
-      const actions = document.createElement('span');
-      actions.className = 'msg-actions';
+      chatBody.addEventListener('scroll', function() {
+        if (chatBody.scrollTop + chatBody.clientHeight >= chatBody.scrollHeight - 10) {
+          updateDbReadReceipts();
+        }
+      });
 
-      // Edit (only for right/sender messages)
-      if (side === 'right') {
-        const editBtn = document.createElement('button');
-        editBtn.className = 'msg-action-btn';
-        editBtn.title = 'Edit';
-        editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
-        editBtn.onclick = () => {
-          // Find the text node (first text node, not attachment)
-          let textNode = null;
-          let originalText = '';
-          for (let i = 0; i < div.childNodes.length; i++) {
-            if (div.childNodes[i].nodeType === Node.TEXT_NODE && div.childNodes[i].textContent.trim()) {
-              textNode = div.childNodes[i];
-              originalText = div.childNodes[i].textContent;
-              break;
-            }
+      // Update send button enable/disable logic to match homepage.html
+      chatInput.addEventListener('input', function() {
+        chatSendBtn.disabled = !chatInput.value.trim();
+      });
+      // Also update after sending
+      function sendFloatingChatMsg() {
+        const msgText = chatInput.value.trim();
+        if (!msgText || !currentUser || !db) return;
+        try {
+          const role = isAdminUser ? 'admin' : 'client';
+          // If user, send to admin. If admin, send to last user (not implemented here)
+          const recipientUid = isAdminUser ? window.lastUserUid || '' : ADMIN_UID;
+          if (!recipientUid) {
+            alert('No recipient selected.');
+            return;
           }
-          
-          // If no text node found, create one
-          if (!textNode) {
-            textNode = document.createTextNode('');
-            div.insertBefore(textNode, div.firstChild);
-          }
-          
-          // Create input field
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.className = 'bubble-edit-input';
-          input.value = originalText;
-          input.style.width = '100%';
-          input.style.marginBottom = '8px';
-          
-          // Create save and cancel buttons
-          const saveBtn = document.createElement('button');
-          saveBtn.className = 'msg-action-btn';
-          saveBtn.title = 'Save';
-          saveBtn.innerHTML = '<i class="fas fa-check"></i>';
-          saveBtn.style.marginRight = '4px';
-          
-          const cancelBtn = document.createElement('button');
-          cancelBtn.className = 'msg-action-btn';
-          cancelBtn.title = 'Cancel';
-          cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
-          
-          // Create button container
-          const btnContainer = document.createElement('div');
-          btnContainer.style.display = 'flex';
-          btnContainer.style.gap = '4px';
-          btnContainer.appendChild(saveBtn);
-          btnContainer.appendChild(cancelBtn);
-          
-          // Replace text with input
-          div.replaceChild(input, textNode);
-          div.appendChild(btnContainer);
-          
-          // Focus input and select all text
-          input.focus();
-          input.select();
-          
-          // Save functionality
-          saveBtn.onclick = () => {
-            const newText = input.value.trim();
-            if (newText && newText !== originalText && options.msgId && db) {
-              db.ref('chat-messages/' + options.msgId).update({ text: newText });
-            } else {
-              // Restore original text
-              div.replaceChild(textNode, input);
-              div.removeChild(btnContainer);
-            }
+          const message = {
+            uid: currentUser.uid,
+            name: currentUser.displayName || 'Anonymous',
+            text: msgText,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            readBy: { [currentUser.uid]: true },
+            recipientUid: recipientUid
           };
-          
-          // Cancel functionality
-          cancelBtn.onclick = () => {
+          db.ref('chat-messages').push(message);
+          chatInput.value = '';
+          chatSendBtn.disabled = true;
+        } catch (error) {
+          console.warn('Failed to send message:', error);
+        }
+      }
+
+      chatSendBtn.addEventListener('click', sendFloatingChatMsg);
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendFloatingChatMsg();
+        }
+      });
+
+      // Initialize file upload handlers
+      initializeFileUploads();
+
+    } catch (error) {
+      console.error('Chat initialization failed:', error);
+    }
+  }
+
+  function updateDbReadReceipts() {
+    if (!currentUser || !chatPopup.classList.contains('open') || !db) return;
+    
+    try {
+      const myRole = isAdminUser ? 'admin' : 'client';
+      const updates = {};
+      const messagesRef = db.ref('chat-messages');
+
+      messagesRef.once('value').then(snap => {
+        const allMessages = snap.val() || {};
+        Object.entries(allMessages).forEach(([msgId, msg]) => {
+          const msgIsFromOther = msg.uid !== currentUser.uid;
+          const iHaveNotRead = !(msg.readBy && msg.readBy[currentUser.uid]);
+
+          if (msgIsFromOther && iHaveNotRead) {
+            updates[`${msgId}/readBy/${currentUser.uid}`] = true;
+            updates[`${msgId}/readBy/${myRole}`] = true;
+          }
+        });
+
+        if (Object.keys(updates).length > 0) {
+          messagesRef.update(updates);
+        }
+      }).catch(error => {
+        console.warn('Failed to update read receipts:', error);
+      });
+    } catch (error) {
+      console.warn('Read receipts update failed:', error);
+    }
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function createFloatingBubble(text, side = 'right', options = {}) {
+    const div = document.createElement('div');
+    div.className = 'floating-chat-bubble ' + side + (options.pinned ? ' pinned' : '');
+    
+    // Handle text content (only if there's text and no attachment, or if it's a non-image attachment)
+    if (text && text.trim() && (!options.attachment || options.attachment.type !== 'image')) {
+      const textNode = document.createTextNode(text);
+      div.appendChild(textNode);
+    }
+    
+    // Handle attachments
+    if (options.attachment) {
+      console.log('Creating attachment element:', options.attachment);
+      const attachment = options.attachment;
+      
+      if (attachment.type === 'image') {
+        // Create image element
+        const img = document.createElement('img');
+        img.src = attachment.url;
+        img.alt = attachment.name;
+        img.style.maxWidth = '180px';
+        img.style.maxHeight = '120px';
+        img.style.display = 'block';
+        img.style.margin = '8px 0';
+        img.style.borderRadius = '10px';
+        img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        img.style.cursor = 'pointer';
+        img.onclick = () => window.showFloatingImageModal?.(attachment.url);
+        div.appendChild(img);
+      } else {
+        // Create file element
+        const fileDiv = document.createElement('div');
+        fileDiv.style.display = 'flex';
+        fileDiv.style.alignItems = 'center';
+        fileDiv.style.gap = '8px';
+        fileDiv.style.margin = '8px 0';
+        fileDiv.style.fontSize = '1.05rem';
+        fileDiv.style.color = '#002244';
+        fileDiv.style.background = '#f5f8fa';
+        fileDiv.style.borderRadius = '8px';
+        fileDiv.style.padding = '6px 12px';
+        fileDiv.innerHTML = `<i class='fas fa-file'></i> <a href="${attachment.url}" download="${attachment.name}" target="_blank">${attachment.name}</a>`;
+        div.appendChild(fileDiv);
+      }
+    }
+
+    const ts = document.createElement('span');
+    ts.className = 'msg-timestamp';
+    ts.textContent = options.timestamp || formatTime(new Date());
+    div.appendChild(ts);
+
+    if (side === 'right') {
+      const receipt = document.createElement('span');
+      receipt.className = 'read-receipt';
+      const otherPartyRole = isAdminUser ? 'client' : 'admin';
+      if (options.readBy && options.readBy[otherPartyRole]) {
+        receipt.innerHTML = '<i class="fas fa-eye"></i>';
+      } else {
+        receipt.textContent = '✓';
+      }
+      div.appendChild(receipt);
+    }
+
+    // Actions container
+    const actions = document.createElement('span');
+    actions.className = 'msg-actions';
+
+    // Edit (only for right/sender messages)
+    if (side === 'right') {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'msg-action-btn';
+      editBtn.title = 'Edit';
+      editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+      editBtn.onclick = () => {
+        // Find the text node (first text node, not attachment)
+        let textNode = null;
+        let originalText = '';
+        for (let i = 0; i < div.childNodes.length; i++) {
+          if (div.childNodes[i].nodeType === Node.TEXT_NODE && div.childNodes[i].textContent.trim()) {
+            textNode = div.childNodes[i];
+            originalText = div.childNodes[i].textContent;
+            break;
+          }
+        }
+        
+        // If no text node found, create one
+        if (!textNode) {
+          textNode = document.createTextNode('');
+          div.insertBefore(textNode, div.firstChild);
+        }
+        
+        // Create input field
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'bubble-edit-input';
+        input.value = originalText;
+        input.style.width = '100%';
+        input.style.marginBottom = '8px';
+        
+        // Create save and cancel buttons
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'msg-action-btn';
+        saveBtn.title = 'Save';
+        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+        saveBtn.style.marginRight = '4px';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'msg-action-btn';
+        cancelBtn.title = 'Cancel';
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+        
+        // Create button container
+        const btnContainer = document.createElement('div');
+        btnContainer.style.display = 'flex';
+        btnContainer.style.gap = '4px';
+        btnContainer.appendChild(saveBtn);
+        btnContainer.appendChild(cancelBtn);
+        
+        // Replace text with input
+        div.replaceChild(input, textNode);
+        div.appendChild(btnContainer);
+        
+        // Focus input and select all text
+        input.focus();
+        input.select();
+        
+        // Save functionality
+        saveBtn.onclick = () => {
+          const newText = input.value.trim();
+          if (newText && newText !== originalText && options.msgId && db) {
+            db.ref('chat-messages/' + options.msgId).update({ text: newText });
+          } else {
+            // Restore original text
             div.replaceChild(textNode, input);
             div.removeChild(btnContainer);
-          };
-          
-          // Handle Enter and Escape keys
-          input.onkeydown = (e) => {
-            if (e.key === 'Enter') {
-              saveBtn.click();
-            } else if (e.key === 'Escape') {
-              cancelBtn.click();
-            }
-          };
-        };
-        actions.appendChild(editBtn);
-      }
-
-      // Delete
-      const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'msg-action-btn';
-      deleteBtn.title = 'Delete';
-      deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-      deleteBtn.onclick = () => {
-        if (options.msgId && db) {
-          db.ref('chat-messages/' + options.msgId).remove();
-        }
-      };
-      actions.appendChild(deleteBtn);
-
-      // React
-      const reactBtn = document.createElement('button');
-      reactBtn.className = 'msg-action-btn';
-      reactBtn.title = 'React';
-      reactBtn.innerHTML = '<i class="far fa-heart"></i>';
-      reactBtn.onclick = () => {
-        showReactionPicker(div, options.msgId);
-      };
-      actions.appendChild(reactBtn);
-
-      // Pin (available for both admin and client users)
-      const pinBtn = document.createElement('button');
-      pinBtn.className = 'msg-action-btn';
-      pinBtn.title = options.pinned ? 'Unpin' : 'Pin';
-      pinBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
-      pinBtn.onclick = () => {
-        if (options.msgId && db && currentUser) {
-          const newPinnedState = !options.pinned;
-          console.log(`${currentUser.email} ${newPinnedState ? 'pinning' : 'unpinning'} message:`, options.msgId);
-          db.ref('chat-messages/' + options.msgId).update({ 
-            pinned: newPinnedState,
-            pinnedBy: currentUser.uid,
-            pinnedAt: firebase.database.ServerValue.TIMESTAMP
-          });
-        }
-      };
-      actions.appendChild(pinBtn);
-
-      // Add reactions display if message has reactions
-      if (options.reactions && Object.keys(options.reactions).length > 0) {
-        const reactionsDiv = document.createElement('div');
-        reactionsDiv.className = 'reactions';
-        
-        Object.entries(options.reactions).forEach(([emoji, users]) => {
-          const reactionDiv = document.createElement('div');
-          reactionDiv.className = 'reaction';
-          if (users && users[currentUser.uid]) {
-            reactionDiv.classList.add('active');
           }
-          reactionDiv.innerHTML = `${emoji} <span class="count">${Object.keys(users || {}).length}</span>`;
-          reactionDiv.onclick = () => {
-            toggleReaction(options.msgId, emoji, currentUser.uid);
-          };
-          reactionsDiv.appendChild(reactionDiv);
-        });
+        };
         
-        div.appendChild(reactionsDiv);
-      }
-
-      div.appendChild(actions);
-
-      return div;
+        // Cancel functionality
+        cancelBtn.onclick = () => {
+          div.replaceChild(textNode, input);
+          div.removeChild(btnContainer);
+        };
+        
+        // Handle Enter and Escape keys
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            saveBtn.click();
+          } else if (e.key === 'Escape') {
+            cancelBtn.click();
+          }
+        };
+      };
+      actions.appendChild(editBtn);
     }
 
-    function renderFloatingChatMessages(messages) {
-      if (!chatBody) return;
-      
-      chatBody.innerHTML = '';
-      if (!currentUser) return;
+    // Delete
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'msg-action-btn';
+    deleteBtn.title = 'Delete';
+    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    deleteBtn.onclick = () => {
+      if (options.msgId && db) {
+        db.ref('chat-messages/' + options.msgId).remove();
+      }
+    };
+    actions.appendChild(deleteBtn);
 
-      try {
-        Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
-          console.log('Rendering message:', { msgId, text: msg.text, attachment: msg.attachment });
+    // React
+    const reactBtn = document.createElement('button');
+    reactBtn.className = 'msg-action-btn';
+    reactBtn.title = 'React';
+    reactBtn.innerHTML = '<i class="far fa-heart"></i>';
+    reactBtn.onclick = () => {
+      showReactionPicker(div, options.msgId);
+    };
+    actions.appendChild(reactBtn);
+
+    // Pin (available for both admin and client users)
+    const pinBtn = document.createElement('button');
+    pinBtn.className = 'msg-action-btn';
+    pinBtn.title = options.pinned ? 'Unpin' : 'Pin';
+    pinBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
+    pinBtn.onclick = () => {
+      if (options.msgId && db && currentUser) {
+        const newPinnedState = !options.pinned;
+        console.log(`${currentUser.email} ${newPinnedState ? 'pinning' : 'unpinning'} message:`, options.msgId);
+        db.ref('chat-messages/' + options.msgId).update({ 
+          pinned: newPinnedState,
+          pinnedBy: currentUser.uid,
+          pinnedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+    };
+    actions.appendChild(pinBtn);
+
+    // Add reactions display if message has reactions
+    if (options.reactions && Object.keys(options.reactions).length > 0) {
+      const reactionsDiv = document.createElement('div');
+      reactionsDiv.className = 'reactions';
+      
+      Object.entries(options.reactions).forEach(([emoji, users]) => {
+        const reactionDiv = document.createElement('div');
+        reactionDiv.className = 'reaction';
+        if (users && users[currentUser.uid]) {
+          reactionDiv.classList.add('active');
+        }
+        reactionDiv.innerHTML = `${emoji} <span class="count">${Object.keys(users || {}).length}</span>`;
+        reactionDiv.onclick = () => {
+          toggleReaction(options.msgId, emoji, currentUser.uid);
+        };
+        reactionsDiv.appendChild(reactionDiv);
+      });
+      
+      div.appendChild(reactionsDiv);
+    }
+
+    div.appendChild(actions);
+
+    return div;
+  }
+
+  function renderFloatingChatMessages(messages) {
+    if (!chatBody) return;
+    
+    chatBody.innerHTML = '';
+    if (!currentUser) return;
+
+    try {
+      Object.entries(messages)
+        .filter(([msgId, msg]) => msg.uid === currentUser.uid || msg.recipientUid === currentUser.uid)
+        .sort((a, b) => a[1].timestamp - b[1].timestamp)
+        .forEach(([msgId, msg]) => {
           const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
           const bubble = createFloatingBubble(msg.text, side, {
             msgId: msgId,
@@ -978,159 +944,183 @@
           });
           chatBody.appendChild(bubble);
         });
-        chatBody.scrollTop = chatBody.scrollHeight;
-      } catch (error) {
-        console.warn('Failed to render chat messages:', error);
-      }
+      chatBody.scrollTop = chatBody.scrollHeight;
+    } catch (error) {
+      console.warn('Failed to render chat messages:', error);
     }
+  }
 
-    function sendFloatingChatMsg() {
-      const msgText = chatInput.value.trim();
-      if (!msgText || !currentUser || !db) return;
+  function updateFloatingChatNotif(messages) {
+    if (!currentUser) return;
+    const notif = document.getElementById('floatingChatNotif');
+    if (!notif) return;
+    // Only count messages where current user is recipient and has not read
+    const unreadCount = Object.values(messages).filter(msg =>
+      msg.recipientUid === currentUser.uid && msg.uid !== currentUser.uid && (!msg.readBy || !msg.readBy[currentUser.uid])
+    ).length;
+    if (unreadCount > 0) {
+      notif.textContent = unreadCount;
+      notif.style.display = 'inline-flex';
+    } else {
+      notif.textContent = '';
+      notif.style.display = 'none';
+    }
+  }
 
-      try {
-        const role = isAdminUser ? 'admin' : 'client';
-        const messageData = {
-          text: msgText,
-          uid: currentUser.uid,
-          name: currentUser.displayName || currentUser.email,
-          timestamp: firebase.database.ServerValue.TIMESTAMP,
-          readBy: {
-            [currentUser.uid]: true,
-            [role]: true
+  function sendFloatingChatMsg() {
+    const msgText = chatInput.value.trim();
+    if (!msgText || !currentUser || !db) return;
+
+    try {
+      const role = isAdminUser ? 'admin' : 'client';
+      const messageData = {
+        text: msgText,
+        uid: currentUser.uid,
+        name: currentUser.displayName || currentUser.email,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        readBy: {
+          [currentUser.uid]: true,
+          [role]: true
+        }
+      };
+
+      db.ref('chat-messages').push(messageData);
+      chatInput.value = '';
+    } catch (error) {
+      console.warn('Failed to send message:', error);
+    }
+  }
+
+  function initializeFileUploads() {
+    console.log('initializeFileUploads called');
+    try {
+      const attachBtn = document.querySelector('.input-btn[title="Attach"]');
+      const pinListBtn = document.querySelector('.input-btn[title="Pin"]');
+      const cameraBtn = document.querySelector('.input-btn[title="Camera"]');
+      console.log('Found buttons:', { attachBtn: !!attachBtn, pinListBtn: !!pinListBtn, cameraBtn: !!cameraBtn });
+      const floatingAttachmentInput = document.getElementById('floatingAttachmentInput');
+      const floatingCameraInput = document.getElementById('floatingCameraInput');
+      const floatingPinnedModalContainer = document.getElementById('floatingPinnedModalContainer');
+
+      if (attachBtn && floatingAttachmentInput) {
+        attachBtn.addEventListener('click', function() {
+          floatingAttachmentInput.value = '';
+          floatingAttachmentInput.click();
+        });
+      }
+
+      if (cameraBtn && floatingCameraInput) {
+        cameraBtn.addEventListener('click', function() {
+          floatingCameraInput.value = '';
+          floatingCameraInput.click();
+        });
+      }
+
+      if (floatingAttachmentInput) {
+        floatingAttachmentInput.addEventListener('change', handleFileUpload);
+      }
+
+      if (floatingCameraInput) {
+        floatingCameraInput.addEventListener('change', handleFileUpload);
+      }
+
+      if (pinListBtn && floatingPinnedModalContainer) {
+        console.log('Pin button found, adding click listener');
+        pinListBtn.addEventListener('click', function() {
+          console.log('Pin button clicked!');
+          try {
+            showPinnedMessages(floatingPinnedModalContainer);
+          } catch (error) {
+            console.error('Error calling showPinnedMessages:', error);
+            alert('Error: ' + error.message);
+          }
+        });
+      } else {
+        console.warn('Pin button or container not found:', { 
+          pinListBtn: !!pinListBtn, 
+          floatingPinnedModalContainer: !!floatingPinnedModalContainer 
+        });
+      }
+
+      // Image modal functionality
+      const floatingImageModalOverlay = document.getElementById('floatingImageModalOverlay');
+      const floatingImageModal = document.getElementById('floatingImageModal');
+      const floatingImageModalImg = floatingImageModal?.querySelector('img');
+      const floatingImageModalClose = floatingImageModal?.querySelector('.close-btn');
+
+      if (floatingImageModalClose) {
+        floatingImageModalClose.onclick = () => {
+          if (floatingImageModalOverlay) {
+            floatingImageModalOverlay.classList.remove('open');
           }
         };
-
-        db.ref('chat-messages').push(messageData);
-        chatInput.value = '';
-      } catch (error) {
-        console.warn('Failed to send message:', error);
       }
-    }
 
-    function initializeFileUploads() {
-      console.log('initializeFileUploads called');
-      try {
-        const attachBtn = document.querySelector('.input-btn[title="Attach"]');
-        const pinListBtn = document.querySelector('.input-btn[title="Pin"]');
-        const cameraBtn = document.querySelector('.input-btn[title="Camera"]');
-        console.log('Found buttons:', { attachBtn: !!attachBtn, pinListBtn: !!pinListBtn, cameraBtn: !!cameraBtn });
-        const floatingAttachmentInput = document.getElementById('floatingAttachmentInput');
-        const floatingCameraInput = document.getElementById('floatingCameraInput');
-        const floatingPinnedModalContainer = document.getElementById('floatingPinnedModalContainer');
-
-        if (attachBtn && floatingAttachmentInput) {
-          attachBtn.addEventListener('click', function() {
-            floatingAttachmentInput.value = '';
-            floatingAttachmentInput.click();
-          });
-        }
-
-        if (cameraBtn && floatingCameraInput) {
-          cameraBtn.addEventListener('click', function() {
-            floatingCameraInput.value = '';
-            floatingCameraInput.click();
-          });
-        }
-
-        if (floatingAttachmentInput) {
-          floatingAttachmentInput.addEventListener('change', handleFileUpload);
-        }
-
-        if (floatingCameraInput) {
-          floatingCameraInput.addEventListener('change', handleFileUpload);
-        }
-
-        if (pinListBtn && floatingPinnedModalContainer) {
-          console.log('Pin button found, adding click listener');
-          pinListBtn.addEventListener('click', function() {
-            console.log('Pin button clicked!');
-            try {
-              showPinnedMessages(floatingPinnedModalContainer);
-            } catch (error) {
-              console.error('Error calling showPinnedMessages:', error);
-              alert('Error: ' + error.message);
-            }
-          });
-        } else {
-          console.warn('Pin button or container not found:', { 
-            pinListBtn: !!pinListBtn, 
-            floatingPinnedModalContainer: !!floatingPinnedModalContainer 
-          });
-        }
-
-        // Image modal functionality
-        const floatingImageModalOverlay = document.getElementById('floatingImageModalOverlay');
-        const floatingImageModal = document.getElementById('floatingImageModal');
-        const floatingImageModalImg = floatingImageModal?.querySelector('img');
-        const floatingImageModalClose = floatingImageModal?.querySelector('.close-btn');
-
-        if (floatingImageModalClose) {
-          floatingImageModalClose.onclick = () => {
-            if (floatingImageModalOverlay) {
-              floatingImageModalOverlay.classList.remove('open');
-            }
-          };
-        }
-
-        if (floatingImageModalOverlay) {
-          floatingImageModalOverlay.onclick = e => {
-            if (e.target === floatingImageModalOverlay) {
-              floatingImageModalOverlay.classList.remove('open');
-            }
-          };
-        }
-
-        window.showFloatingImageModal = function(src) {
-          if (floatingImageModalImg && floatingImageModalOverlay) {
-            floatingImageModalImg.src = src;
-            floatingImageModalOverlay.classList.add('open');
+      if (floatingImageModalOverlay) {
+        floatingImageModalOverlay.onclick = e => {
+          if (e.target === floatingImageModalOverlay) {
+            floatingImageModalOverlay.classList.remove('open');
           }
         };
-
-      } catch (error) {
-        console.warn('File upload initialization failed:', error);
       }
+
+      window.showFloatingImageModal = function(src) {
+        if (floatingImageModalImg && floatingImageModalOverlay) {
+          floatingImageModalImg.src = src;
+          floatingImageModalOverlay.classList.add('open');
+        }
+      };
+
+    } catch (error) {
+      console.warn('File upload initialization failed:', error);
     }
+  }
 
-    function handleFileUpload(e) {
-      console.log('handleFileUpload called with:', e.target.files);
-      if (!e.target.files || e.target.files.length === 0) {
-        console.log('No files selected');
-        return;
-      }
-      if (!currentUser) {
-        console.log('No current user');
-        return;
-      }
-      if (!db) {
-        console.log('No database connection');
-        return;
-      }
-      if (typeof firebase === 'undefined') {
-        console.log('Firebase not available');
-        return;
-      }
-      
-      try {
-        Array.from(e.target.files).forEach(file => {
-          // Show loading message
-          const loadingDiv = createFloatingBubble('📎 Uploading ' + file.name + '...', 'right', { timestamp: formatTime(new Date()) });
-          if (chatBody) {
-            chatBody.appendChild(loadingDiv);
-            chatBody.scrollTop = chatBody.scrollHeight;
-          }
-          
-          // Create unique filename
-          const timestamp = Date.now();
-          const uniqueFileName = `${timestamp}_${file.name}`;
-          console.log('Creating file reference for:', uniqueFileName);
-          const fileRef = firebase.storage().ref(`chat-attachments/${uniqueFileName}`);
-          console.log('File reference created:', fileRef);
-          
-          // Upload file to Firebase Storage
-          console.log('Starting file upload...');
-          fileRef.put(file).then(snapshot => {
+  function handleFileUpload(e) {
+    console.log('handleFileUpload called with:', e.target.files);
+    if (!e.target.files || e.target.files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
+    if (!currentUser) {
+      console.log('No current user');
+      return;
+    }
+    if (!db) {
+      console.log('No database connection');
+      return;
+    }
+    if (typeof firebase === 'undefined') {
+      console.log('Firebase not available');
+      return;
+    }
+    
+    try {
+      Array.from(e.target.files).forEach(file => {
+        // Show loading message
+        const loadingDiv = createFloatingBubble('📎 Uploading ' + file.name + '...', 'right', { timestamp: formatTime(new Date()) });
+        if (chatBody) {
+          chatBody.appendChild(loadingDiv);
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+        
+        // Create unique filename
+        const timestamp = Date.now();
+        const uniqueFileName = `${timestamp}_${file.name}`;
+        console.log('Creating file reference for:', uniqueFileName);
+        const fileRef = firebase.storage().ref(`chat-attachments/${uniqueFileName}`);
+        console.log('File reference created:', fileRef);
+        
+        // --- New: Read file as Data URL (base64) ---
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+
+          // --- Modified: Upload file to Firebase Storage using putString ---
+          console.log('Starting file upload via data URL...');
+          // Pass metadata to ensure correct content type is set
+          const metadata = { contentType: file.type };
+          fileRef.putString(dataUrl, 'data_url', metadata).then(snapshot => {
             console.log('File uploaded successfully:', snapshot);
             // Get download URL
             return snapshot.ref.getDownloadURL();
@@ -1140,7 +1130,7 @@
             if (chatBody && loadingDiv.parentNode) {
               chatBody.removeChild(loadingDiv);
             }
-            
+
             // Create message data
             const role = isAdminUser ? 'admin' : 'client';
             const isImage = file.type.startsWith('image/');
@@ -1161,7 +1151,7 @@
                 fileName: uniqueFileName
               }
             };
-            
+
             // Save to database
             console.log('Saving message data to database:', messageData);
             db.ref('chat-messages').push(messageData).then(() => {
@@ -1169,7 +1159,7 @@
             }).catch(error => {
               console.error('Failed to save message to database:', error);
             });
-            
+
           }).catch(error => {
             console.error('File upload failed:', error);
             console.error('Error details:', {
@@ -1187,257 +1177,308 @@
               chatBody.scrollTop = chatBody.scrollHeight;
             }
           });
-        });
-      } catch (error) {
-        console.warn('File upload failed:', error);
-      }
-    }
+        };
 
-    function showPinnedMessages(container) {
-      console.log('showPinnedMessages called with:', { container: !!container, db: !!db });
-      try {
-        if (!container || !db) {
-          console.warn('Missing container or db:', { container: !!container, db: !!db });
-          alert('Missing container or db: ' + JSON.stringify({ container: !!container, db: !!db }));
-          return;
-        }
-        
-        // Set up the modal container with proper styling
-        console.log('Setting up modal container...');
-        container.style.display = 'flex';
-        container.style.position = 'fixed';
-        container.style.top = '0';
-        container.style.left = '0';
-        container.style.width = '100%';
-        container.style.height = '100%';
-        container.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        container.style.zIndex = '1002';
-        container.style.justifyContent = 'center';
-        container.style.alignItems = 'center';
-        
-        // Show loading state
-        console.log('Setting up loading state...');
-        container.innerHTML = `
-        <div class="pinned-modal">
-          <button class="close-btn" title="Close">&times;</button>
-          <h2>Pinned Messages</h2>
-          <div class="pinned-list">
-              <div style="color:#888;">Loading pinned messages...</div>
-          </div>
-        </div>
-      `;
-        
-        console.log('Adding show class to container...');
-        container.classList.add('show');
-        console.log('Container classes after adding show:', container.className);
-        console.log('Container display style:', container.style.display);
-        
-        // Fetch pinned messages from Firebase
-        console.log('Fetching pinned messages from Firebase...');
-        console.log('Current user:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'Not logged in');
-        console.log('Is admin user:', isAdminUser);
-        
-        db.ref('chat-messages').orderByChild('pinned').equalTo(true).once('value').then(snap => {
-          const pinnedMessages = snap.val();
-          console.log('Pinned messages fetched:', pinnedMessages);
-          
-          if (!pinnedMessages || Object.keys(pinnedMessages).length === 0) {
-            container.innerHTML = `
-              <div class="pinned-modal">
-                <button class="close-btn" title="Close">&times;</button>
-                <h2>Pinned Messages</h2>
-                <div class="pinned-list">
-                  <div style="color:#888;">No pinned messages.</div>
-                </div>
-              </div>
-            `;
-          } else {
-            container.innerHTML = `
-              <div class="pinned-modal">
-                <button class="close-btn" title="Close">&times;</button>
-                <h2>Pinned Messages</h2>
-                <div class="pinned-list"></div>
-              </div>
-            `;
-            
-            const pinnedList = container.querySelector('.pinned-list');
-            
-            // Sort messages by timestamp
-            const sortedMessages = Object.entries(pinnedMessages)
-              .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
-            
-            sortedMessages.forEach(([msgId, msg]) => {
-              const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
-              const bubble = createFloatingBubble(msg.text, side, {
-                msgId: msgId,
-                timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
-                readBy: msg.readBy || {},
-                pinned: true,
-                reactions: msg.reactions || {},
-                attachment: msg.attachment || null
-              });
-              
-              // Remove action buttons from pinned message display
-              const actions = bubble.querySelector('.msg-actions');
-              if (actions) actions.remove();
-              
-              // Add pin info if available
-              if (msg.pinnedBy) {
-                const pinInfo = document.createElement('div');
-                pinInfo.style.fontSize = '0.8rem';
-                pinInfo.style.color = '#0047AB';
-                pinInfo.style.marginTop = '4px';
-                pinInfo.style.fontStyle = 'italic';
-                pinInfo.style.fontWeight = '500';
-                pinInfo.textContent = `📌 Pinned by ${msg.pinnedBy === currentUser.uid ? 'you' : 'someone'}`;
-                bubble.appendChild(pinInfo);
-              }
-              
-              pinnedList.appendChild(bubble);
-            });
-          }
-          
-          // Set up close functionality
-          container.querySelector('.close-btn').onclick = () => {
-            container.classList.remove('show');
-            container.innerHTML = '';
-          };
-          
-          container.onclick = e => { 
-            if (e.target === container) {
-              container.classList.remove('show');
-              container.innerHTML = '';
+        reader.onerror = (error) => {
+            console.error('Error reading file:', error);
+            if (chatBody && loadingDiv.parentNode) {
+                chatBody.removeChild(loadingDiv);
             }
-          };
-          
-        }).catch(error => {
-          console.warn('Failed to fetch pinned messages:', error);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    } catch (error) {
+      console.warn('File upload failed:', error);
+    }
+  }
+
+  function showPinnedMessages(container) {
+    console.log('showPinnedMessages called with:', { container: !!container, db: !!db });
+    try {
+      if (!container || !db) {
+        console.warn('Missing container or db:', { container: !!container, db: !!db });
+        alert('Missing container or db: ' + JSON.stringify({ container: !!container, db: !!db }));
+        return;
+      }
+      
+      // Set up the modal container with proper styling
+      console.log('Setting up modal container...');
+      container.style.display = 'flex';
+      container.style.position = 'fixed';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      container.style.zIndex = '1002';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+      
+      // Show loading state
+      console.log('Setting up loading state...');
+      container.innerHTML = `
+      <div class="pinned-modal">
+        <button class="close-btn" title="Close">&times;</button>
+        <h2>Pinned Messages</h2>
+        <div class="pinned-list">
+            <div style="color:#888;">Loading pinned messages...</div>
+        </div>
+      </div>
+    `;
+      
+      console.log('Adding show class to container...');
+      container.classList.add('show');
+      console.log('Container classes after adding show:', container.className);
+      console.log('Container display style:', container.style.display);
+      
+      // Fetch pinned messages from Firebase
+      console.log('Fetching pinned messages from Firebase...');
+      console.log('Current user:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'Not logged in');
+      console.log('Is admin user:', isAdminUser);
+      
+      db.ref('chat-messages').orderByChild('pinned').equalTo(true).once('value').then(snap => {
+        const pinnedMessages = snap.val();
+        console.log('Pinned messages fetched:', pinnedMessages);
+        
+        if (!pinnedMessages || Object.keys(pinnedMessages).length === 0) {
           container.innerHTML = `
             <div class="pinned-modal">
               <button class="close-btn" title="Close">&times;</button>
               <h2>Pinned Messages</h2>
               <div class="pinned-list">
-                <div style="color:#d32f2f;">Failed to load pinned messages.</div>
+                <div style="color:#888;">No pinned messages.</div>
               </div>
             </div>
           `;
-        });
+          return;
+        }
         
-      } catch (error) {
-        console.warn('Failed to show pinned messages:', error);
-      }
-    }
-
-    // Reaction helper functions
-    function showReactionPicker(bubble, msgId) {
-      // Remove any existing reaction picker
-      const existingPicker = document.querySelector('.reaction-picker');
-      if (existingPicker) {
-        existingPicker.remove();
-      }
-
-      const reactions = ['❤️', '👍', '👎', '😂', '😮', '😢', '😡', '🎉', '🔥', '💯'];
-      
-      const picker = document.createElement('div');
-      picker.className = 'reaction-picker';
-      
-      reactions.forEach(emoji => {
-        const option = document.createElement('button');
-        option.className = 'reaction-option';
-        option.textContent = emoji;
-        option.onclick = () => {
-          addReaction(msgId, emoji, currentUser.uid);
-          picker.remove();
-        };
-        picker.appendChild(option);
-      });
-      
-      bubble.appendChild(picker);
-      
-      // Show picker
-      setTimeout(() => picker.classList.add('show'), 10);
-      
-      // Close picker when clicking outside
-      const closePicker = (e) => {
-        if (!picker.contains(e.target) && !bubble.querySelector('.msg-action-btn').contains(e.target)) {
-          picker.remove();
-          document.removeEventListener('click', closePicker);
-        }
-      };
-      
-      setTimeout(() => document.addEventListener('click', closePicker), 100);
-    }
-
-    function addReaction(msgId, emoji, userId) {
-      if (!db || !msgId) return;
-      
-      const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
-      reactionRef.set(true);
-    }
-
-    function toggleReaction(msgId, emoji, userId) {
-      if (!db || !msgId) return;
-      
-      const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
-      reactionRef.once('value').then(snap => {
-        if (snap.val()) {
-          // Remove reaction
-          reactionRef.remove();
-        } else {
-          // Add reaction
-          reactionRef.set(true);
-        }
-      });
-    }
-
-    // Initialize chat when DOM is loaded
-    window.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, initializing chat...');
-      console.log('Firebase available:', typeof firebase !== 'undefined');
-      if (typeof firebase !== 'undefined') {
-        console.log('Firebase apps:', firebase.apps.length);
-        console.log('Firebase auth available:', !!firebase.auth);
-        console.log('Firebase database available:', !!firebase.database);
-        console.log('Firebase storage available:', !!firebase.storage);
-      }
-      
-      // Remove any debugging border from chat head
-      setTimeout(() => {
-        const chatHead = document.getElementById('floatingChatHead');
-        if (chatHead) {
-          chatHead.style.border = '';
-        }
-      }, 100);
-      
-      initializeChat();
-      
-      // Test Firebase Storage
-      setTimeout(() => {
-        console.log('Testing Firebase Storage...');
-        if (typeof firebase !== 'undefined' && firebase.storage) {
-          try {
-            const testRef = firebase.storage().ref('test-file.txt');
-            const testBlob = new Blob(['test content'], { type: 'text/plain' });
-            testRef.put(testBlob).then(() => {
-              console.log('Firebase Storage test successful');
-              return testRef.getDownloadURL();
-            }).then(url => {
-              console.log('Test file URL:', url);
-              // Clean up test file
-              return testRef.delete();
-            }).then(() => {
-              console.log('Test file cleaned up');
-            }).catch(error => {
-              console.error('Firebase Storage test failed:', error);
-            });
-          } catch (error) {
-            console.error('Firebase Storage test error:', error);
+        container.innerHTML = `
+          <div class="pinned-modal">
+            <button class="close-btn" title="Close">&times;</button>
+            <h2>Pinned Messages</h2>
+            <div class="pinned-list"></div>
+          </div>
+        `;
+        
+        const pinnedList = container.querySelector('.pinned-list');
+        // Only show pinned messages that were pinned by the current user or the admin
+        const filteredMessages = Object.entries(pinnedMessages).filter(([msgId, msg]) => {
+          return (
+            msg.pinned === true &&
+            (msg.pinnedBy === currentUser.uid || msg.pinnedBy === ADMIN_UID)
+          );
+        });
+        const sortedMessages = filteredMessages.sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+        
+        sortedMessages.forEach(([msgId, msg]) => {
+          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+          const bubble = createFloatingBubble(msg.text, side, {
+            msgId: msgId,
+            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+            readBy: msg.readBy || {},
+            pinned: true,
+            reactions: msg.reactions || {},
+            attachment: msg.attachment || null
+          });
+          // Remove action buttons from pinned message display
+          const actions = bubble.querySelector('.msg-actions');
+          if (actions) actions.remove();
+          // Add pin info if available
+          if (msg.pinnedBy) {
+            const pinInfo = document.createElement('div');
+            pinInfo.style.fontSize = '0.8rem';
+            pinInfo.style.color = '#0047AB';
+            pinInfo.style.marginTop = '4px';
+            pinInfo.style.fontStyle = 'italic';
+            pinInfo.style.fontWeight = '500';
+            if (msg.pinnedBy === currentUser.uid) {
+              pinInfo.textContent = `📌 Pinned by you`;
+            } else if (msg.pinnedBy === ADMIN_UID) {
+              pinInfo.textContent = `📌 Pinned by admin`;
+            } else {
+              pinInfo.textContent = `📌 Pinned by someone`;
+            }
+            bubble.appendChild(pinInfo);
           }
-        } else {
-          console.warn('Firebase Storage not available for testing');
-        }
-      }, 2000);
+          pinnedList.appendChild(bubble);
+        });
+        // Set up close functionality
+        container.querySelector('.close-btn').onclick = () => {
+          container.classList.remove('show');
+          container.innerHTML = '';
+        };
+        container.onclick = e => { 
+          if (e.target === container) {
+            container.classList.remove('show');
+            container.innerHTML = '';
+          }
+        };
+      }).catch(error => {
+        console.warn('Failed to fetch pinned messages:', error);
+        container.innerHTML = `
+          <div class="pinned-modal">
+            <button class="close-btn" title="Close">&times;</button>
+            <h2>Pinned Messages</h2>
+            <div class="pinned-list">
+              <div style="color:#d32f2f;">Failed to load pinned messages.</div>
+            </div>
+          </div>
+        `;
+      });
+      
+    } catch (error) {
+      console.warn('Failed to show pinned messages:', error);
+    }
+  }
+
+  // Reaction helper functions
+  function showReactionPicker(bubble, msgId) {
+    // Remove any existing reaction picker
+    const existingPicker = document.querySelector('.reaction-picker');
+    if (existingPicker) {
+      existingPicker.remove();
+    }
+
+    const reactions = ['❤️', '👍', '👎', '😂', '😮', '😢', '😡', '🎉', '🔥', '💯'];
+    
+    const picker = document.createElement('div');
+    picker.className = 'reaction-picker';
+    
+    reactions.forEach(emoji => {
+      const option = document.createElement('button');
+      option.className = 'reaction-option';
+      option.textContent = emoji;
+      option.onclick = () => {
+        addReaction(msgId, emoji, currentUser.uid);
+        picker.remove();
+      };
+      picker.appendChild(option);
     });
-  </script>
+    
+    bubble.appendChild(picker);
+    
+    // Show picker
+    setTimeout(() => picker.classList.add('show'), 10);
+    
+    // Close picker when clicking outside
+    const closePicker = (e) => {
+      if (!picker.contains(e.target) && !bubble.querySelector('.msg-action-btn').contains(e.target)) {
+        picker.remove();
+        document.removeEventListener('click', closePicker);
+      }
+    };
+    
+    setTimeout(() => document.addEventListener('click', closePicker), 100);
+  }
+
+  function addReaction(msgId, emoji, userId) {
+    if (!db || !msgId) return;
+    
+    const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+    reactionRef.set(true);
+  }
+
+  function toggleReaction(msgId, emoji, userId) {
+    if (!db || !msgId) return;
+    
+    const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+    reactionRef.once('value').then(snap => {
+      if (snap.val()) {
+        // Remove reaction
+        reactionRef.remove();
+      } else {
+        // Add reaction
+        reactionRef.set(true);
+      }
+    });
+  }
+
+  // Initialize chat when DOM is loaded
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing chat...');
+    console.log('Firebase available:', typeof firebase !== 'undefined');
+    if (typeof firebase !== 'undefined') {
+      console.log('Firebase apps:', firebase.apps.length);
+      console.log('Firebase auth available:', !!firebase.auth);
+      console.log('Firebase database available:', !!firebase.database);
+      console.log('Firebase storage available:', !!firebase.storage);
+    }
+    
+    // Remove any debugging border from chat head
+    setTimeout(() => {
+      const chatHead = document.getElementById('floatingChatHead');
+      if (chatHead) {
+        chatHead.style.border = '';
+      }
+    }, 100);
+    
+    initializeChat();
+    
+    // Test Firebase Storage
+    /*
+    setTimeout(() => {
+      console.log('Testing Firebase Storage...');
+      if (typeof firebase !== 'undefined' && firebase.storage) {
+        try {
+          const testRef = firebase.storage().ref('test-file.txt');
+          const testBlob = new Blob(['test content'], { type: 'text/plain' });
+          testRef.put(testBlob).then(() => {
+            console.log('Firebase Storage test successful');
+            return testRef.getDownloadURL();
+          }).then(url => {
+            console.log('Test file URL:', url);
+            // Clean up test file
+            return testRef.delete();
+          }).then(() => {
+            console.log('Test file cleaned up');
+          }).catch(error => {
+            console.error('Firebase Storage test failed:', error);
+          });
+        } catch (error) {
+          console.error('Firebase Storage test error:', error);
+        }
+      } else {
+        console.warn('Firebase Storage not available for testing');
+      }
+    }, 2000);
+    */
+  });
+</script>
+
+<!-- Floating Chat HTML (copied from homepage.html) -->
+<div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
+  <i class="fas fa-comment"></i>
+  <span id="floatingChatNotif" style="display:none;position:absolute;top:2px;right:2px;background:#ff4444;color:#fff;font-size:0.85em;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;z-index:10;"></span>
+</div>
+<div class="floating-chat-popup" id="floatingChatPopup">
+  <div class="floating-chat-popup-header">
+    <span style="font-weight:700; font-size:1.1rem; letter-spacing:1px;">AudioWerks</span>
+    <div class="floating-chat-header-right">
+      <button class="floating-chat-call-btn" title="Call"><i class="fas fa-phone"></i></button>
+    </div>
+  </div>
+  <div class="floating-chat-popup-body" id="floatingChatPopupBody"></div>
+  <div class="floating-chat-popup-input">
+    <div class="input-icons">
+      <button class="input-btn" title="Attach"><i class="fas fa-paperclip"></i></button>
+      <button class="input-btn" title="Pin"><i class="fas fa-thumbtack"></i></button>
+      <button class="input-btn" title="Camera"><i class="fas fa-camera"></i></button>
+    </div>
+    <input type="text" id="floatingChatInput" placeholder="Type your message here..." />
+    <button class="send-btn" id="floatingChatSendBtn" title="Send Message" disabled><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+<div id="floatingPinnedModalContainer" style="display: none;"></div>
+<input type="file" id="floatingAttachmentInput" style="display:none" multiple />
+<input type="file" id="floatingCameraInput" accept="image/*" capture="environment" style="display:none" multiple />
+<div id="floatingImageModalOverlay">
+  <div id="floatingImageModal">
+    <button class="close-btn" title="Close">&times;</button>
+    <img src="" alt="Preview" />
+  </div>
+</div>
+
 </body>
-</html> 
+</html>
