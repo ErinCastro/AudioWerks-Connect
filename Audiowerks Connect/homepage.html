@@ -724,6 +724,7 @@
   <!-- Floating Chat HTML (style from portfolioo.html) -->
   <div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
     <i class="fas fa-comment"></i>
+    <span id="floatingChatNotif" style="display:none;position:absolute;top:2px;right:2px;background:#ff4444;color:#fff;font-size:0.85em;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;z-index:10;"></span>
   </div>
   <div class="floating-chat-popup" id="floatingChatPopup">
     <div class="floating-chat-popup-header">
@@ -1006,6 +1007,7 @@
           db.ref('chat-messages').on('value', snap => {
             const messages = snap.val() || {};
             renderFloatingChatMessages(messages);
+            updateFloatingChatNotif(messages);
           });
         });
       } else {
@@ -1020,6 +1022,9 @@
             chatInput.focus();
             chatBody.scrollTop = chatBody.scrollHeight;
             updateDbReadReceipts();
+            // Remove notification badge immediately when chat is opened
+            const notif = document.getElementById('floatingChatNotif');
+            if (notif) notif.style.display = 'none';
           }
         });
 
@@ -1044,34 +1049,20 @@
       }
     }
 
-    function updateDbReadReceipts() {
-      if (!currentUser || !chatPopup.classList.contains('open') || !db) return;
-      
-      try {
-      const myRole = isAdminUser ? 'admin' : 'client';
-      const updates = {};
-      const messagesRef = db.ref('chat-messages');
-
-      messagesRef.once('value').then(snap => {
-        const allMessages = snap.val() || {};
-        Object.entries(allMessages).forEach(([msgId, msg]) => {
-          const msgIsFromOther = msg.uid !== currentUser.uid;
-          const iHaveNotRead = !(msg.readBy && msg.readBy[currentUser.uid]);
-
-          if (msgIsFromOther && iHaveNotRead) {
-            updates[`${msgId}/readBy/${currentUser.uid}`] = true;
-            updates[`${msgId}/readBy/${myRole}`] = true;
-          }
-        });
-
-        if (Object.keys(updates).length > 0) {
-          messagesRef.update(updates);
-        }
-        }).catch(error => {
-          console.warn('Failed to update read receipts:', error);
-        });
-      } catch (error) {
-        console.warn('Read receipts update failed:', error);
+    function updateFloatingChatNotif(messages) {
+      if (!currentUser) return;
+      const notif = document.getElementById('floatingChatNotif');
+      if (!notif) return;
+      // Only count messages where current user is recipient and has not read
+      const unreadCount = Object.values(messages).filter(msg =>
+        msg.recipientUid === currentUser.uid && msg.uid !== currentUser.uid && (!msg.readBy || !msg.readBy[currentUser.uid])
+      ).length;
+      if (unreadCount > 0) {
+        notif.textContent = unreadCount;
+        notif.style.display = 'inline-flex';
+      } else {
+        notif.textContent = '';
+        notif.style.display = 'none';
       }
     }
 
@@ -1741,6 +1732,26 @@
           // Add reaction
           reactionRef.set(true);
         }
+      });
+    }
+
+    // Add this function to mark messages as read for the current user
+    function updateDbReadReceipts() {
+      if (!db || !currentUser) return;
+      db.ref('chat-messages').once('value').then(snap => {
+        const messages = snap.val() || {};
+        Object.entries(messages).forEach(([msgId, msg]) => {
+          // Only mark as read if the current user is the recipient and hasn't read it yet
+          if (
+            msg.recipientUid === currentUser.uid &&
+            msg.uid !== currentUser.uid &&
+            (!msg.readBy || !msg.readBy[currentUser.uid])
+          ) {
+            const readBy = Object.assign({}, msg.readBy || {});
+            readBy[currentUser.uid] = true;
+            db.ref('chat-messages/' + msgId).update({ readBy });
+          }
+        });
       });
     }
 
