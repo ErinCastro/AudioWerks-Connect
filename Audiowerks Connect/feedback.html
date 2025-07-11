@@ -477,11 +477,11 @@
         }
 
         .manage-account-link:hover {
-            color: #gray;
+            color: #666;
             opacity: 1;
         }
 
-        .header-icons {
+        .header-icons-absolute {
             position: absolute;
             top: 18px;
             right: 30px;
@@ -621,6 +621,139 @@
             transform: rotate(90deg);
             /* No color change */
         }
+
+        /* Review Filter Styles */
+        .review-filter-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .filter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 34, 68, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .filter-wrapper:hover {
+            border-color: #0047AB;
+            box-shadow: 0 4px 12px rgba(0, 71, 171, 0.15);
+        }
+
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #0047AB;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-label i {
+            font-size: 16px;
+            color: #0047AB;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #0047AB;
+            box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: #0047AB;
+        }
+
+        /* Review Actions Styles */
+        .review-card {
+            position: relative;
+        }
+
+        .review-header {
+            margin-bottom: 10px;
+        }
+
+        .review-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .edit-review-btn, .delete-review-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .edit-review-btn {
+            color: #ffc300;
+        }
+
+        .edit-review-btn:hover {
+            background: rgba(255, 195, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .delete-review-btn {
+            color: #ff6b6b;
+        }
+
+        .delete-review-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Responsive adjustments for filter */
+        @media (max-width: 768px) {
+            .review-filter-container {
+                justify-content: center;
+                padding: 0 15px;
+            }
+            
+            .filter-wrapper {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 16px;
+            }
+            
+            .filter-select {
+                min-width: 120px;
+            }
+
+            .review-actions {
+                top: 5px;
+                right: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -695,7 +828,23 @@
     <div class="reviews-section">
         <div class="reviews-title-container">
             <h2>Reviews</h2>
+            <div class="white-divider"></div>
         </div>
+        
+        <!-- Review Filter -->
+        <div class="review-filter-container">
+            <div class="filter-wrapper">
+                <label for="reviewFilter" class="filter-label">
+                    <i class="fas fa-filter"></i>
+                    Filter Reviews
+                </label>
+                <select id="reviewFilter" class="filter-select" onchange="filterReviews()">
+                    <option value="all">All Reviews</option>
+                    <option value="my">My Reviews</option>
+                </select>
+            </div>
+        </div>
+        
         <div class="reviews-grid" id="reviewsGrid">
             <!-- Reviews will be loaded dynamically -->
         </div>
@@ -711,9 +860,11 @@
         // Global variables for charts
         let equipmentChart, areaChart;
         let allReviews = [];
+        let filteredReviews = [];
         let currentPage = 0;
         const reviewsPerPage = 5;
         let selectedRating = 5; // Global variable for rating
+        let currentFilter = 'all'; // Track current filter
 
         // Initialize charts with real data from Firebase
         async function initializeChartsWithRealData() {
@@ -781,12 +932,17 @@
                 const reviewsSnapshot = await firebase.database().ref('reviews').once('value');
                 const reviews = reviewsSnapshot.val() || {};
                 
-                allReviews = Object.values(reviews).map(review => ({
+                allReviews = Object.entries(reviews).map(([key, review]) => ({
+                    key: key,
                     text: review.text || review.review || '',
                     stars: review.rating || review.stars || 5,
                     author: review.author || review.customerName || 'Anonymous',
+                    authorId: review.authorId || '',
                     timestamp: review.timestamp || Date.now()
                 })).sort((a, b) => b.timestamp - a.timestamp);
+
+                // Apply current filter
+                applyFilter();
 
                 // Update statistic cards with real data
                 updateStatisticCards(serviceData, eventTypeData);
@@ -800,6 +956,33 @@
                 console.error('Error fetching real data:', error);
                 initializeChartsWithFallbackData();
             }
+        }
+
+        function applyFilter() {
+            const filterValue = document.getElementById('reviewFilter').value;
+            currentFilter = filterValue;
+            currentPage = 0; // Reset to first page when filtering
+
+            if (filterValue === 'my') {
+                // Filter to show only current user's reviews
+                const currentUser = firebase.auth().currentUser;
+                if (currentUser) {
+                    filteredReviews = allReviews.filter(review => 
+                        review.authorId === currentUser.uid || 
+                        review.author === currentUser.email
+                    );
+                } else {
+                    filteredReviews = [];
+                }
+            } else {
+                // Show all reviews
+                filteredReviews = [...allReviews];
+            }
+        }
+
+        function filterReviews() {
+            applyFilter();
+            renderReviews();
         }
 
         function updateStatisticCards(serviceData, eventTypeData) {
@@ -960,12 +1143,15 @@
             };
 
             allReviews = [
-                { text: "Excellent Setup!", stars: 4, author: "Anonymous" },
-                { text: "The service was excellent", stars: 5, author: "Anonymous" },
-                { text: "The supplier was so accommodating for all our request", stars: 5, author: "Anonymous" },
-                { text: "They worked like magic! My event was a success", stars: 5, author: "Anonymous" },
-                { text: "The team was professional and efficient", stars: 4, author: "Anonymous" }
+                { text: "Excellent Setup!", stars: 4, author: "Anonymous", authorId: "" },
+                { text: "The service was excellent", stars: 5, author: "Anonymous", authorId: "" },
+                { text: "The supplier was so accommodating for all our request", stars: 5, author: "Anonymous", authorId: "" },
+                { text: "They worked like magic! My event was a success", stars: 5, author: "Anonymous", authorId: "" },
+                { text: "The team was professional and efficient", stars: 4, author: "Anonymous", authorId: "" }
             ];
+
+            // Apply current filter
+            applyFilter();
 
             // Update statistic cards with fallback data
             updateStatisticCards(serviceData, eventTypeData);
@@ -983,22 +1169,41 @@
         function renderReviews() {
             reviewsGrid.innerHTML = '';
             
-            if (allReviews.length === 0) {
-                reviewsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666; font-style: italic;">No reviews yet. Be the first to leave a review!</div>';
+            if (filteredReviews.length === 0) {
+                if (currentFilter === 'my') {
+                    reviewsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666; font-style: italic;">You haven\'t written any reviews yet. Be the first to leave a review!</div>';
+                } else {
+                    reviewsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666; font-style: italic;">No reviews yet. Be the first to leave a review!</div>';
+                }
                 return;
             }
             
             const start = currentPage * reviewsPerPage;
-            const end = Math.min(start + reviewsPerPage, allReviews.length);
+            const end = Math.min(start + reviewsPerPage, filteredReviews.length);
+            const currentUser = firebase.auth().currentUser;
             
             for (let i = start; i < end; i++) {
-                const review = allReviews[i];
+                const review = filteredReviews[i];
+                const isOwnReview = currentUser && (review.authorId === currentUser.uid || review.author === currentUser.email);
+                
                 const card = document.createElement('div');
                 card.className = 'review-card';
                 card.innerHTML = `
                     <div class="review-avatar"></div>
                     <div class="review-content">
-                        <div class="review-author" style="font-weight: 600; color: #0047AB; margin-bottom: 5px; font-size: 14px;">${review.author}</div>
+                        <div class="review-header">
+                            <div class="review-author" style="font-weight: 600; color: #0047AB; margin-bottom: 5px; font-size: 14px;">${review.author}</div>
+                        </div>
+                        ${isOwnReview ? `
+                            <div class="review-actions">
+                                <button class="edit-review-btn" onclick="editReview('${review.key || i}')" title="Edit Review">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-review-btn" onclick="deleteReview('${review.key || i}')" title="Delete Review">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        ` : ''}
                         <div class="review-text">${review.text}</div>
                         <div class="stars">
                             ${[...Array(5)].map((_, idx) => `<span class="star${idx < review.stars ? '' : ' empty'}">★</span>`).join('')}
@@ -1009,7 +1214,7 @@
             }
             
             prevBtn.disabled = currentPage === 0;
-            nextBtn.disabled = end >= allReviews.length;
+            nextBtn.disabled = end >= filteredReviews.length;
         }
 
         prevBtn.addEventListener('click', () => {
@@ -1020,7 +1225,7 @@
         });
         
         nextBtn.addEventListener('click', () => {
-            if ((currentPage + 1) * reviewsPerPage < allReviews.length) {
+            if ((currentPage + 1) * reviewsPerPage < filteredReviews.length) {
                 currentPage++;
                 renderReviews();
             }
@@ -1334,6 +1539,264 @@
           localStorage.clear();
           sessionStorage.clear();
           window.location.href = "login.html";
+        }
+
+        // Edit Review Function
+        function editReview(reviewKey) {
+            const review = allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey]);
+            if (!review) {
+                showPopup('Review not found!', 'Error');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 500px;
+                ">
+                    <h3 style="color: #0047AB; margin-bottom: 20px;">Edit Your Review</h3>
+                    <textarea id="editReviewText" placeholder="Write your review here..." style="
+                        width: 100%;
+                        height: 100px;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                        resize: vertical;
+                    ">${review.text}</textarea>
+                    <div style="margin-bottom: 15px;">
+                        <label>Rating: </label>
+                        <div id="editStarRating" style="display: inline-block;">
+                            ${[...Array(5)].map((_, i) => `<span class="edit-star-select" data-rating="${i+1}" style="cursor: pointer; font-size: 20px; color: ${i < review.stars ? '#ffc300' : '#ddd'};">★</span>`).join('')}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button onclick="closeEditReviewForm()" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: #f8f9fa;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button onclick="updateReview('${reviewKey}')" style="
+                            padding: 8px 16px;
+                            background: #0047AB;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">Update Review</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Star rating functionality
+            const stars = modal.querySelectorAll('.edit-star-select');
+            let selectedRating = review.stars;
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    stars.forEach((s, i) => {
+                        s.style.color = i < selectedRating ? '#ffc300' : '#ddd';
+                    });
+                });
+            });
+        }
+
+        function closeEditReviewForm() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) modal.remove();
+        }
+
+        async function updateReview(reviewKey) {
+            const reviewText = document.getElementById('editReviewText').value.trim();
+            if (!reviewText) {
+                showPopup('Please write a review!', 'Review Required');
+                return;
+            }
+
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showPopup('Please log in to edit your review!', 'Login Required');
+                    return;
+                }
+
+                // Get the star rating
+                const stars = document.querySelectorAll('.edit-star-select');
+                let selectedRating = 5;
+                stars.forEach((star, index) => {
+                    if (star.style.color === 'rgb(255, 195, 0)') {
+                        selectedRating = index + 1;
+                    }
+                });
+
+                // Find the review in Firebase
+                const reviewsRef = firebase.database().ref('reviews');
+                const snapshot = await reviewsRef.once('value');
+                const reviews = snapshot.val() || {};
+                
+                let reviewId = null;
+                for (const [key, review] of Object.entries(reviews)) {
+                    if ((review.authorId === user.uid || review.author === user.email) && 
+                        review.text === allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey])?.text) {
+                        reviewId = key;
+                        break;
+                    }
+                }
+
+                if (!reviewId) {
+                    showPopup('Review not found or you don\'t have permission to edit it!', 'Error');
+                    return;
+                }
+
+                // Update the review
+                await reviewsRef.child(reviewId).update({
+                    text: reviewText,
+                    rating: selectedRating,
+                    stars: selectedRating,
+                    lastEdited: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                closeEditReviewForm();
+                
+                // Refresh the reviews
+                await initializeChartsWithRealData();
+                
+                showPopup('Review updated successfully!', 'Success');
+            } catch (error) {
+                console.error('Error updating review:', error);
+                showPopup('Error updating review. Please try again.', 'Error');
+            }
+        }
+
+        // Delete Review Function
+        async function deleteReview(reviewKey) {
+            const review = allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey]);
+            if (!review) {
+                showPopup('Review not found!', 'Error');
+                return;
+            }
+
+            // Show confirmation popup
+            const confirmModal = document.createElement('div');
+            confirmModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            confirmModal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 400px;
+                    text-align: center;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                ">
+                    <h3 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.3rem;">Delete Review</h3>
+                    <p style="margin-bottom: 20px; line-height: 1.5; color: #333;">Are you sure you want to delete your review? This action cannot be undone.</p>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="closeDeleteConfirm()" style="
+                            padding: 10px 20px;
+                            border: 1px solid #ddd;
+                            background: #f8f9fa;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Cancel</button>
+                        <button onclick="confirmDeleteReview('${reviewKey}')" style="
+                            padding: 10px 20px;
+                            background: #ff6b6b;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Delete</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(confirmModal);
+        }
+
+        function closeDeleteConfirm() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) modal.remove();
+        }
+
+        async function confirmDeleteReview(reviewKey) {
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showPopup('Please log in to delete your review!', 'Login Required');
+                    return;
+                }
+
+                // Find the review in Firebase
+                const reviewsRef = firebase.database().ref('reviews');
+                const snapshot = await reviewsRef.once('value');
+                const reviews = snapshot.val() || {};
+                
+                let reviewId = null;
+                for (const [key, review] of Object.entries(reviews)) {
+                    if ((review.authorId === user.uid || review.author === user.email) && 
+                        review.text === allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey])?.text) {
+                        reviewId = key;
+                        break;
+                    }
+                }
+
+                if (!reviewId) {
+                    showPopup('Review not found or you don\'t have permission to delete it!', 'Error');
+                    return;
+                }
+
+                // Delete the review
+                await reviewsRef.child(reviewId).remove();
+
+                closeDeleteConfirm();
+                
+                // Refresh the reviews
+                await initializeChartsWithRealData();
+                
+                showPopup('Review deleted successfully!', 'Success');
+            } catch (error) {
+                console.error('Error deleting review:', error);
+                showPopup('Error deleting review. Please try again.', 'Error');
+            }
         }
     </script>
 
