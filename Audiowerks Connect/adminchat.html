@@ -1322,6 +1322,19 @@
       const attachmentInput = document.getElementById('attachmentInput');
       const cameraInput = document.getElementById('cameraInput');
       const pinnedModalContainer = document.getElementById('pinnedModalContainer');
+      const searchForm = document.querySelector('.chat-search-bar');
+      const searchInput = searchForm ? searchForm.querySelector('input[type="text"]') : null;
+      let chatSearchTerm = '';
+
+      if (searchForm && searchInput) {
+        searchForm.addEventListener('submit', function(e) {
+          e.preventDefault(); // Prevent form submit
+        });
+        searchInput.addEventListener('input', function(e) {
+          chatSearchTerm = e.target.value.trim().toLowerCase();
+          renderChatList();
+        });
+      }
 
       // Attachment icon
       if (attachBtn && attachmentInput) {
@@ -1580,13 +1593,24 @@
         if (!chatList) return;
         chatList.innerHTML = '';
         
-        const sortedUserIds = Object.keys(chatMessages).sort((a, b) => {
+        let sortedUserIds = Object.keys(chatMessages).sort((a, b) => {
           const lastMsgA = chatMessages[a][chatMessages[a].length - 1];
           const lastMsgB = chatMessages[b][chatMessages[b].length - 1];
           const timeA = lastMsgA ? lastMsgA.timestamp : 0;
           const timeB = lastMsgB ? lastMsgB.timestamp : 0;
           return timeB - timeA;
         });
+
+        // Filter by search term if present
+        if (chatSearchTerm) {
+          sortedUserIds = sortedUserIds.filter(userId => {
+            const userName = (userNames[userId] || 'User').toLowerCase();
+            const userMsgs = chatMessages[userId];
+            const lastMsg = userMsgs[userMsgs.length - 1];
+            const lastMsgText = (lastMsg.text || (lastMsg.attachment ? 'Attachment' : '')).toLowerCase();
+            return userName.includes(chatSearchTerm) || lastMsgText.includes(chatSearchTerm);
+          });
+        }
 
         if (sortedUserIds.length === 0) {
           chatList.innerHTML = `<div style="text-align: center; color: #888; padding: 40px 20px;">No conversations found.</div>`;
