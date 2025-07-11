@@ -567,7 +567,7 @@
     width: 90vw;
     right: 5vw;
     bottom: 100px;
-  }
+}
   
   .floating-chat-head {
     bottom: 20px;
@@ -582,7 +582,7 @@
   
   .floating-chat-popup-input {
     padding: 6px 6px;
-  }
+}
   
   .floating-chat-popup-input input {
     font-size: 0.9rem;
@@ -596,7 +596,7 @@
   }
   
   .floating-chat-popup-input .send-btn {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
     padding: 3px 8px;
   }
 }
