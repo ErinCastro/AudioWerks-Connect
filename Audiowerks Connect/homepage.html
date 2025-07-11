@@ -887,7 +887,7 @@
       window.location.href = "login.html";
       } catch (error) {
         console.error('Logout error:', error);
-        window.location.href = "login.html";
+      window.location.href = "login.html";
     }
     }
 
@@ -1076,7 +1076,7 @@
       return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-        function createFloatingBubble(text, side = 'right', options = {}) {
+    function createFloatingBubble(text, side = 'right', options = {}) {
       const div = document.createElement('div');
       div.className = 'floating-chat-bubble ' + side + (options.pinned ? ' pinned' : '');
       
@@ -1305,19 +1305,19 @@
       if (!currentUser) return;
 
             try {
-        Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
+      Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
           console.log('Rendering message:', { msgId, text: msg.text, attachment: msg.attachment });
-          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
-          const bubble = createFloatingBubble(msg.text, side, {
-            msgId: msgId,
-            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
-            readBy: msg.readBy || {},
+        const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+        const bubble = createFloatingBubble(msg.text, side, {
+          msgId: msgId,
+          timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+          readBy: msg.readBy || {},
             pinned: msg.pinned || false,
             reactions: msg.reactions || {},
             attachment: msg.attachment || null
-          });
-          chatBody.appendChild(bubble);
         });
+        chatBody.appendChild(bubble);
+      });
       chatBody.scrollTop = chatBody.scrollHeight;
       } catch (error) {
         console.warn('Failed to render chat messages:', error);
@@ -1330,18 +1330,16 @@
 
       try {
       const role = isAdminUser ? 'admin' : 'client';
-      const messageData = {
-        text: msgText,
+      const message = {
         uid: currentUser.uid,
-        name: currentUser.displayName || currentUser.email,
+        name: currentUser.displayName || 'Anonymous',
+        text: msgText,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
-        readBy: {
-          [currentUser.uid]: true,
-          [role]: true
-        }
+        readBy: { [currentUser.uid]: true },
+        recipientUid: 'FpAT19tEbYbIhbPbAi3TGNTutOT2'
       };
 
-      db.ref('chat-messages').push(messageData);
+      db.ref('chat-messages').push(message);
       chatInput.value = '';
       } catch (error) {
         console.warn('Failed to send message:', error);
@@ -1493,6 +1491,7 @@
                 [currentUser.uid]: true,
                 [role]: true
               },
+              recipientUid: 'FpAT19tEbYbIhbPbAi3TGNTutOT2',
               attachment: {
                 type: isImage ? 'image' : 'file',
                 name: file.name,
@@ -1525,8 +1524,8 @@
             if (chatBody) {
               chatBody.appendChild(errorDiv);
               chatBody.scrollTop = chatBody.scrollHeight;
-            }
-          });
+        }
+      });
     });
       } catch (error) {
         console.warn('File upload failed:', error);
@@ -1602,9 +1601,14 @@
             
             const pinnedList = container.querySelector('.pinned-list');
             
-            // Sort messages by timestamp
-            const sortedMessages = Object.entries(pinnedMessages)
-              .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+            // Show all pinned messages where the current user is either the sender or the recipient
+            const filteredMessages = Object.entries(pinnedMessages).filter(([msgId, msg]) => {
+              return (
+                msg.pinned === true &&
+                (msg.uid === currentUser.uid || msg.recipientUid === currentUser.uid)
+              );
+            });
+            const sortedMessages = filteredMessages.sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
             
             sortedMessages.forEach(([msgId, msg]) => {
               const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
@@ -1735,31 +1739,31 @@
       initializeChat();
       
       // Test Firebase Storage
-      setTimeout(() => {
-        console.log('Testing Firebase Storage...');
-        if (typeof firebase !== 'undefined' && firebase.storage) {
-          try {
-            const testRef = firebase.storage().ref('test-file.txt');
-            const testBlob = new Blob(['test content'], { type: 'text/plain' });
-            testRef.put(testBlob).then(() => {
-              console.log('Firebase Storage test successful');
-              return testRef.getDownloadURL();
-            }).then(url => {
-              console.log('Test file URL:', url);
-              // Clean up test file
-              return testRef.delete();
-            }).then(() => {
-              console.log('Test file cleaned up');
-            }).catch(error => {
-              console.error('Firebase Storage test failed:', error);
-            });
-          } catch (error) {
-            console.error('Firebase Storage test error:', error);
-          }
-        } else {
-          console.warn('Firebase Storage not available for testing');
-        }
-      }, 2000);
+      // setTimeout(() => {
+      //   console.log('Testing Firebase Storage...');
+      //   if (typeof firebase !== 'undefined' && firebase.storage) {
+      //     try {
+      //       const testRef = firebase.storage().ref('test-file.txt');
+      //       const testBlob = new Blob(['test content'], { type: 'text/plain' });
+      //       testRef.put(testBlob).then(() => {
+      //         console.log('Firebase Storage test successful');
+      //         return testRef.getDownloadURL();
+      //       }).then(url => {
+      //         console.log('Test file URL:', url);
+      //         // Clean up test file
+      //         return testRef.delete();
+      //       }).then(() => {
+      //         console.log('Test file cleaned up');
+      //       }).catch(error => {
+      //         console.error('Firebase Storage test failed:', error);
+      //       });
+      //     } catch (error) {
+      //       console.error('Firebase Storage test error:', error);
+      //     }
+      //   } else {
+      //     console.warn('Firebase Storage not available for testing');
+      //   }
+      // }, 2000);
       
       // Test page interactivity
       setTimeout(() => {
