@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard - AudioWerks</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     /* Copy header and menu styles from homepage.html */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
@@ -372,6 +374,38 @@
       background: #b0b6be;
       color: #fff;
     }
+    /* Download buttons styling */
+    #downloadCsvBtn, #downloadExcelBtn {
+      display: inline-block;
+      min-width: 140px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,71,171,0.07);
+      letter-spacing: 0.5px;
+    }
+    #downloadCsvBtn {
+      background: #0047AB;
+      color: #fff;
+    }
+    #downloadCsvBtn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+    #downloadExcelBtn {
+      background: #43a047;
+      color: #fff;
+    }
+    #downloadExcelBtn:hover {
+      background: #388e3c;
+      color: #fff;
+    }
   </style>
 </head>
 <body>
@@ -430,7 +464,8 @@
       </tbody>
     </table>
     <!-- New: Download CSV button and live preview table -->
-    <button id="downloadCsvBtn" style="margin:16px 0;">Download CSV</button>
+    <button id="downloadCsvBtn" style="margin:16px 8px 16px 0;">Download CSV</button>
+    <button id="downloadExcelBtn" style="margin:16px 0;">Download Excel</button>
     <h4 style="margin-top:20px;">Live Preview of All Bookings</h4>
     <div style="overflow-x:auto;">
       <table id="livePreviewTable" style="width:100%;border-collapse:collapse;">
@@ -1186,6 +1221,24 @@ if (window.firebase && firebase.auth) {
   });
 }
 window.addEventListener('DOMContentLoaded', loadAdminAnnouncements);
+</script>
+
+<script>
+// Excel download logic
+function downloadBookingsExcel() {
+  const table = document.getElementById('livePreviewTable');
+  if (!table) return alert('No data to export.');
+  // Convert table to worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(table);
+  XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
+  XLSX.writeFile(wb, 'bookings.xlsx');
+}
+// Attach event listener after DOM is loaded
+window.addEventListener('DOMContentLoaded', function() {
+  const excelBtn = document.getElementById('downloadExcelBtn');
+  if (excelBtn) excelBtn.onclick = downloadBookingsExcel;
+});
 </script>
 
 </body>
