@@ -1620,7 +1620,8 @@
         sortedUserIds.forEach(userId => {
           const userMsgs = chatMessages[userId];
           const lastMsg = userMsgs[userMsgs.length - 1];
-          const unreadCount = userMsgs.filter(msg => !msg.readBy || !msg.readBy[currentUser.uid]).length;
+          // Only count as unread if the message is from the other user and not read by admin
+          const unreadCount = userMsgs.filter(msg => !msg.isAdmin && (!msg.readBy || !msg.readBy[currentUser.uid])).length;
           
           const li = document.createElement('li');
           li.className = 'chat-item';
@@ -1666,6 +1667,8 @@
         
         if (messages.length === 0) {
           chatMessagesDiv.innerHTML = `<div style="text-align: center; color: #888; margin-top: 40px;">No messages yet.</div>`;
+          if (chatInput) chatInput.disabled = true;
+          if (sendBtn) sendBtn.disabled = true;
           return;
         }
         
