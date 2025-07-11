@@ -1231,65 +1231,70 @@
               </div>
             </div>
           `;
-        } else {
-          container.innerHTML = `
-            <div class="pinned-modal">
-              <button class="close-btn" title="Close">&times;</button>
-              <h2>Pinned Messages</h2>
-              <div class="pinned-list"></div>
-            </div>
-          `;
-          
-          const pinnedList = container.querySelector('.pinned-list');
-          
-          // Sort messages by timestamp
-          const sortedMessages = Object.entries(pinnedMessages)
-            .sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
-          
-          sortedMessages.forEach(([msgId, msg]) => {
-            const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
-            const bubble = createFloatingBubble(msg.text, side, {
-              msgId: msgId,
-              timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
-              readBy: msg.readBy || {},
-              pinned: true,
-              reactions: msg.reactions || {},
-              attachment: msg.attachment || null
-            });
-            
-            // Remove action buttons from pinned message display
-            const actions = bubble.querySelector('.msg-actions');
-            if (actions) actions.remove();
-            
-            // Add pin info if available
-            if (msg.pinnedBy) {
-              const pinInfo = document.createElement('div');
-              pinInfo.style.fontSize = '0.8rem';
-              pinInfo.style.color = '#0047AB';
-              pinInfo.style.marginTop = '4px';
-              pinInfo.style.fontStyle = 'italic';
-              pinInfo.style.fontWeight = '500';
-              pinInfo.textContent = `📌 Pinned by ${msg.pinnedBy === currentUser.uid ? 'you' : 'someone'}`;
-              bubble.appendChild(pinInfo);
-            }
-            
-            pinnedList.appendChild(bubble);
-          });
+          return;
         }
         
+        container.innerHTML = `
+          <div class="pinned-modal">
+            <button class="close-btn" title="Close">&times;</button>
+            <h2>Pinned Messages</h2>
+            <div class="pinned-list"></div>
+          </div>
+        `;
+        
+        const pinnedList = container.querySelector('.pinned-list');
+        // Only show pinned messages that were pinned by the current user or the admin
+        const filteredMessages = Object.entries(pinnedMessages).filter(([msgId, msg]) => {
+          return (
+            msg.pinned === true &&
+            (msg.pinnedBy === currentUser.uid || msg.pinnedBy === ADMIN_UID)
+          );
+        });
+        const sortedMessages = filteredMessages.sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+        
+        sortedMessages.forEach(([msgId, msg]) => {
+          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+          const bubble = createFloatingBubble(msg.text, side, {
+            msgId: msgId,
+            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+            readBy: msg.readBy || {},
+            pinned: true,
+            reactions: msg.reactions || {},
+            attachment: msg.attachment || null
+          });
+          // Remove action buttons from pinned message display
+          const actions = bubble.querySelector('.msg-actions');
+          if (actions) actions.remove();
+          // Add pin info if available
+          if (msg.pinnedBy) {
+            const pinInfo = document.createElement('div');
+            pinInfo.style.fontSize = '0.8rem';
+            pinInfo.style.color = '#0047AB';
+            pinInfo.style.marginTop = '4px';
+            pinInfo.style.fontStyle = 'italic';
+            pinInfo.style.fontWeight = '500';
+            if (msg.pinnedBy === currentUser.uid) {
+              pinInfo.textContent = `📌 Pinned by you`;
+            } else if (msg.pinnedBy === ADMIN_UID) {
+              pinInfo.textContent = `📌 Pinned by admin`;
+            } else {
+              pinInfo.textContent = `📌 Pinned by someone`;
+            }
+            bubble.appendChild(pinInfo);
+          }
+          pinnedList.appendChild(bubble);
+        });
         // Set up close functionality
         container.querySelector('.close-btn').onclick = () => {
           container.classList.remove('show');
           container.innerHTML = '';
         };
-        
         container.onclick = e => { 
           if (e.target === container) {
             container.classList.remove('show');
             container.innerHTML = '';
           }
         };
-        
       }).catch(error => {
         console.warn('Failed to fetch pinned messages:', error);
         container.innerHTML = `
