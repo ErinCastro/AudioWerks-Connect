@@ -97,10 +97,27 @@ function deleteBundle(id) {
 }
 
 // --- Admin Check ---
-// Example: check if user email is in a list of admin emails in the database
+// Check if user is admin by finding their username and checking if it exists in admins node
 function isAdmin(user) {
   if (!user || !user.email) return Promise.resolve(false);
-  return db.ref('admins').orderByChild('email').equalTo(user.email).once('value').then(snap => snap.exists());
+  
+  return db.ref('users').once('value').then(snap => {
+    const users = snap.val() || {};
+    let username = null;
+    
+    // Find username by email
+    for (const [uname, udata] of Object.entries(users)) {
+      if (udata.email && udata.email.replace(/^"|"$/g, '') === user.email) {
+        username = uname;
+        break;
+      }
+    }
+    
+    if (!username) return false;
+    
+    // Check if username is in admins
+    return db.ref('admins/' + username).once('value').then(adminSnap => adminSnap.exists());
+  });
 }
 
 // Expose functions globally

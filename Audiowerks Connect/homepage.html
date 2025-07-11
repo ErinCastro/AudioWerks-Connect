@@ -1000,7 +1000,8 @@
       currentUser = user;
       if (user) {
         determineUserRole(user).then(() => {
-          db.ref('chat-messages').on('value', snap => {
+          // Listen only to this user's thread
+          db.ref('chat-messages/' + user.uid).on('value', snap => {
             const messages = snap.val() || {};
             renderFloatingChatMessages(messages);
           });
@@ -1300,13 +1301,12 @@
 
     function renderFloatingChatMessages(messages) {
       if (!chatBody) return;
-      
       chatBody.innerHTML = '';
       if (!currentUser) return;
-
-            try {
+      try {
+        console.log('All messages received for user:', messages);
         Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
-          console.log('Rendering message:', { msgId, text: msg.text, attachment: msg.attachment });
+          console.log('Rendering message:', { msgId, ...msg });
           const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
           const bubble = createFloatingBubble(msg.text, side, {
             msgId: msgId,
@@ -1318,7 +1318,7 @@
           });
           chatBody.appendChild(bubble);
         });
-      chatBody.scrollTop = chatBody.scrollHeight;
+        chatBody.scrollTop = chatBody.scrollHeight;
       } catch (error) {
         console.warn('Failed to render chat messages:', error);
       }
@@ -1341,7 +1341,8 @@
         }
       };
 
-      db.ref('chat-messages').push(messageData);
+      // Push to this user's thread
+      db.ref('chat-messages/' + currentUser.uid).push(messageData);
       chatInput.value = '';
       } catch (error) {
         console.warn('Failed to send message:', error);
@@ -1504,7 +1505,7 @@
             
             // Save to database
             console.log('Saving message data to database:', messageData);
-            db.ref('chat-messages').push(messageData).then(() => {
+            db.ref('chat-messages/' + currentUser.uid).push(messageData).then(() => {
               console.log('Message saved successfully to database');
             }).catch(error => {
               console.error('Failed to save message to database:', error);

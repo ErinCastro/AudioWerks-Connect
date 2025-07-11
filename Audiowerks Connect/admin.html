@@ -372,6 +372,7 @@
       window.location.href = 'login.html';
       return;
     }
+    
     // Get username by searching users for a record with this user's email
     let username = null;
     const usersSnap = await firebase.database().ref('users').once('value');
@@ -382,19 +383,23 @@
         break;
       }
     }
+    
     if (!username) {
-      alert('Access Denied: Admins only');
+      alert('Access Denied: User not found in database');
       window.location.href = 'login.html';
       return;
     }
+    
     // Check if username is in admins
     const adminSnap = await firebase.database().ref('admins/' + username).once('value');
     if (!adminSnap.val()) {
-      alert('Access Denied: Admins only');
+      alert('Access Denied: Admins only. Username "' + username + '" is not an admin.');
       window.location.href = 'login.html';
       return;
     }
+    
     // If admin, load dashboard data
+    console.log('Admin access granted for username:', username);
     loadDashboard();
   });
 

@@ -526,7 +526,26 @@
                   return;
                 }
                 localStorage.setItem('userPassword', password);
-                window.location.href = 'homepage.html';
+                // Check if user is admin and redirect accordingly
+                const usersSnap = await firebase.database().ref('users').once('value');
+                const users = usersSnap.val() || {};
+                let foundUsername = null;
+                for (const [uname, udata] of Object.entries(users)) {
+                  if (udata.email && udata.email.replace(/^"|"$/g, '') === user.email) {
+                    foundUsername = uname;
+                    break;
+                  }
+                }
+                if (foundUsername) {
+                  const adminSnap = await firebase.database().ref('admins/' + foundUsername).once('value');
+                  if (adminSnap.val()) {
+                    window.location.href = 'admin.html';
+                  } else {
+                    window.location.href = 'homepage.html';
+                  }
+                } else {
+                  window.location.href = 'homepage.html';
+                }
               } catch (error) {
                 if (error.code === 'auth/wrong-password') {
                   passwordError.textContent = 'Incorrect password.';
