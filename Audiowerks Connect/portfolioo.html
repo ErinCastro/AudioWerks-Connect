@@ -390,9 +390,10 @@
         window.location.href = "login.html";
       }
     </script>
-  <!-- Floating Chat HTML (EXACT structure from homepage.html for perfect style match) -->
+  <!-- Floating Chat HTML (copied from homepage.html) -->
   <div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
     <i class="fas fa-comment"></i>
+    <span id="floatingChatNotif" style="display:none;position:absolute;top:2px;right:2px;background:#ff4444;color:#fff;font-size:0.85em;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;z-index:10;"></span>
   </div>
   <div class="floating-chat-popup" id="floatingChatPopup">
     <div class="floating-chat-popup-header">
@@ -415,15 +416,22 @@
   <div id="floatingPinnedModalContainer" style="display: none;"></div>
   <input type="file" id="floatingAttachmentInput" style="display:none" multiple />
   <input type="file" id="floatingCameraInput" accept="image/*" capture="environment" style="display:none" multiple />
-  <div id="floatingImageModalOverlay"><div id="floatingImageModal"><button class="close-btn" title="Close">&times;</button><img src="" alt="Preview" /></div></div>
+  <div id="floatingImageModalOverlay">
+    <div id="floatingImageModal">
+      <button class="close-btn" title="Close">&times;</button>
+      <img src="" alt="Preview" />
+    </div>
+  </div>
 
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-storage-compat.js"></script>
   <script src="firebase-config-new.js"></script>
-
   <script>
+    // --- CONFIG: Set your admin UID here ---
+    const ADMIN_UID = 'FpAT19tEbYbIhbPbAi3TGNTutOT2NIptGOOVYPX6vP2kAo31JRNeMtl1'; // TODO: Replace with your actual admin UID
     // Floating chat head logic and backend (copied from homepage.html)
     let chatHead, chatPopup, chatInput, chatSendBtn, chatBody, db, currentUser, isAdminUser;
 
@@ -477,6 +485,7 @@
                 db.ref('chat-messages').on('value', snap => {
                     const messages = snap.val() || {};
                     renderFloatingChatMessages(messages);
+                    updateFloatingChatNotif(messages);
                 });
             });
         } else {
@@ -779,22 +788,41 @@
       if (!currentUser) return;
 
       try {
-        Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
-          console.log('Rendering message:', { msgId, text: msg.text, attachment: msg.attachment });
-          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
-          const bubble = createFloatingBubble(msg.text, side, {
-            msgId: msgId,
-            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
-            readBy: msg.readBy || {},
-            pinned: msg.pinned || false,
-            reactions: msg.reactions || {},
-            attachment: msg.attachment || null
+        Object.entries(messages)
+          .filter(([msgId, msg]) => msg.uid === currentUser.uid || msg.recipientUid === currentUser.uid)
+          .sort((a, b) => a[1].timestamp - b[1].timestamp)
+          .forEach(([msgId, msg]) => {
+            const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+            const bubble = createFloatingBubble(msg.text, side, {
+              msgId: msgId,
+              timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+              readBy: msg.readBy || {},
+              pinned: msg.pinned || false,
+              reactions: msg.reactions || {},
+              attachment: msg.attachment || null
+            });
+            chatBody.appendChild(bubble);
           });
-          chatBody.appendChild(bubble);
-        });
         chatBody.scrollTop = chatBody.scrollHeight;
       } catch (error) {
         console.warn('Failed to render chat messages:', error);
+      }
+    }
+
+    function updateFloatingChatNotif(messages) {
+      if (!currentUser) return;
+      const notif = document.getElementById('floatingChatNotif');
+      if (!notif) return;
+      // Only count messages where current user is recipient and has not read
+      const unreadCount = Object.values(messages).filter(msg =>
+        msg.recipientUid === currentUser.uid && msg.uid !== currentUser.uid && (!msg.readBy || !msg.readBy[currentUser.uid])
+      ).length;
+      if (unreadCount > 0) {
+        notif.textContent = unreadCount;
+        notif.style.display = 'inline-flex';
+      } else {
+        notif.textContent = '';
+        notif.style.display = 'none';
       }
     }
 
