@@ -1293,6 +1293,9 @@
   <script src="firebase-config-new.js"></script>
   
   <script>
+    // --- CONFIG: Set your admin UID here ---
+    const ADMIN_UID = 'NIptGOOVYPX6vP2kAo31JRNeMtl1'; // Updated to correct admin UID
+    
     // Firebase services are already initialized in firebase-config-new.js
     
     // Firebase services
@@ -1426,14 +1429,22 @@
       // Move upload logic to a function
       function uploadAttachmentFile(file, fileType) {
         const isImage = fileType === 'image';
+        let recipientUid;
+        if (currentUser.uid === ADMIN_UID) {
+          // Admin sending to user
+          recipientUid = selectedChatId;
+        } else {
+          // User sending to admin
+          recipientUid = ADMIN_UID;
+        }
         // Create a temporary message with file info first
         const tempMessage = {
           uid: currentUser.uid,
-          recipientUid: selectedChatId,
-          name: 'Admin',
+          recipientUid: recipientUid,
+          name: currentUser.displayName || 'Anonymous',
           text: `Uploading ${file.name}...`,
           timestamp: firebase.database.ServerValue.TIMESTAMP,
-          isAdmin: true,
+          isAdmin: currentUser.uid === ADMIN_UID,
           attachment: {
             name: file.name,
             size: file.size,
@@ -1444,7 +1455,7 @@
         // Save the temporary message first
         const messageRef = db.ref('chat-messages').push(tempMessage);
         // Try to upload to Firebase Storage with CORS workaround
-        const storageRef = storage.ref().child(`chat-attachments/${selectedChatId}/${Date.now()}_${file.name}`);
+        const storageRef = storage.ref().child(`chat-attachments/${recipientUid}/${Date.now()}_${file.name}`);
         // Add metadata to help with CORS
         const metadata = {
           contentType: file.type,
@@ -1456,7 +1467,6 @@
         };
         storageRef.put(file, metadata).then(snapshot => {
           return snapshot.ref.getDownloadURL();
-        }).then(url => {
           // Update the message with the actual URL
           return messageRef.update({
             text: '',
@@ -1724,7 +1734,21 @@
 
         const div = document.createElement('div');
         div.className = `chat-bubble`; // Simplified class, sender is on wrapper
-        if (options.isPinned) div.classList.add('pinned');
+        if (msg.pinned) div.classList.add('pinned');
+
+        // Add pin icon indicator if pinned
+        if (msg.pinned) {
+          const pinIndicator = document.createElement('span');
+          pinIndicator.className = 'pin-indicator';
+          pinIndicator.innerHTML = '<i class="fas fa-thumbtack"></i>';
+          pinIndicator.style.position = 'absolute';
+          pinIndicator.style.top = '6px';
+          pinIndicator.style.right = '10px';
+          pinIndicator.style.color = '#f7b731';
+          pinIndicator.style.fontSize = '1.1rem';
+          pinIndicator.title = 'Pinned';
+          div.appendChild(pinIndicator);
+        }
 
         let textNode = null;
         if (text) {
@@ -1842,39 +1866,101 @@
           db.ref(`chat-messages/${msg.id}`).remove();
         };
         actions.appendChild(delBtn);
-        // React
+        // React (replace with homepage.html logic)
         const reactBtn = document.createElement('button');
         reactBtn.className = 'msg-action-btn';
         reactBtn.title = 'React';
-        reactBtn.innerHTML = '<i class="fas fa-heart"></i>';
+        reactBtn.innerHTML = '<i class="far fa-heart"></i>';
         reactBtn.onclick = (e) => {
           e.preventDefault();
-          const reactionRef = db.ref(`chat-messages/${msg.id}/reactions/${currentUser.uid}`);
-          reactionRef.once('value', snapshot => {
-              if (snapshot.exists()) {
-                  reactionRef.remove();
-              } else {
-                  reactionRef.set('❤️');
-              }
-          });
+          showReactionPicker(div, msg.id);
         };
         actions.appendChild(reactBtn);
-        // Pin
+        // Pin (update to homepage.html logic)
         const pinBtn = document.createElement('button');
         pinBtn.className = 'msg-action-btn';
-        pinBtn.title = options.isPinned ? 'Unpin' : 'Pin';
+        pinBtn.title = msg.pinned ? 'Unpin' : 'Pin';
         pinBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
         pinBtn.onclick = (e) => {
           e.preventDefault();
-          db.ref(`chat-messages/${msg.id}/isPinned`).set(!options.isPinned);
+          if (!msg.id || !db || !currentUser) return;
+          const newPinnedState = !msg.pinned;
+          db.ref('chat-messages/' + msg.id).update({
+            pinned: newPinnedState,
+            pinnedBy: currentUser.uid,
+            pinnedAt: firebase.database.ServerValue.TIMESTAMP
+          });
         };
         actions.appendChild(pinBtn);
         div.appendChild(actions);
+        // Add reactions display if message has reactions
+        if (msg.reactions && Object.keys(msg.reactions).length > 0) {
+          const reactionsDiv = document.createElement('div');
+          reactionsDiv.className = 'reactions';
+          Object.entries(msg.reactions).forEach(([emoji, users]) => {
+            const reactionDiv = document.createElement('div');
+            reactionDiv.className = 'reaction';
+            if (users && users[currentUser.uid]) {
+              reactionDiv.classList.add('active');
+            }
+            reactionDiv.innerHTML = `${emoji} <span class="count">${Object.keys(users || {}).length}</span>`;
+            reactionDiv.onclick = () => {
+              toggleReaction(msg.id, emoji, currentUser.uid);
+            };
+            reactionsDiv.appendChild(reactionDiv);
+          });
+          div.appendChild(reactionsDiv);
+        }
         // --- END ACTION BUTTONS ---
 
         // (Reactions display, if any, can be added here as needed)
 
         return bubbleWrapper;
+      }
+
+      function showReactionPicker(bubble, msgId) {
+        // Remove any existing reaction picker
+        const existingPicker = document.querySelector('.reaction-picker');
+        if (existingPicker) existingPicker.remove();
+        const reactions = ['❤️', '👍', '👎', '😂', '😮', '😢', '😡', '🎉', '🔥', '💯'];
+        const picker = document.createElement('div');
+        picker.className = 'reaction-picker';
+        reactions.forEach(emoji => {
+          const option = document.createElement('button');
+          option.className = 'reaction-option';
+          option.textContent = emoji;
+          option.onclick = () => {
+            addReaction(msgId, emoji, currentUser.uid);
+            picker.remove();
+          };
+          picker.appendChild(option);
+        });
+        bubble.appendChild(picker);
+        setTimeout(() => picker.classList.add('show'), 10);
+        // Close picker when clicking outside
+        const closePicker = (e) => {
+          if (!picker.contains(e.target) && !bubble.querySelector('.msg-action-btn').contains(e.target)) {
+            picker.remove();
+            document.removeEventListener('click', closePicker);
+          }
+        };
+        setTimeout(() => document.addEventListener('click', closePicker), 100);
+      }
+      function addReaction(msgId, emoji, userId) {
+        if (!db || !msgId) return;
+        const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+        reactionRef.set(true);
+      }
+      function toggleReaction(msgId, emoji, userId) {
+        if (!db || !msgId) return;
+        const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+        reactionRef.once('value').then(snap => {
+          if (snap.val()) {
+            reactionRef.remove();
+          } else {
+            reactionRef.set(true);
+          }
+        });
       }
 
       function showImageModal(src) {
@@ -1896,13 +1982,21 @@
       function sendMessage() {
         if (chatInput.disabled || chatInput.value.trim() === '' || !selectedChatId) return;
         const text = chatInput.value.trim();
+        let recipientUid;
+        if (currentUser.uid === ADMIN_UID) {
+          // Admin sending to user
+          recipientUid = selectedChatId;
+        } else {
+          // User sending to admin
+          recipientUid = ADMIN_UID;
+        }
         const message = {
           uid: currentUser.uid,
-          recipientUid: selectedChatId,
-          name: 'Admin',
+          recipientUid: recipientUid,
+          name: currentUser.displayName || 'Anonymous',
           text: text,
           timestamp: firebase.database.ServerValue.TIMESTAMP,
-          isAdmin: true
+          isAdmin: currentUser.uid === ADMIN_UID
         };
         db.ref('chat-messages').push(message).then(() => {
           chatInput.value = '';
@@ -1911,51 +2005,80 @@
       }
 
       function showPinnedModal() {
+        console.log('[PINNED MODAL] called, selectedChatId:', selectedChatId);
         if (!selectedChatId) return;
-
-        // Force a fresh read from Firebase to get the latest pinned status
         db.ref('chat-messages').once('value', snapshot => {
-            const allMessages = snapshot.val() || {};
-            const allPinned = [];
-
-            Object.values(allMessages).forEach(msg => {
-                // A message is part of this conversation if its sender and receiver
-                // match the admin and the selected client.
-                const isMatch1 = msg.uid === currentUser.uid && msg.recipientUid === selectedChatId;
-                const isMatch2 = msg.uid === selectedChatId && msg.recipientUid === currentUser.uid;
-
-                if ((isMatch1 || isMatch2) && msg.isPinned) {
-                    allPinned.push(msg);
-                }
+          const allMessages = snapshot.val() || {};
+          const allPinned = [];
+          Object.entries(allMessages).forEach(([msgId, msg]) => {
+            const isInConversation = 
+              (msg.uid === currentUser.uid && msg.recipientUid === selectedChatId) ||
+              (msg.uid === selectedChatId && msg.recipientUid === currentUser.uid);
+            const isPinned = msg.pinned === true;
+            const isPinnedByAdmin = msg.pinnedBy === currentUser.uid || msg.pinnedBy === ADMIN_UID;
+            // Debug log for each message
+            console.log('[PINNED MODAL DEBUG]', {
+              msgId,
+              msgUid: msg.uid,
+              msgRecipientUid: msg.recipientUid,
+              selectedChatId,
+              currentUserUid: currentUser.uid,
+              isInConversation,
+              isPinned,
+              isPinnedByAdmin,
+              msgPinned: msg.pinned,
+              msgPinnedBy: msg.pinnedBy
             });
-
-            console.log('[DEBUG] Final Pinned Messages:', allPinned);
-            const modal = document.createElement('div');
-            modal.className = 'pinned-modal-overlay';
-            modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
-            modal.innerHTML = `
-              <div class="pinned-modal" style="background:#fff;border-radius:18px;max-width:96vw;max-height:90vh;overflow:auto;padding:32px 28px 24px 28px;position:relative;">
-                <button class="close-btn" title="Close" style="position:absolute;top:12px;right:18px;background:none;border:none;font-size:1.7rem;color:#002244;cursor:pointer;border-radius:50%;padding:2px 8px;transition:background 0.2s;">&times;</button>
-                <h2 style="margin-top:0;margin-bottom:18px;">Pinned Messages</h2>
-                <div class="pinned-list"></div>
-              </div>
-            `;
-            const pinnedList = modal.querySelector('.pinned-list');
-            if (allPinned.length === 0) {
-              pinnedList.innerHTML = '<div style="color:#888;text-align:center;">No pinned messages.</div>';
-            } else {
-              allPinned.sort((a, b) => a.timestamp - b.timestamp);
-              allPinned.forEach(msg => {
-                const isMe = msg.uid === currentUser.uid;
-                const bubble = createMessageBubble(msg, isMe);
-                pinnedList.appendChild(bubble);
-              });
+            if (isInConversation && isPinned && isPinnedByAdmin) {
+              allPinned.push({ ...msg, id: msgId });
             }
-            // Close logic
-            modal.querySelector('.close-btn').onclick = () => pinnedModalContainer.innerHTML = '';
-            modal.onclick = e => { if (e.target === modal) pinnedModalContainer.innerHTML = ''; };
-            pinnedModalContainer.innerHTML = '';
-            pinnedModalContainer.appendChild(modal);
+          });
+          const modal = document.createElement('div');
+          modal.className = 'pinned-modal-overlay';
+          modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;';
+          modal.innerHTML = `
+            <div class="pinned-modal" style="background:#fff;border-radius:18px;max-width:96vw;max-height:90vh;overflow:auto;padding:32px 28px 24px 28px;position:relative;">
+              <button class="close-btn" title="Close" style="position:absolute;top:12px;right:18px;background:none;border:none;font-size:1.7rem;color:#002244;cursor:pointer;border-radius:50%;padding:2px 8px;transition:background 0.2s;">&times;</button>
+              <h2 style="margin-top:0;margin-bottom:18px;">Pinned Messages</h2>
+              <div class="pinned-list"></div>
+            </div>
+          `;
+          const pinnedList = modal.querySelector('.pinned-list');
+          if (allPinned.length === 0) {
+            pinnedList.innerHTML = '<div style="color:#888;text-align:center;">No pinned messages.</div>';
+          } else {
+            allPinned.sort((a, b) => a.timestamp - b.timestamp);
+            allPinned.forEach(msg => {
+              const isMe = msg.uid === currentUser.uid;
+              const bubble = createMessageBubble(msg, isMe);
+              // Remove action buttons from pinned message display
+              const actions = bubble.querySelector('.msg-actions');
+              if (actions) actions.remove();
+              // Add pin info if available
+              if (msg.pinnedBy) {
+                const pinInfo = document.createElement('div');
+                pinInfo.style.fontSize = '0.8rem';
+                pinInfo.style.color = '#0047AB';
+                pinInfo.style.marginTop = '4px';
+                pinInfo.style.fontStyle = 'italic';
+                pinInfo.style.fontWeight = '500';
+                if (msg.pinnedBy === currentUser.uid) {
+                  pinInfo.textContent = `📌 Pinned by you`;
+                } else if (msg.pinnedBy === ADMIN_UID) {
+                  pinInfo.textContent = `📌 Pinned by admin`;
+                } else {
+                  pinInfo.textContent = `📌 Pinned by someone`;
+                }
+                bubble.appendChild(pinInfo);
+              }
+              pinnedList.appendChild(bubble);
+            });
+          }
+          // Close logic
+          modal.querySelector('.close-btn').onclick = () => pinnedModalContainer.innerHTML = '';
+          modal.onclick = e => { if (e.target === modal) pinnedModalContainer.innerHTML = ''; };
+          pinnedModalContainer.innerHTML = '';
+          pinnedModalContainer.appendChild(modal);
         });
       }
     });
