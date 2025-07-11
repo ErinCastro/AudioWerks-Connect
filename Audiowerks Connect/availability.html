@@ -411,7 +411,7 @@
     <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
       <a href="homepage.html">Home</a>
       <a href="portfolioo.html">Portfolio</a>
-      <a href="#booking">Book Here</a>
+      <a href="Services.html">Book Here</a>
       <a href="User.html">User Profile</a>
       <a href="availability.html">Equipment</a>
       <a href="feedback.html">Feedback Dashboard</a>
@@ -442,6 +442,7 @@
           <th>Bundle Name</th>
           <th>Price</th>
           <th>Included Services</th>
+          <th>Available Units</th>
         </tr>
       </thead>
       <tbody id="bundlesTbody"></tbody>
@@ -542,11 +543,12 @@
             <td style="padding:12px 10px;font-weight:bold;">${bundle.name || ''}</td>
             <td style="padding:12px 10px;">₱${bundle.price || ''}</td>
             <td style="padding:12px 10px;">${(bundle.services||[]).join(', ')}</td>
+            <td class="inventory-info">${bundle.available !== undefined ? bundle.available + ' units' : '0 units'}</td>
           `;
           bundlesTbody.appendChild(tr);
         });
       } else {
-        bundlesTbody.innerHTML = '<tr><td colspan="3" style="padding:12px 10px;">No bundles found.</td></tr>';
+        bundlesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No bundles found.</td></tr>';
       }
     });
   </script>

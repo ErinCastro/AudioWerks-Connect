@@ -645,7 +645,7 @@
     <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
       <a href="homepage.html">Home</a>
       <a href="portfolioo.html">Portfolio</a>
-      <a href="#booking">Book Here</a>
+      <a href="Services.html">Book Here</a>
       <a href="User.html">User Profile</a>
       <a href="availability.html">Equipments</a>
       <a href="feedback.html">Feedback Dashboard</a>
@@ -1062,17 +1062,17 @@
               promises.push(firebase.database().ref('reservedPhones/' + oldPhone).set(true));
             }
             return Promise.all(promises);
+          }).then(function() {
+            document.getElementById('successMsg').textContent = 'Profile updated successfully!';
+            // Update originalData and disable Save button
+            originalData = {
+              username: document.getElementById('name').value,
+              phone: document.getElementById('phone').value
+            };
+            document.getElementById('saveBtn').disabled = true;
+          }).catch(function(err) {
+            // Error already shown in phoneError if reserved or update failed
           });
-        }).then(function() {
-          document.getElementById('successMsg').textContent = 'Profile updated successfully!';
-          // Update originalData and disable Save button
-          originalData = {
-            username: document.getElementById('name').value,
-            phone: document.getElementById('phone').value
-          };
-          document.getElementById('saveBtn').disabled = true;
-        }).catch(function(err) {
-          // Error already shown in phoneError if reserved or update failed
         });
       });
     });

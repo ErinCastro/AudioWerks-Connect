@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="text/html"; charset="utf-8">
+        <meta name="viewport" content="width=device-widtd initial-scale=1.0">
+        <title> Nike Store</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+            background-blend-mode: lighten;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .logo-container img {
+            height: 70px;
+            cursor: pointer;
+        }
+        .logo-container a {
+            display: inline-block;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+        .header-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header-icons i {
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .header-icons i:hover {
+            transform: scale(1.2);
+        }
+        .menu-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+        .menu-popup a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-popup a:hover {
+            background-color: #f0f0f0;
+        }
+        .menu-popup a:last-child {
+            background-color: #191970;
+            color: #fff;
+            border-bottom: none;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        .menu-popup a:last-child:hover {
+            background-color: #000080;
+            transform: scale(1.02);
+        }
+        .fa-bars {
+            color: #000;
+            transition: transform 0.3s;
+        }
+        .fa-bars.active {
+            transform: rotate(90deg);
+        }
+    footer {
+      background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+      color: white;
+      text-align: center;
+      padding: 25px 10px 15px;
+      margin-top: auto;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      position: relative;
+    }
+    .footer-social {
+      margin: 10px 0 5px;
+    }
+    .footer-social a {
+      color: #bccedf;
+      margin: 0 8px;
+      font-size: 1.5rem;
+      transition: color 0.2s;
+    }
+    .footer-social a:hover {
+      color: #ffc300;
+    }
+    .footer-contact span {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .footer-note {
+      margin: 8px 0 0;
+      font-size: 1rem;
+      color: #bccedf;
+    }
+    .back-to-top {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: #ffc300;
+      color: #191970;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s;
+    }
+    .back-to-top:hover {
+      background: #191970;
+      color: #ffc300;
+    }
+
+/* My Bookings Table Styles */
+.my-bookings-section {
+  margin: 40px 0 60px 0;
+  background: #f9fafb;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 32px 18px 24px 18px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.my-bookings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  background: transparent;
+}
+.my-bookings-table th {
+  background: #eaf1fb;
+  color: #0047AB;
+  font-weight: 700;
+  padding: 14px 8px;
+  font-size: 1.1rem;
+  border-radius: 10px 10px 0 0;
+}
+.my-bookings-table td {
+  background: #fff;
+  padding: 14px 8px;
+  font-size: 1.08rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.04);
+  text-align: center;
+}
+.my-bookings-table tr:nth-child(even) td {
+  background: #f4f7fa;
+}
+.status-badge {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 7px 22px;
+  border-radius: 18px;
+  margin-top: 6px;
+  margin-bottom: 0;
+  background: #b0b6be;
+  color: #fff;
+  letter-spacing: 1px;
+}
+.status-badge.Pending {
+  background: #ff9800;
+}
+.status-badge.Confirmed {
+  background: #4caf50;
+}
+.status-badge.Cancelled {
+  background: #f44336;
+}
+.status-badge.Completed {
+  background: #2196f3;
+}
+.cancel-booking-btn {
+  background-color: #f44336;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+.cancel-booking-btn:hover {
+  background-color: #d32f2f;
+}
+@media (max-width: 700px) {
+  .my-bookings-section {
+    padding: 12px 2vw 12px 2vw;
+  }
+  .my-bookings-table th, .my-bookings-table td {
+    font-size: 0.98rem;
+    padding: 8px 2px;
+  }
+}
+</style>
+    </head>
+
+    <body class="body-bg"> 
+        
+        <header>
+        <div class="logo-container">
+          <a href="homepage.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" /></a>
+        </div>
+        <div class="header-center">
+          <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
+          <p style="font-size: 1.1rem; color: #0047AB; margin: 0;">Lights and Sounds</p>
+        </div>
+        <div class="header-icons">
+          <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+        </div>
+        <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+          <a href="homepage.html">Home</a>
+          <a href="portfolioo.html">Portfolio</a>
+          <a href="Services.html">Book Here</a>
+          <a href="User.html">User Profile</a>
+          <a href="availability.html">Equipment</a>
+          <a href="feedback.html">Feedback Dashboard</a>
+          <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+      </header>
+            <Hr class="lines">
+            <h1 class="title1">SERVICES</h1>
+            <Hr class="lines">
+        <br>
+        <div class="my-bookings-section">
+  <div class="section-title">My Bookings</div>
+  <table class="my-bookings-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Quantity</th>
+        <th>Total Price</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="bookingsTable"></tbody>
+  </table>
+</div>
+        <h1 class="headslabel"><b>BUNDLE OFFERS</b></h1>
+        <main class="product-grid" id="bundlesProductGrid"></main>
+        <br>
+        <h1 class="headslabel"><b>INDIVIDUAL PRODUCTS</b></h1>
+        <main class="product-grid" id="servicesProductGrid"></main>
+        <br>
+        <footer>
+  <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+  <div class="footer-social">
+    <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+  </div>
+  <div class="footer-contact">
+    <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+  </div>
+  <div class="footer-note">
+    <span>You can also contact us directly on this website.</span>
+  </div>
+  <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+</footer>
+    </body>
+    <script>
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    bars.classList.toggle('active');
+  }
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (!menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+  function logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  }
+</script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="firebase-config-new.js"></script>
+<script>
+  function renderBookings(bookings, userEmail) {
+    const tbody = document.getElementById('bookingsTable');
+    tbody.innerHTML = '';
+    Object.entries(bookings).forEach(([id, b]) => {
+      // Show bookings for this user and guest bookings if logged in, or just guest bookings if not logged in
+      if ((userEmail && (b.customer === userEmail || b.customer === 'Guest')) || (!userEmail && b.customer === 'Guest')) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${b.productName}</td>
+          <td>${b.startDate}</td>
+          <td>${b.endDate}</td>
+          <td>${b.quantity}</td>
+          <td>${b.totalPrice}</td>
+          <td><span class="status-badge ${b.status}">${b.status}</span></td>
+          <td>
+            ${(b.status === 'Pending' || b.status === 'Confirmed') ? `<button class="cancel-booking-btn" data-id="${id}">Cancel</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    });
+  }
+  firebase.auth().onAuthStateChanged(user => {
+    let userEmail = user ? user.email : null;
+    firebase.database().ref('bookings').on('value', snap => {
+      const bookings = snap.val() || {};
+      renderBookings(bookings, userEmail);
+    });
+  });
+  // Map service/bundle names to image files in the images folder
+  const serviceImages = {
+    'Lights & Sounds': 'images/lights-sounds.png',
+    'Led Wall': 'images/led-wall.png',
+    'Stage': 'images/stage.png',
+    'Mood Light': 'images/mood-lights.png',
+    'String Lights': 'images/string-lights.png',
+    'Low Lying': 'images/low-lying.jpg',
+    // Add more mappings as needed
+  };
+  document.addEventListener('DOMContentLoaded', async function() {
+    // Load Bundles
+    const bundlesGrid = document.getElementById('bundlesProductGrid');
+    if (bundlesGrid) {
+      bundlesGrid.innerHTML = '';
+      const db = firebase.database();
+      const bundlesSnap = await db.ref('bundles').once('value');
+      const bundles = bundlesSnap.val() || {};
+      Object.entries(bundles).forEach(([id, b]) => {
+        // Use the first service's image as the bundle image, or a default
+        let bundleImage = 'images/logo.png';
+        if (b.services && b.services.length > 0) {
+          const firstService = b.services[0];
+          bundleImage = serviceImages[firstService] || 'images/logo.png';
+        }
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <a href="Prod Description.html?bundleId=${id}"><img src="${bundleImage}" alt="${b.name}"></a>
+          <p class="product-title">${b.name}</p>
+          <p class="product-type">${(b.services||[]).join(', ')}</p>
+          <p class="product-price"><b>₱${b.price}</b></p>
+        `;
+        bundlesGrid.appendChild(div);
+      });
+    }
+    // Load Individual Products
+    const grid = document.getElementById('servicesProductGrid');
+    if (grid) {
+      grid.innerHTML = '';
+      const db = firebase.database();
+      const servicesSnap = await db.ref('services').once('value');
+      const services = servicesSnap.val() || {};
+      Object.entries(services).forEach(([id, s]) => {
+        const imgSrc = serviceImages[s.name] || 'images/logo.png';
+        const div = document.createElement('div');
+        div.className = 'product';
+        div.innerHTML = `
+          <a href="Prod Description.html?productId=${id}"><img src="${imgSrc}" alt="${s.name}"></a>
+          <p class="product-title">${s.name}</p>
+          <p class="product-type">${s.inclusions || ''}</p>
+          <p class="product-price"><b>₱${s.price}</b></p>
+        `;
+        grid.appendChild(div);
+      });
+    }
+  });
+  document.addEventListener('click', async function(e) {
+    if (e.target && e.target.classList.contains('cancel-booking-btn')) {
+      const bookingId = e.target.getAttribute('data-id');
+      if (confirm('Are you sure you want to cancel this booking?')) {
+        try {
+          await firebase.database().ref('bookings/' + bookingId + '/status').set('Cancelled');
+        } catch (error) {
+          alert('Failed to cancel booking. Please try again.');
+        }
+      }
+    }
+  });
+</script>
+</html>
+
+

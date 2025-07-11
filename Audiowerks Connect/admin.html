@@ -313,24 +313,17 @@
       <thead>
         <tr>
           <th>Customer</th>
-          <th>Date</th>
-          <th>Service</th>
+          <th>Product</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Quantity</th>
+          <th>Total Price</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>Juan Dela Cruz</td>
-          <td>July 5, 2025</td>
-          <td>LED Wall</td>
-          <td>Confirmed</td>
-        </tr>
-        <tr>
-          <td>Ana Santos</td>
-          <td>July 10, 2025</td>
-          <td>Stage</td>
-          <td>Pending</td>
-        </tr>
+      <tbody id="bookingsTableBody">
+        <!-- Bookings will be loaded here dynamically -->
       </tbody>
     </table>
   </div>
@@ -417,13 +410,49 @@
     document.querySelector('.card h3 + p + p').textContent = `Confirmed: ${confirmed} | Pending: ${pending} | Cancelled: ${cancelled}`;
 
     // Load bookings table
-    const bookingsTbody = document.querySelector('.card:nth-of-type(2) tbody');
+    const bookingsTbody = document.getElementById('bookingsTableBody');
     bookingsTbody.innerHTML = '';
+    // Fetch users for username lookup
+    const usersSnap = await firebase.database().ref('users').once('value');
+    const users = usersSnap.val() || {};
     Object.entries(bookings).forEach(([id, b]) => {
+      // Try to find username by UID first, then by email as fallback
+      let username = '';
+      if (b.customerUid && users[b.customerUid] && users[b.customerUid].name) {
+        // Direct UID lookup
+        username = users[b.customerUid].name;
+      } else if (b.customer && b.customer !== 'Guest') {
+        // Fallback to email lookup
+        for (const [uname, udata] of Object.entries(users)) {
+          if (udata.email && udata.email.replace(/^"|"$/g, '') === b.customer) {
+            username = uname;
+            break;
+          }
+        }
+      }
+      const displayName = username || b.customerName || b.customer || 'Guest';
       const tr = document.createElement('tr');
       tr.setAttribute('data-id', id);
-      tr.style.cursor = 'pointer';
-      tr.innerHTML = `<td>${b.customer || ''}</td><td>${b.date || ''}</td><td>${b.service || ''}</td><td>${b.status || ''}</td>`;
+      tr.innerHTML = `
+        <td>${displayName}</td>
+        <td>${b.productName || 'Unknown'}</td>
+        <td>${b.startDate || 'N/A'}</td>
+        <td>${b.endDate || 'N/A'}</td>
+        <td>${b.quantity || 1}</td>
+        <td>${b.totalPrice || '₱0'}</td>
+        <td>
+          <select class="status-select" data-id="${id}" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Confirmed" ${b.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="Cancelled" ${b.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            <option value="Completed" ${b.status === 'Completed' ? 'selected' : ''}>Completed</option>
+          </select>
+        </td>
+        <td>
+          <button class="view-booking" data-id="${id}" style="background: #0047AB; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px;">View</button>
+          <button class="delete-booking" data-id="${id}" style="background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Delete</button>
+        </td>
+      `;
       bookingsTbody.appendChild(tr);
     });
 
@@ -481,6 +510,23 @@
   }
 
   // TODO: Add event listeners for add/edit/delete actions for announcements and services
+
+  // --- Bookings Management ---
+  document.addEventListener('change', async function(e) {
+    // Update booking status
+    if (e.target && e.target.classList.contains('status-select')) {
+      const bookingId = e.target.getAttribute('data-id');
+      const newStatus = e.target.value;
+      
+      try {
+        await firebase.database().ref(`bookings/${bookingId}/status`).set(newStatus);
+        console.log(`Booking ${bookingId} status updated to ${newStatus}`);
+      } catch (error) {
+        console.error('Error updating booking status:', error);
+        alert('Error updating booking status. Please try again.');
+      }
+    }
+  });
 
   // --- Announcements ---
   document.addEventListener('click', async function(e) {
@@ -586,6 +632,29 @@
         loadBundles();
       }
     }
+    // View booking details
+    if (e.target && e.target.classList.contains('view-booking')) {
+      const id = e.target.getAttribute('data-id');
+      const bookings = await window.getAllBookings() || {};
+      const booking = bookings[id];
+      if (booking) {
+        await showBookingDetails(booking);
+      }
+    }
+    // Delete booking
+    if (e.target && e.target.classList.contains('delete-booking')) {
+      const id = e.target.getAttribute('data-id');
+      if (confirm('Delete this booking? This action cannot be undone.')) {
+        try {
+          await firebase.database().ref(`bookings/${id}`).remove();
+          console.log(`Booking ${id} deleted`);
+          loadDashboard();
+        } catch (error) {
+          console.error('Error deleting booking:', error);
+          alert('Error deleting booking. Please try again.');
+        }
+      }
+    }
   });
 
   // Remove the extra input row and 'Add Service' button above the main add service row
@@ -654,6 +723,88 @@
     content.innerHTML = Object.entries(booking).map(([k,v]) => `<b>${k}:</b> ${v}<br>`).join('');
     modal.style.display = 'flex';
   }
+
+  // Function to show booking details
+  async function showBookingDetails(booking) {
+    let modal = document.getElementById('bookingDetailsModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bookingDetailsModal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(0,0,0,0.4)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '2000';
+      document.body.appendChild(modal);
+    }
+
+    // Get customer name from users node if available
+    let customerDisplayName = booking.customerName || booking.customer || 'Guest';
+    if (booking.customerUid) {
+      try {
+        const userSnap = await firebase.database().ref(`users/${booking.customerUid}`).once('value');
+        const userData = userSnap.val();
+        if (userData && userData.name) {
+          customerDisplayName = userData.name;
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+
+    const bookingDate = new Date(booking.timestamp).toLocaleString();
+    modal.innerHTML = `
+      <div style="background:#fff;padding:30px 40px;border-radius:10px;min-width:400px;max-width:90vw;box-shadow:0 2px 16px #0003;position:relative;">
+        <button onclick="closeBookingDetails()" style="position:absolute;top:10px;right:10px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
+        <h3 style="color:#0047AB;margin-bottom:20px;">Booking Details</h3>
+        <div style="line-height:1.8;">
+          <p><strong>Customer:</strong> ${customerDisplayName}</p>
+          <p><strong>Product:</strong> ${booking.productName}</p>
+          <p><strong>Start Date:</strong> ${booking.startDate}</p>
+          <p><strong>End Date:</strong> ${booking.endDate}</p>
+          <p><strong>Quantity:</strong> ${booking.quantity}</p>
+          <p><strong>Total Price:</strong> ${booking.totalPrice}</p>
+          <p><strong>Status:</strong> <span style="color:${getStatusColor(booking.status)};font-weight:bold;">${booking.status}</span></p>
+          <p><strong>Booking Date:</strong> ${bookingDate}</p>
+          <p><strong>Product Type:</strong> ${booking.productType}</p>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'flex';
+  }
+
+  function closeBookingDetails() {
+    const modal = document.getElementById('bookingDetailsModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function getStatusColor(status) {
+    switch(status) {
+      case 'Confirmed': return '#4CAF50';
+      case 'Pending': return '#FF9800';
+      case 'Cancelled': return '#F44336';
+      case 'Completed': return '#2196F3';
+      default: return '#000';
+    }
+  }
+
+  // Function to get all bookings
+  window.getAllBookings = async function() {
+    try {
+      const snapshot = await firebase.database().ref('bookings').once('value');
+      return snapshot.val() || {};
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      return {};
+    }
+  };
 
   // Booking row click event
   document.addEventListener('click', function(e) {

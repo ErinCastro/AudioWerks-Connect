@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Book Your Sound System</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body class="body-bg">
+
+    <Hr class="lines">
+        <h1 class="title1">SERVICES</h1>
+    <Hr class="lines">
+        
+    <div class="back-container">
+        <a href="Services.html" class="b-button">← Back</a>
+    </div>
+
+    <!-- Equipment Details Section -->
+    <div class="details-section">
+        <div class="equipment-img-wrapper">
+            <img src="https://placehold.co/400x300" alt="Sound System Equipment" class="equipment-image" />
+        </div>
+        <div class="equipment-info">
+            <h1 class="equipment-title">PRODUCT NAME</h1>
+            <p class="core-equipment-description" style="font-weight:500;color:#0047AB;margin-bottom:8px;display:none;"></p>
+            <p class="equipment-description">
+                <!-- Description will be filled dynamically -->
+            </p>
+            <p class="status-label">Status: <span id="stockStatus">Loading...</span></p>
+            <p class="price-label">Price: <span id="price-display">₱250/day</span></p>
+            <div class="quantity-wrapper">
+                <label for="quantityInput" class="status-label">Quantity:</label>
+                <input type="number" id="quantityInput" name="quantity" value="1" min="1" style="width: 80px; padding: 4px; border-radius: 6px; border: 1px solid #ccc;" />
+            </div>
+
+            <!-- Booking Form -->
+            <form class="booking-form" id="bookingForm">
+                <div class="date-grid">
+                    <div class="start-date-wrapper">
+                        <label for="startDate" class="start-label">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" required />
+                    </div>
+                    <div class="end-date-wrapper">
+                        <label for="endDate" class="end-label">End Date</label>
+                        <input type="date" id="endDate" name="endDate" required />
+                    </div>
+                </div>
+                <div class="total-wrapper">
+                    <p class="total-text">Total Price: <span id="totalPrice">₱0</span></p>
+                </div>
+                <button type="submit" class="b-button">Book Now</button>
+            </form>
+        </div>
+    </div>
+    <!-- Featured Items Section -->
+    <div class="featured-items-section" style="margin-top:40px;">
+      <h2 class="featured-heading" style="background-color: rgb(13, 30, 59); font-size: 30px; font-weight: bold; height: 50px; text-align: center; color: #f9fafb; margin: 0px; margin-bottom: 40px; padding-top: 15px;">FEATURED</h2>
+      <div class="product-grid" id="featuredItemsGrid"></div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="firebase-config-new.js"></script>
+    <script>
+      // Map service/bundle names to image files in the images folder
+      const serviceImages = {
+        'Lights & Sounds': 'images/lights-sounds.png',
+        'Led Wall': 'images/led-wall.png',
+        'Stage': 'images/stage.png',
+        'Mood Light': 'images/mood-lights.png',
+        'String Lights': 'images/string-lights.png',
+        'Low Lying': 'images/low-lying.jpg',
+        // Add more mappings as needed
+      };
+      // Core equipment descriptions (from availability.html)
+      const coreEquipmentDescriptions = {
+        'Lights & Sounds': 'Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.',
+        'Led Wall': 'Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.',
+        'Stage': 'Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.',
+        'Mood Light': 'Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.',
+        'String Lights': 'Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.',
+        'Low Lying': 'Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.'
+      };
+      function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+      }
+      document.addEventListener('DOMContentLoaded', async function() {
+        const productId = getQueryParam('productId');
+        const bundleId = getQueryParam('bundleId');
+        const db = firebase.database();
+        let currentName = '';
+        if (productId) {
+          const snap = await db.ref('services/' + productId).once('value');
+          const product = snap.val();
+          if (!product) return;
+          document.querySelector('.equipment-title').textContent = product.name;
+          document.querySelector('.equipment-image').src = serviceImages[product.name] || 'images/logo.png';
+          document.querySelector('.equipment-description').textContent = product.inclusions || '';
+          document.getElementById('price-display').textContent = '₱' + product.price;
+          currentName = product.name;
+          // Update the booking form price
+          updatePrice(product.price);
+          // Show core equipment description if available
+          const coreDesc = coreEquipmentDescriptions[product.name];
+          const coreDescElem = document.querySelector('.core-equipment-description');
+          if (coreDesc) {
+            coreDescElem.textContent = coreDesc;
+            coreDescElem.style.display = 'block';
+          } else {
+            coreDescElem.style.display = 'none';
+          }
+          // Set availableStock and max quantity
+          availableStock = product.available !== undefined ? parseInt(product.available) : 10;
+          document.getElementById('stockStatus').innerText = `${availableStock} unit(s) available`;
+          const quantityInput = document.getElementById('quantityInput');
+          quantityInput.max = availableStock;
+          if (parseInt(quantityInput.value) > availableStock) {
+            quantityInput.value = availableStock;
+          }
+        } else if (bundleId) {
+          const snap = await db.ref('bundles/' + bundleId).once('value');
+          const bundle = snap.val();
+          if (!bundle) return;
+          document.querySelector('.equipment-title').textContent = bundle.name;
+          let bundleImage = 'images/logo.png';
+          if (bundle.services && bundle.services.length > 0) {
+            const firstService = bundle.services[0];
+            bundleImage = serviceImages[firstService] || 'images/logo.png';
+          }
+          document.querySelector('.equipment-image').src = bundleImage;
+          document.querySelector('.equipment-description').textContent = (bundle.services||[]).join(', ');
+          document.getElementById('price-display').textContent = '₱' + bundle.price;
+          currentName = bundle.name;
+          // Update the booking form price
+          updatePrice(bundle.price);
+          // Hide core description for bundles
+          const coreDescElem = document.querySelector('.core-equipment-description');
+          coreDescElem.style.display = 'none';
+          // Set availableStock and max quantity for bundles
+          availableStock = bundle.available !== undefined ? parseInt(bundle.available) : 10;
+          document.getElementById('stockStatus').innerText = `${availableStock} unit(s) available`;
+          const quantityInput = document.getElementById('quantityInput');
+          quantityInput.max = availableStock;
+          if (parseInt(quantityInput.value) > availableStock) {
+            quantityInput.value = availableStock;
+          }
+        }
+        // Load and display featured items (all other services)
+        const featuredGrid = document.getElementById('featuredItemsGrid');
+        if (featuredGrid) {
+          featuredGrid.innerHTML = '';
+          const servicesSnap = await db.ref('services').once('value');
+          const services = servicesSnap.val() || {};
+          Object.entries(services).forEach(([id, s]) => {
+            if (s.name === currentName) return; // Skip current item
+            const imgSrc = serviceImages[s.name] || 'images/logo.png';
+            const div = document.createElement('div');
+            div.className = 'product';
+            div.innerHTML = `
+              <a href="Prod Description.html?productId=${id}"><img src="${imgSrc}" alt="${s.name}"></a>
+              <p class="product-title">${s.name}</p>
+              <p class="product-type">${s.inclusions || ''}</p>
+              <p class="product-price"><b>₱${s.price}</b></p>
+            `;
+            featuredGrid.appendChild(div);
+          });
+        }
+      });
+    </script>
+    <script>
+        let currentPrice = 250; // Default price, will be updated from product data
+        let availableStock = 10; // Simulated database value
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('stockStatus').innerText = `${availableStock} unit(s) available`;
+            
+            // Set minimum date for start date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').min = today;
+        });
+
+        function calculatePrice() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const quantityInput = document.getElementById('quantityInput');
+            const totalPriceDisplay = document.getElementById('totalPrice');
+
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(endDateInput.value);
+            const quantity = parseInt(quantityInput.value) || 1;
+
+            if (startDateInput.value && endDateInput.value && endDate >= startDate) {
+                const timeDiff = endDate - startDate;
+                const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+                const totalPrice = daysDiff * currentPrice * quantity;
+                totalPriceDisplay.innerText = `₱${totalPrice}`;
+            } else {
+                totalPriceDisplay.innerText = '₱0';
+            }
+        }
+
+        // Update price when product data is loaded
+        function updatePrice(price) {
+            currentPrice = price;
+            calculatePrice();
+        }
+
+        document.getElementById('startDate').addEventListener('input', calculatePrice);
+        document.getElementById('endDate').addEventListener('input', calculatePrice);
+
+        // Set minimum date for end date based on start date
+        document.getElementById('startDate').addEventListener('change', function() {
+            const startDate = this.value;
+            const endDateInput = document.getElementById('endDate');
+            
+            if (startDate) {
+                // Set minimum date for end date to be the start date
+                endDateInput.min = startDate;
+                
+                // If end date is before start date, clear it
+                if (endDateInput.value && endDateInput.value < startDate) {
+                    endDateInput.value = '';
+                    calculatePrice();
+                }
+            }
+        });
+
+        document.getElementById('quantityInput').addEventListener('input', () => {
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+            if (quantity > availableStock) {
+                alert(`Only ${availableStock} unit(s) are available.`);
+                document.getElementById('quantityInput').value = availableStock;
+            }
+            calculatePrice();
+        });
+
+        // Form submission handling
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const quantity = document.getElementById('quantityInput').value;
+            
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates.');
+                return;
+            }
+            
+            if (new Date(endDate) < new Date(startDate)) {
+                alert('End date cannot be before start date.');
+                return;
+            }
+            
+            // Allow booking without login
+            let customer = 'Guest';
+            let customerName = 'Guest';
+            let customerUid = null;
+            if (firebase.auth && typeof firebase.auth === 'function' && firebase.auth().currentUser) {
+                const user = firebase.auth().currentUser;
+                customer = user.email || 'Guest';
+                customerName = user.displayName || user.email || 'Guest';
+                customerUid = user.uid;
+            }
+            
+            // Create booking data
+            const bookingData = {
+                productName: document.querySelector('.equipment-title').textContent,
+                startDate: startDate,
+                endDate: endDate,
+                quantity: parseInt(quantity),
+                totalPrice: document.getElementById('totalPrice').textContent,
+                customer: customer,
+                customerName: customerName,
+                customerUid: customerUid,
+                status: 'Pending',
+                timestamp: new Date().toISOString(),
+                productId: getQueryParam('productId') || getQueryParam('bundleId'),
+                productType: getQueryParam('productId') ? 'service' : 'bundle'
+            };
+            
+            try {
+                // Save booking to Firebase
+                const db = firebase.database();
+                const bookingRef = await db.ref('bookings').push(bookingData);
+                
+                console.log('Booking saved with ID:', bookingRef.key);
+                // Show notification
+                alert('Booking submitted successfully! We will contact you soon to confirm your reservation. You will be redirected to the Services page.');
+                
+                // Reset form
+                document.getElementById('bookingForm').reset();
+                document.getElementById('totalPrice').textContent = '₱0';
+                
+                // Reset date constraints
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('startDate').min = today;
+                document.getElementById('endDate').min = '';
+                
+                // Redirect to Services.html after 2 seconds
+                setTimeout(function() {
+                  window.location.href = 'Services.html';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error saving booking:', error);
+                alert('Error submitting booking. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
