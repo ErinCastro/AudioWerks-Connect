@@ -1,5 +1,4 @@
 // Firebase is already initialized in firebase-config-new.js
-
 // Auth reference
 const auth = firebase.auth();
 // Database reference

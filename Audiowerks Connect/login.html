@@ -427,16 +427,16 @@
             <p class="tagline">Lights and Sounds</p>
         </div>
         
-        <form id="loginForm" onsubmit="handleLogin(event)">
+        <form id="loginForm" onsubmit="return false;">
             <div class="form-group">
                 <label class="form-label" for="name">USERNAME</label>
-                <input type="text" id="name" name="name" class="form-input" placeholder="Username" required>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Enter your username" required>
                 <div id="nameError" style="color: #d32f2f; font-size: 14px; margin-top: 5px; display: none;"></div>
             </div>
             
             <div class="form-group">
                 <label class="form-label" for="password">PASSWORD</label>
-                <input type="password" id="password" name="password" class="form-input" placeholder="••••••" required>
+                <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
                 <div id="passwordError" style="color: #d32f2f; font-size: 14px; margin-top: 5px; display: none;"></div>
             </div>
             
@@ -448,6 +448,7 @@
             <a href="forgot.html" class="forgot-password" onclick="forgotPassword()">Forgot Password?</a>
             <a href="register.html" class="signup-link" onclick="signupRedirect()">Signup !</a>
         </div>
+        <div id="recaptcha-container" style="display:none;"></div>
     </div>
 <!-- Firebase App (the core Firebase SDK) -->
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
@@ -459,151 +460,94 @@
 <script src="firebase-config-new.js"></script>
 <script src="firebase-backend-new.js"></script>
 
-    <script>
-        function handleLogin(event) {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import {
+          getAuth, signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBIJf4WsNG3_1C-9WjmMhuI-X8kLZdK958",
+            authDomain: "audiowerks-8e6bf.firebaseapp.com",
+            databaseURL: "https://audiowerks-8e6bf-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "audiowerks-8e6bf",
+            storageBucket: "audiowerks-8e6bf.firebasestorage.app",
+            messagingSenderId: "462605181203",
+            appId: "1:462605181203:web:b93b118cc9b63c77907ae6",
+            measurementId: "G-93R061TZ32"
+        };
+        initializeApp(firebaseConfig);
+
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const nameError = document.getElementById('nameError');
+        const passwordError = document.getElementById('passwordError');
+        const loginError = document.getElementById('loginError');
+
+        if (loginForm) {
+          loginForm.addEventListener('submit', async function(event) {
+            console.log('Login form submitted'); // Debug: confirm handler runs
             event.preventDefault();
-
-            const loginBtn = document.getElementById('loginBtn');
-            const formData = new FormData(event.target);
-            const username = formData.get('name').trim();
-            const password = formData.get('password').trim();
-            let valid = true;
-
-            // Error containers
-            const nameError = document.getElementById('nameError');
-            const passwordError = document.getElementById('passwordError');
-            const loginError = document.getElementById('loginError');
-            nameError.style.display = 'none';
-            passwordError.style.display = 'none';
-            loginError.style.display = 'none';
             nameError.textContent = '';
             passwordError.textContent = '';
             loginError.textContent = '';
-
-            // Validate fields
-            if (!username) {
-                nameError.textContent = 'Please enter your username.';
-                nameError.style.display = 'block';
-                valid = false;
-            }
-            if (!password) {
-                passwordError.textContent = 'Please enter your password.';
-                passwordError.style.display = 'block';
-                valid = false;
-            }
-            if (!valid) {
-                return;
-            }
-
-            // Add loading state
+            nameError.style.display = 'none';
+            passwordError.style.display = 'none';
+            loginError.style.display = 'none';
             loginBtn.classList.add('loading');
             loginBtn.disabled = true;
             loginBtn.textContent = 'Logging in...';
-
-            // 1. Look up email by username in the database
-            firebase.database().ref('users/' + username).once('value')
-                .then((snapshot) => {
-                    const userData = snapshot.val();
-                    if (!userData || !userData.email) {
-                        // Username not found
-                        loginBtn.classList.remove('loading');
-                        loginBtn.disabled = false;
-                        loginBtn.textContent = 'Log in';
-                        nameError.textContent = 'Username not found. Please check your username or register.';
-                        nameError.style.display = 'block';
-                        passwordError.style.display = 'none';
-                        loginError.style.display = 'none';
-                        throw new Error('Username not found.'); // Prevent further execution
-                    }
-                    const email = userData.email;
-                    // Check if this username is in admins list
-                    return firebase.database().ref('admins/' + username).once('value').then(adminSnap => {
-                        const isAdminUser = !!adminSnap.val();
-                        return { email, isAdminUser };
-                    });
-                })
-                .then(({ email, isAdminUser }) => {
-                    // 2. Sign in with email and password
-                    return firebase.auth().signInWithEmailAndPassword(email, password).then(userCredential => ({ userCredential, isAdminUser }));
-                })
-                .then(({ userCredential, isAdminUser }) => {
-                    // Login successful
-                    const user = userCredential.user;
-                    if (!user.emailVerified) {
-                        loginBtn.classList.remove('loading');
-                        loginBtn.disabled = false;
-                        loginBtn.textContent = 'Log in';
-                        loginError.textContent = 'Please verify your email before logging in. Check your inbox for the verification link.';
-                        loginError.style.display = 'block';
-                        return;
-                    }
-                    localStorage.setItem('userPassword', password);
-                    if (isAdminUser) {
-                        window.location.href = 'admin.html';
-                    } else {
-                        // Update username mapping for login
-                        // Fetch user profile from database
-                        firebase.database().ref('users/' + user.uid).once('value').then(function(snapshot) {
-                            const data = snapshot.val() || {};
-                            firebase.database().ref('users/' + username).set({
-                                email: data.email || user.email,
-                                phone: data.phone ? data.phone.replace('+63', '') : ''
-                            });
-                            window.location.href = 'homepage.html';
-                        });
-                    }
-                })
-                .catch((error) => {
-                    if (error.message === 'Username not found.') {
-                        // Already handled above
-                        return;
-                    }
-                    loginBtn.classList.remove('loading');
-                    loginBtn.disabled = false;
-                    loginBtn.textContent = 'Log in';
-                    if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                        passwordError.textContent = 'Incorrect password. Please try again.';
-                        passwordError.style.display = 'block';
-                        nameError.style.display = 'none';
-                        loginError.style.display = 'none';
-                    } else {
-                        passwordError.style.display = 'none';
-                        nameError.style.display = 'none';
-                        loginError.textContent = error.message;
-                        loginError.style.display = 'block';
-                    }
-                });
-        }
-
-
-        // Form validation with visual feedback
-        const inputs = document.querySelectorAll('.form-input');
-        inputs.forEach(input => {
-            input.addEventListener('blur', function() {
-                if (this.checkValidity()) {
-                    this.style.background = '#b8d4f0';
-                    setTimeout(() => {
-                        this.style.background = '#a8c5e8';
-                    }, 1000);
+            const username = document.getElementById('name').value.trim();
+            const password = document.getElementById('password').value.trim();
+            try {
+              // 1. Look up email by username in the database (compat API for DB is fine)
+              const userSnap = await firebase.database().ref('users/' + username).once('value');
+              const userData = userSnap.val();
+              if (!userData || !userData.email) {
+                nameError.textContent = 'Username not found. Please check your username or register.';
+                nameError.style.display = 'block';
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Log in';
+                return;
+              }
+              const email = userData.email;
+              // 2. Try to sign in with email and password
+              const auth = getAuth();
+              try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                if (!user.emailVerified) {
+                  loginError.textContent = 'Please verify your email before logging in. Check your inbox for the verification link.';
+                  loginError.style.display = 'block';
+                  loginBtn.classList.remove('loading');
+                  loginBtn.disabled = false;
+                  loginBtn.textContent = 'Log in';
+                  return;
                 }
-            });
-        });
-
-        // Keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+                localStorage.setItem('userPassword', password);
+                window.location.href = 'homepage.html';
+              } catch (error) {
+                if (error.code === 'auth/wrong-password') {
+                  passwordError.textContent = 'Incorrect password.';
+                  passwordError.style.display = 'block';
+                } else {
+                  loginError.textContent = error.message;
+                  loginError.style.display = 'block';
+                }
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Log in';
+              }
+            } catch (err) {
+              loginError.textContent = err.message;
+              loginError.style.display = 'block';
+              loginBtn.classList.remove('loading');
+              loginBtn.disabled = false;
+              loginBtn.textContent = 'Log in';
             }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('loginForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                });
-            }
-        });
+          });
+        }
     </script>
 </body>
 </html>
