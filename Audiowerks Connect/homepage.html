@@ -761,6 +761,9 @@
   <script src="firebase-config-new.js"></script>
 
   <script>
+    // --- CONFIG: Set your admin UID here ---
+    const ADMIN_UID = 'FpAT19tEbYbIhbPbAi3TGNTutOT2NIptGOOVYPX6vP2kAo31JRNeMtl1'; // TODO: Replace with your actual admin UID
+
     // Initialize AOS with error handling
     try {
     AOS.init();
@@ -1304,21 +1307,24 @@
       chatBody.innerHTML = '';
       if (!currentUser) return;
 
-            try {
-      Object.entries(messages).sort((a, b) => a[1].timestamp - b[1].timestamp).forEach(([msgId, msg]) => {
-          console.log('Rendering message:', { msgId, text: msg.text, attachment: msg.attachment });
-        const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
-        const bubble = createFloatingBubble(msg.text, side, {
-          msgId: msgId,
-          timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
-          readBy: msg.readBy || {},
-            pinned: msg.pinned || false,
-            reactions: msg.reactions || {},
-            attachment: msg.attachment || null
-        });
-        chatBody.appendChild(bubble);
-      });
-      chatBody.scrollTop = chatBody.scrollHeight;
+      try {
+        // Only show messages where the current user is sender or recipient
+        Object.entries(messages)
+          .filter(([msgId, msg]) => msg.uid === currentUser.uid || msg.recipientUid === currentUser.uid)
+          .sort((a, b) => a[1].timestamp - b[1].timestamp)
+          .forEach(([msgId, msg]) => {
+            const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+            const bubble = createFloatingBubble(msg.text, side, {
+              msgId: msgId,
+              timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+              readBy: msg.readBy || {},
+              pinned: msg.pinned || false,
+              reactions: msg.reactions || {},
+              attachment: msg.attachment || null
+            });
+            chatBody.appendChild(bubble);
+          });
+        chatBody.scrollTop = chatBody.scrollHeight;
       } catch (error) {
         console.warn('Failed to render chat messages:', error);
       }
@@ -1329,18 +1335,23 @@
       if (!msgText || !currentUser || !db) return;
 
       try {
-      const role = isAdminUser ? 'admin' : 'client';
-      const message = {
-        uid: currentUser.uid,
-        name: currentUser.displayName || 'Anonymous',
-        text: msgText,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        readBy: { [currentUser.uid]: true },
-        recipientUid: 'FpAT19tEbYbIhbPbAi3TGNTutOT2'
-      };
-
-      db.ref('chat-messages').push(message);
-      chatInput.value = '';
+        const role = isAdminUser ? 'admin' : 'client';
+        // If user, send to admin. If admin, send to last user (not implemented here)
+        const recipientUid = isAdminUser ? window.lastUserUid || '' : ADMIN_UID;
+        if (!recipientUid) {
+          alert('No recipient selected.');
+          return;
+        }
+        const message = {
+          uid: currentUser.uid,
+          name: currentUser.displayName || 'Anonymous',
+          text: msgText,
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          readBy: { [currentUser.uid]: true },
+          recipientUid: recipientUid
+        };
+        db.ref('chat-messages').push(message);
+        chatInput.value = '';
       } catch (error) {
         console.warn('Failed to send message:', error);
       }
