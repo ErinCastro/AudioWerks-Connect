@@ -566,6 +566,57 @@
   from { transform: scale(0.95); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
+    /* Announcement Modal Styles */
+    #announcementModal {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.45);
+      align-items: center;
+      justify-content: center;
+    }
+    #announcementModal .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,34,68,0.18);
+      padding: 32px 28px 24px 28px;
+      max-width: 420px;
+      width: 90vw;
+      text-align: center;
+      position: relative;
+      animation: modalPopIn 0.3s cubic-bezier(.4,2,.6,1) 1;
+    }
+    #announcementModal h3 {
+      color: #0047AB;
+      margin-bottom: 18px;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    #announcementModal .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.7rem;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    #announcementModal .close-btn:hover {
+      color: #0047AB;
+    }
+    #announcementModal .announcement-text {
+      font-size: 1.13rem;
+      color: #222;
+      margin-bottom: 10px;
+      white-space: pre-line;
+    }
+    @keyframes modalPopIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -989,6 +1040,53 @@ document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopu
         console.warn('Firebase initialization failed:', error);
       }
     });
+
+    // Announcement Modal Logic (show all announcements in sequence)
+    if (typeof firebase !== 'undefined') {
+      console.log('[AnnouncementModal] Firebase is defined');
+      firebase.database().ref('announcements').orderByChild('timestamp').once('value', snap => {
+        const announcements = snap.val();
+        console.log('[AnnouncementModal] Fetched announcements:', announcements);
+        if (announcements) {
+          // Sort all announcements by timestamp ascending (oldest first)
+          const all = Object.values(announcements).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+          let idx = 0;
+          function showNextAnnouncement() {
+            if (idx >= all.length) return;
+            const ann = all[idx];
+            if (ann && ann.text) {
+              const modal = document.getElementById('announcementModal');
+              const content = document.getElementById('announcementModalContent');
+              content.textContent = ann.text;
+              modal.style.display = 'flex';
+              // Close button
+              document.getElementById('closeAnnouncementModal').onclick = () => {
+                modal.style.display = 'none';
+                idx++;
+                setTimeout(showNextAnnouncement, 200); // Small delay for smoothness
+              };
+              // Also close on background click
+              modal.onclick = (e) => {
+                if (e.target === modal) {
+                  modal.style.display = 'none';
+                  idx++;
+                  setTimeout(showNextAnnouncement, 200);
+                }
+              };
+              console.log('[AnnouncementModal] Showing announcement', idx+1, 'of', all.length);
+            } else {
+              idx++;
+              showNextAnnouncement(); // Skip if no text
+            }
+          }
+          showNextAnnouncement();
+        } else {
+          console.log('[AnnouncementModal] No announcements found');
+        }
+      });
+    } else {
+      console.log('[AnnouncementModal] Firebase is NOT defined');
+    }
 
     // Floating chat functionality with error handling
     let chatHead, chatPopup, chatInput, chatSendBtn, chatBody, db, currentUser, isAdminUser;
@@ -1838,3 +1936,12 @@ document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopu
   </script>
 </body>
 </html>
+
+<!-- Announcement Modal -->
+<div id="announcementModal">
+  <div class="modal-content">
+    <button class="close-btn" id="closeAnnouncementModal" aria-label="Close announcement">&times;</button>
+    <h3>Announcement</h3>
+    <div class="announcement-text" id="announcementModalContent"></div>
+  </div>
+</div>
