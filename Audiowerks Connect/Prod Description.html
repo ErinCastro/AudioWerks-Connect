@@ -46,6 +46,25 @@
                         <input type="date" id="endDate" name="endDate" required />
                     </div>
                 </div>
+                
+                <!-- Venue and Location Fields -->
+                <div class="venue-location-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div class="venue-wrapper">
+                        <label for="venue" class="venue-label" style="display: block; margin-bottom: 5px; font-weight: 600; color: #0047AB;">Venue</label>
+                        <input type="text" id="venue" name="venue" placeholder="Enter venue name..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" />
+                    </div>
+                    <div class="location-wrapper">
+                        <label for="location" class="location-label" style="display: block; margin-bottom: 5px; font-weight: 600; color: #0047AB;">Location</label>
+                        <input type="text" id="location" name="location" placeholder="Enter location/address..." required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" />
+                    </div>
+                </div>
+                
+                <!-- Event Time Field -->
+                <div class="time-wrapper" style="margin-bottom: 15px;">
+                    <label for="eventTime" class="time-label" style="display: block; margin-bottom: 5px; font-weight: 600; color: #0047AB;">Event Time</label>
+                    <input type="time" id="eventTime" name="eventTime" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" />
+                </div>
+                
                 <div class="total-wrapper">
                     <p class="total-text">Total Price: <span id="totalPrice">₱0</span></p>
                 </div>
@@ -245,9 +264,17 @@
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             const quantity = document.getElementById('quantityInput').value;
+            const venue = document.getElementById('venue').value;
+            const location = document.getElementById('location').value;
+            const eventTime = document.getElementById('eventTime').value;
             
             if (!startDate || !endDate) {
                 alert('Please select both start and end dates.');
+                return;
+            }
+            
+            if (!venue || !location || !eventTime) {
+                alert('Please fill in all required fields: venue, location, and event time.');
                 return;
             }
             
@@ -277,6 +304,9 @@
                 customer: customer,
                 customerName: customerName,
                 customerUid: customerUid,
+                venue: venue,
+                location: location,
+                eventTime: eventTime,
                 status: 'Pending',
                 timestamp: new Date().toISOString(),
                 productId: getQueryParam('productId') || getQueryParam('bundleId'),

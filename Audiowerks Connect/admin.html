@@ -453,6 +453,9 @@
           <th>Product</th>
           <th>Start Date</th>
           <th>End Date</th>
+          <th>Venue</th>
+          <th>Location</th>
+          <th>Event Time</th>
           <th>Quantity</th>
           <th>Total Price</th>
           <th>Status</th>
@@ -590,6 +593,9 @@
         <td>${b.productName || 'Unknown'}</td>
         <td>${b.startDate || 'N/A'}</td>
         <td>${b.endDate || 'N/A'}</td>
+        <td>${b.venue || 'N/A'}</td>
+        <td>${b.location || 'N/A'}</td>
+        <td>${b.eventTime || 'N/A'}</td>
         <td>${b.quantity || 1}</td>
         <td>${b.totalPrice || '₱0'}</td>
         <td>
@@ -988,6 +994,9 @@
           <p><strong>Product:</strong> ${booking.productName}</p>
           <p><strong>Start Date:</strong> ${booking.startDate}</p>
           <p><strong>End Date:</strong> ${booking.endDate}</p>
+          <p><strong>Venue:</strong> ${booking.venue || 'N/A'}</p>
+          <p><strong>Location:</strong> ${booking.location || 'N/A'}</p>
+          <p><strong>Event Time:</strong> ${booking.eventTime || 'N/A'}</p>
           <p><strong>Quantity:</strong> ${booking.quantity}</p>
           <p><strong>Total Price:</strong> ${booking.totalPrice}</p>
           <p><strong>Status:</strong> <span style="color:${getStatusColor(booking.status)};font-weight:bold;">${booking.status}</span></p>
