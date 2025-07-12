@@ -198,7 +198,18 @@
       .menu-popup {
         min-width: 90px;
         right: 4px;
-        top: 44px;
+      }
+    }
+
+        /* Animation for notification popups */
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
       }
     }
     .announcement-add-row {
@@ -886,17 +897,9 @@
     }
     // Delete booking
     if (e.target && e.target.classList.contains('delete-booking')) {
+      e.stopPropagation(); // Prevent event from bubbling up to row click
       const id = e.target.getAttribute('data-id');
-      if (confirm('Delete this booking? This action cannot be undone.')) {
-        try {
-          await firebase.database().ref(`bookings/${id}`).remove();
-          console.log(`Booking ${id} deleted`);
-          loadDashboard();
-        } catch (error) {
-          console.error('Error deleting booking:', error);
-          alert('Error deleting booking. Please try again.');
-        }
-      }
+      showDeleteBookingConfirm(id);
     }
   });
 
@@ -1041,6 +1044,154 @@
     }
   }
 
+  // Custom delete booking confirmation popup
+  function showDeleteBookingConfirm(bookingId) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      ">
+        <div style="margin-bottom: 20px;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff6b6b; margin-bottom: 15px;"></i>
+          <h3 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.3rem;">Delete Booking</h3>
+          <p style="margin-bottom: 20px; line-height: 1.5; color: #333;">Are you sure you want to delete this booking? This action cannot be undone.</p>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button onclick="closeDeleteBookingConfirm()" style="
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+          ">Cancel</button>
+          <button onclick="confirmDeleteBooking('${bookingId}')" style="
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+          ">Delete</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+
+  function closeDeleteBookingConfirm() {
+    const modal = document.querySelector('div[style*="position: fixed"][style*="z-index: 9999"]');
+    if (modal) modal.remove();
+  }
+
+  async function confirmDeleteBooking(bookingId) {
+    try {
+      await firebase.database().ref(`bookings/${bookingId}`).remove();
+      console.log(`Booking ${bookingId} deleted`);
+      
+      // Show success message
+      showSuccessMessage('Booking deleted successfully!');
+      
+      // Close the confirmation modal
+      closeDeleteBookingConfirm();
+      
+      // Reload dashboard
+      loadDashboard();
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      showErrorMessage('Error deleting booking. Please try again.');
+    }
+  }
+
+  // Success message popup
+  function showSuccessMessage(message) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+    `;
+    
+    modal.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.remove();
+      }
+    }, 3000);
+  }
+
+  // Error message popup
+  function showErrorMessage(message) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+    `;
+    
+    modal.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.remove();
+      }
+    }, 3000);
+  }
+
   // Function to get all bookings
   window.getAllBookings = async function() {
     try {
@@ -1054,12 +1205,17 @@
 
   // Booking row click event
   document.addEventListener('click', function(e) {
+    // Don't trigger row click if clicking on delete button
+    if (e.target && e.target.classList.contains('delete-booking')) {
+      return;
+    }
+    
     const tr = e.target.closest('tr[data-id]');
     if (tr && tr.parentElement.parentElement.parentElement.previousElementSibling && tr.parentElement.parentElement.parentElement.previousElementSibling.textContent.includes('Bookings')) {
       const bookingId = tr.getAttribute('data-id');
       window.getAllBookings().then(bookings => {
         if (bookings && bookings[bookingId]) {
-          showBookingModal(bookings[bookingId]);
+          showBookingDetails(bookings[bookingId]);
         }
       });
     }

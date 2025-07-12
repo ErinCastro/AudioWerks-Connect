@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Book Your Sound System</title>
+    <title>Booking</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
@@ -317,6 +317,28 @@
             box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.1);
         }
 
+        /* Select dropdown styling - only for location dropdown */
+        select.form-input {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230047AB' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        select.form-input option {
+            padding: 8px 12px;
+            background: white;
+            color: #333;
+        }
+
+        select.form-input option:hover {
+            background: #f8f9fa;
+        }
+
         .booking-summary {
             background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
             padding: 25px;
@@ -622,9 +644,17 @@
                         <div class="form-group">
                             <label for="location" class="form-label">
                                 <i class="fas fa-map-marker-alt"></i>
-                                Location/Address
+                                Location
                             </label>
-                            <input type="text" id="location" name="location" placeholder="Enter location/address..." required class="form-input" />
+                            <select id="location" name="location" required class="form-input">
+                                <option value="">Select a location...</option>
+                                <option value="Bulacan">Bulacan</option>
+                                <option value="Cavite">Cavite</option>
+                                <option value="Laguna">Laguna</option>
+                                <option value="Manila">Manila</option>
+                                <option value="Pampanga">Pampanga</option>
+                                <option value="Tagaytay">Tagaytay</option>
+                            </select>
                         </div>
                         
                         <div class="form-group">
@@ -998,7 +1028,7 @@
             
             // Create booking data
             const bookingData = {
-                productName: document.querySelector('.equipment-title').textContent,
+                productName: document.getElementById('productTitle').textContent,
                 startDate: startDate,
                 endDate: endDate,
                 quantity: parseInt(quantity),
@@ -1131,13 +1161,18 @@ function updateAvailableStockDisplay(availableStock) {
   
   // Disable booking button if sold out
   if (bookingButton) {
+    console.log('Booking button found, availableStock:', availableStock);
     if (availableStock === 0) {
       bookingButton.disabled = true;
       bookingButton.innerHTML = '<i class="fas fa-times-circle"></i><span>Sold Out</span>';
+      console.log('Booking button disabled - sold out');
     } else {
       bookingButton.disabled = false;
       bookingButton.innerHTML = '<i class="fas fa-check-circle"></i><span>Book Now</span>';
+      console.log('Booking button enabled - stock available');
     }
+  } else {
+    console.warn('Booking button not found!');
   }
   
   console.log('Updated available stock to:', availableStock);
@@ -1146,6 +1181,14 @@ function updateAvailableStockDisplay(availableStock) {
 document.addEventListener('DOMContentLoaded', function() {
   const productId = getQueryParam('productId');
   const bundleId = getQueryParam('bundleId');
+  
+  // Ensure booking button is enabled by default
+  const bookingButton = document.getElementById('bookingButton');
+  if (bookingButton) {
+    bookingButton.disabled = false;
+    bookingButton.innerHTML = '<i class="fas fa-check-circle"></i><span>Book Now</span>';
+    console.log('Booking button initialized as enabled');
+  }
   
   if (typeof firebase === 'undefined' || !firebase.database) {
     console.warn('Firebase not available for real-time updates');
@@ -1173,7 +1216,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      const availableStock = item.available !== undefined ? parseInt(item.available) : 0;
+      const availableStock = item.available !== undefined ? parseInt(item.available) : 10; // Default to 10 if not specified
+      console.log('Real-time stock update:', availableStock);
       updateAvailableStockDisplay(availableStock);
     }, (error) => {
       console.error('Error in real-time listener:', error);
