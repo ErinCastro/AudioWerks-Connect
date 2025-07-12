@@ -212,6 +212,123 @@
       margin: 36px 0 18px 0;
       letter-spacing: 1px;
     }
+
+    /* Polished Availability Page Styles */
+    .availability-header {
+      background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+      color: white;
+      padding: 40px 20px;
+      margin: 20px 0;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 71, 171, 0.3);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .main-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      margin: 0 0 30px 0;
+      opacity: 0.9;
+    }
+
+    .status-legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .legend-badge {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .content-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section-container {
+      margin: 40px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .section-description {
+      font-size: 1.1rem;
+      color: #666;
+      margin: 0;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #0047AB;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
     .main-card, .bundle-card {
       background: #fff;
       border-radius: 18px;
@@ -227,24 +344,32 @@
       margin-top: 12px;
     }
     .main-table th, .bundle-table th {
-      background: #eaf1fb;
-      color: #0047AB;
+      background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+      color: white;
       font-weight: 700;
-      padding: 16px 10px;
+      padding: 18px 12px;
       font-size: 1.1rem;
-      border-radius: 10px 10px 0 0;
+      border-radius: 12px 12px 0 0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
     .main-table td, .bundle-table td {
-      background: #f9f9fb;
-      padding: 18px 12px;
+      background: white;
+      padding: 20px 15px;
       font-size: 1.08rem;
       vertical-align: middle;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(30,58,138,0.04);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border: 1px solid #f0f0f0;
     }
-    .main-table tr:hover, .bundle-table tr:hover {
-      background: #e0eaff;
-      transition: background 0.2s;
+    .main-table tr:hover td, .bundle-table tr:hover td {
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 71, 171, 0.15);
+      border-color: #0047AB;
     }
     .product-img {
       width: 90px;
@@ -273,23 +398,66 @@
     }
     .status-badge {
       display: inline-block;
-      font-size: 1rem;
-      font-weight: 600;
-      padding: 7px 22px;
-      border-radius: 18px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 20px;
+      border-radius: 20px;
       margin-top: 6px;
       margin-bottom: 0;
       background: #b0b6be;
       color: #fff;
       letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
     }
     .status-available {
-      background: #3bdf7c;
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
       color: #fff;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
     }
     .status-booked {
-      background: #b0b6be;
+      background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
       color: #fff;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+    .status-sold-out {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: #fff;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    .status-sold-out::after {
+      content: "SOLD OUT";
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc3545;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 2px solid white;
+    }
+    .sold-out-overlay {
+      position: relative;
+      opacity: 0.6;
+    }
+    .sold-out-overlay::before {
+      content: "SOLD OUT";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(220, 53, 69, 0.9);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      z-index: 10;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
     .status-label {
       font-size: 0.98rem;
@@ -301,6 +469,25 @@
       font-size: 1rem;
       color: #0047AB;
       font-weight: 600;
+    }
+    .product-image {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 3px solid #e0e0e0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .product-image:hover {
+      transform: scale(1.15);
+      border-color: #0047AB;
+      box-shadow: 0 6px 20px rgba(0, 71, 171, 0.3);
+    }
+    .product-image.sold-out {
+      opacity: 0.5;
+      filter: grayscale(70%);
+      transform: scale(0.95);
     }
     footer {
         background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
@@ -384,6 +571,29 @@
       .section-title {
         font-size: 1.3rem;
       }
+      .product-image {
+        width: 50px;
+        height: 50px;
+      }
+      .main-title {
+        font-size: 2rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      .status-legend {
+        gap: 15px;
+      }
+      .legend-item {
+        font-size: 0.85rem;
+      }
+      .availability-header {
+        padding: 30px 15px;
+        margin: 15px 0;
+      }
+      .content-wrapper {
+        padding: 0 15px;
+      }
     }
 
     /* --- FLOATING CHAT STYLES START --- */
@@ -427,33 +637,73 @@
   <div class="tab-bar">
     <button class="tab selected">Equipment</button>
   </div>
-  <div class="section-title">Equipment Availability</div>
-  <div class="main-card">
-    <table class="main-table" id="servicesTable">
-      <thead>
-        <tr>
-          <th>Service</th>
-          <th>Description</th>
-          <th>Status</th>
-          <th>Available Units</th>
-        </tr>
-      </thead>
-      <tbody id="servicesTbody"></tbody>
-    </table>
+  <div class="availability-header">
+    <div class="header-content">
+      <h1 class="main-title">🎵 Equipment Availability</h1>
+      <p class="subtitle">Real-time inventory status for all our premium audio and lighting equipment</p>
+      <div class="status-legend">
+        <div class="legend-item">
+          <span class="legend-badge status-available"></span>
+          <span>Available</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-badge status-booked"></span>
+          <span>Limited Stock</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-badge status-sold-out"></span>
+          <span>Sold Out</span>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="section-title" style="margin-top:40px;">Bundles</div>
-  <div class="bundle-card">
-    <table class="bundle-table">
-      <thead>
-        <tr>
-          <th>Bundle Name</th>
-          <th>Price</th>
-          <th>Included Services</th>
-          <th>Available Units</th>
-        </tr>
-      </thead>
-      <tbody id="bundlesTbody"></tbody>
-    </table>
+
+  <div class="content-wrapper">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">🎤 Individual Services</h2>
+        <p class="section-description">High-quality audio and lighting equipment for your events</p>
+      </div>
+      <div class="main-card">
+        <div class="table-container">
+          <table class="main-table" id="servicesTable">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Available Units</th>
+              </tr>
+            </thead>
+            <tbody id="servicesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">📦 Bundle Packages</h2>
+        <p class="section-description">Complete event solutions with multiple services included</p>
+      </div>
+      <div class="bundle-card">
+        <div class="table-container">
+          <table class="bundle-table">
+            <thead>
+              <tr>
+                <th>Bundle Name</th>
+                <th>Image</th>
+                <th>Price</th>
+                <th>Included Services</th>
+                <th>Available Units</th>
+              </tr>
+            </thead>
+            <tbody id="bundlesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
   <footer>
     <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
@@ -1545,55 +1795,182 @@ function toggleMenu(btn) {
 <script>
 // Hardcoded descriptions for each service
 const hardcodedDescriptions = {
-  'Lights & Sounds': 'Top-tier lighting and sound systems for any event size.',
-  'String Lights': 'Create magical ambiances with our elegant string lighting.',
-  'Mood Lights': 'Set the perfect mood with customizable color and intensity.',
-  'LED Wall': 'High-resolution LED walls for dynamic visuals and presentations.',
-  'Stage': 'Sturdy, modular stages for performances, speeches, and more.',
-  'Low Lying Fog': 'Create dramatic effects with our low-lying fog machines.'
+  'Lights & Sounds': 'Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.',
+         'Led Wall': 'Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.',
+         'Stage': 'Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.',
+         'Mood Light': 'Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.',
+         'String Lights': 'Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.',
+         'Low Lying': 'Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.'
   // Add more as needed
+};
+
+// Service images mapping
+const serviceImages = {
+  'Lights & Sounds': 'images/lights-sounds.png',
+  'Led Wall': 'images/led-wall.png',
+  'Stage': 'images/stage.png',
+  'Mood Light': 'images/mood-lights.png',
+  'String Lights': 'images/string-lights.png',
+  'Low Lying': 'images/low-lying.jpg'
+  // Add more mappings as needed
 };
 </script>
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-  (async () => {
-    // Load services
-    const servicesTbody = document.getElementById('servicesTbody');
-    servicesTbody.innerHTML = '';
-    const services = await window.getAllServices ? (await window.getAllServices()) : {};
-    if (services && Object.keys(services).length > 0) {
-      Object.values(services).forEach(service => {
-        const desc = hardcodedDescriptions[service.name] || '';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="padding:12px 10px;font-weight:bold;">${service.name || ''}</td>
-          <td>${desc}</td>
-          <td><span class="status-badge ${service.available > 0 ? 'status-available' : 'status-booked'}">${service.available > 0 ? 'Available' : 'Booked'}</span></td>
-          <td class="inventory-info">${service.available !== undefined ? service.available + ' units' : '0 units'}</td>
-        `;
-        servicesTbody.appendChild(tr);
-      });
-    } else {
-      servicesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No services found.</td></tr>';
-    }
+// Function to update services table with real-time data
+function updateServicesTable(services) {
+  const servicesTbody = document.getElementById('servicesTbody');
+  if (!servicesTbody) return;
+  
+  servicesTbody.innerHTML = '';
+  if (services && Object.keys(services).length > 0) {
+    Object.values(services).forEach(service => {
+      const desc = hardcodedDescriptions[service.name] || '';
+      const available = parseInt(service.available) || 0;
+      const isSoldOut = available === 0;
+      
+      const tr = document.createElement('tr');
+      tr.className = isSoldOut ? 'sold-out-overlay' : '';
+      const imageSrc = serviceImages[service.name] || 'images/logo.png';
+      tr.innerHTML = `
+        <td style="padding:12px 10px;font-weight:bold;${isSoldOut ? 'color:#b0b6be;' : ''}">${service.name || ''}</td>
+        <td style="padding:8px;text-align:center;">
+          <img src="${imageSrc}" alt="${service.name}" class="product-image ${isSoldOut ? 'sold-out' : ''}" />
+        </td>
+        <td style="padding:12px 10px;${isSoldOut ? 'color:#b0b6be;' : ''}">${desc}</td>
+        <td><span class="status-badge ${isSoldOut ? 'status-sold-out' : (available > 0 ? 'status-available' : 'status-booked')}">${isSoldOut ? 'Sold Out' : (available > 0 ? 'Available' : 'Booked')}</span></td>
+        <td class="inventory-info" style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available} units</td>
+      `;
+      servicesTbody.appendChild(tr);
+    });
+  } else {
+    servicesTbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <i class="fas fa-microphone-slash"></i>
+            <h3>No Services Available</h3>
+            <p>Check back later for our latest equipment offerings.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+}
 
-    // Load bundles
-    const bundlesTbody = document.getElementById('bundlesTbody');
-    bundlesTbody.innerHTML = '';
-    const bundles = await window.getAllBundles ? (await window.getAllBundles()) : {};
-    if (bundles && Object.keys(bundles).length > 0) {
-      Object.values(bundles).forEach(bundle => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="padding:12px 10px;font-weight:bold;">${bundle.name || ''}</td>
-          <td style="padding:12px 10px;">₱${bundle.price || ''}</td>
-          <td style="padding:12px 10px;">${(bundle.services||[]).join(', ')}</td>
-          <td class="inventory-info">${bundle.available !== undefined ? bundle.available + ' units' : '0 units'}</td>
-        `;
-        bundlesTbody.appendChild(tr);
-      });
-    } else {
-      bundlesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No bundles found.</td></tr>';
+// Function to update bundles table with real-time data
+function updateBundlesTable(bundles) {
+  const bundlesTbody = document.getElementById('bundlesTbody');
+  if (!bundlesTbody) return;
+  
+  bundlesTbody.innerHTML = '';
+  if (bundles && Object.keys(bundles).length > 0) {
+    Object.values(bundles).forEach(bundle => {
+      const available = parseInt(bundle.available) || 0;
+      const isSoldOut = available === 0;
+      
+      const tr = document.createElement('tr');
+      tr.className = isSoldOut ? 'sold-out-overlay' : '';
+      // Use the first service's image as the bundle image, or a default
+      let bundleImage = 'images/logo.png';
+      if (bundle.services && bundle.services.length > 0) {
+        const firstService = bundle.services[0];
+        bundleImage = serviceImages[firstService] || 'images/logo.png';
+      }
+      
+      tr.innerHTML = `
+        <td style="padding:12px 10px;font-weight:bold;${isSoldOut ? 'color:#b0b6be;' : ''}">${bundle.name || ''}</td>
+        <td style="padding:8px;text-align:center;">
+          <img src="${bundleImage}" alt="${bundle.name}" class="product-image ${isSoldOut ? 'sold-out' : ''}" />
+        </td>
+        <td style="padding:12px 10px;${isSoldOut ? 'color:#b0b6be;' : ''}">₱${bundle.price || ''}</td>
+        <td style="padding:12px 10px;${isSoldOut ? 'color:#b0b6be;' : ''}">${(bundle.services||[]).join(', ')}</td>
+        <td class="inventory-info" style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available} units</td>
+      `;
+      bundlesTbody.appendChild(tr);
+    });
+  } else {
+    bundlesTbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No Bundles Available</h3>
+            <p>Check back later for our complete event packages.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Initialize real-time listeners for services and bundles
+function initializeRealTimeUpdates() {
+  if (typeof firebase === 'undefined' || !firebase.database) {
+    console.warn('Firebase not available for real-time updates');
+    return;
+  }
+
+  const db = firebase.database();
+  
+  // Real-time listener for services
+  db.ref('services').on('value', (snap) => {
+    const services = snap.val();
+    console.log('Services updated:', services);
+    updateServicesTable(services);
+  }, (error) => {
+    console.error('Error listening to services:', error);
+  });
+
+  // Real-time listener for bundles
+  db.ref('bundles').on('value', (snap) => {
+    const bundles = snap.val();
+    console.log('Bundles updated:', bundles);
+    updateBundlesTable(bundles);
+  }, (error) => {
+    console.error('Error listening to bundles:', error);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Show loading state
+  const servicesTbody = document.getElementById('servicesTbody');
+  const bundlesTbody = document.getElementById('bundlesTbody');
+  
+  if (servicesTbody) {
+    servicesTbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 40px;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 15px; color: #666;">Loading services...</p>
+        </td>
+      </tr>
+    `;
+  }
+  
+  if (bundlesTbody) {
+    bundlesTbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 40px;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 15px; color: #666;">Loading bundles...</p>
+        </td>
+      </tr>
+    `;
+  }
+  
+  // Initialize real-time updates
+  initializeRealTimeUpdates();
+  
+  // Also load initial data as fallback
+  (async () => {
+    try {
+      const services = await window.getAllServices ? (await window.getAllServices()) : {};
+      const bundles = await window.getAllBundles ? (await window.getAllBundles()) : {};
+      
+      updateServicesTable(services);
+      updateBundlesTable(bundles);
+    } catch (error) {
+      console.error('Error loading initial data:', error);
     }
   })();
 });

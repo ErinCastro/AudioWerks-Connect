@@ -744,8 +744,24 @@
     if (e.target && e.target.classList.contains('status-select')) {
       const bookingId = e.target.getAttribute('data-id');
       const newStatus = e.target.value;
-      
+
       try {
+        // If status is being set to Cancelled, restore stock
+        if (newStatus === 'Cancelled') {
+          // Get booking details
+          const bookingSnap = await firebase.database().ref(`bookings/${bookingId}`).once('value');
+          const booking = bookingSnap.val();
+          if (booking) {
+            const isBundle = booking.productType === 'bundle';
+            const refPath = isBundle ? `bundles/${booking.productId}` : `services/${booking.productId}`;
+            const prodSnap = await firebase.database().ref(refPath).once('value');
+            const prod = prodSnap.val();
+            if (prod) {
+              const newAvailable = (prod.available || 0) + (booking.quantity || 1);
+              await firebase.database().ref(refPath + '/available').set(newAvailable);
+            }
+          }
+        }
         await firebase.database().ref(`bookings/${bookingId}/status`).set(newStatus);
         console.log(`Booking ${bookingId} status updated to ${newStatus}`);
       } catch (error) {

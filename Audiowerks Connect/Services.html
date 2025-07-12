@@ -140,6 +140,263 @@
       color: #ffc300;
     }
 
+/* Polished Services Page Styles */
+.services-hero {
+  background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+  color: white;
+  padding: 60px 20px;
+  margin: 20px 0;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 71, 171, 0.3);
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0 0 15px 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  margin: 0 0 40px 0;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffc300;
+}
+
+.stat-label {
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.bookings-section, .services-section {
+  margin: 50px 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #0047AB;
+  margin: 0 0 10px 0;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.bookings-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  margin-top: 12px;
+}
+
+.bookings-table th {
+  background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+  color: white;
+  font-weight: 700;
+  padding: 18px 12px;
+  font-size: 1.1rem;
+  border-radius: 12px 12px 0 0;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.bookings-table td {
+  background: white;
+  padding: 20px 15px;
+  font-size: 1.08rem;
+  vertical-align: middle;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.bookings-table tr:hover td {
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 71, 171, 0.15);
+  border-color: #0047AB;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.product {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #f0f0f0;
+}
+
+.product:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0, 71, 171, 0.2);
+  border-color: #0047AB;
+}
+
+.product.sold-out {
+  opacity: 0.6;
+  filter: grayscale(30%);
+}
+
+.product.sold-out::before {
+  content: "SOLD OUT";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 10px;
+  z-index: 10;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.product img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product:hover img {
+  transform: scale(1.05);
+}
+
+.product-info {
+  padding: 25px;
+}
+
+.product-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #191970;
+  margin: 0 0 10px 0;
+}
+
+.product-type {
+  font-size: 1rem;
+  color: #666;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+}
+
+.product-price {
+  font-size: 1.4rem;
+  color: #0047AB;
+  font-weight: bold;
+  margin: 0;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0047AB;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
 /* My Bookings Table Styles */
 .my-bookings-section {
   margin: 40px 0 60px 0;
@@ -178,40 +435,53 @@
 }
 .status-badge {
   display: inline-block;
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 7px 22px;
-  border-radius: 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 20px;
   margin-top: 6px;
   margin-bottom: 0;
   background: #b0b6be;
   color: #fff;
   letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
 }
 .status-badge.Pending {
-  background: #ff9800;
+  background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
 }
 .status-badge.Confirmed {
-  background: #4caf50;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
 }
 .status-badge.Cancelled {
-  background: #f44336;
+  background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
 }
 .status-badge.Completed {
-  background: #2196f3;
+  background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
 }
 .cancel-booking-btn {
-  background-color: #f44336;
+  background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
   color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   font-size: 0.9rem;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 .cancel-booking-btn:hover {
-  background-color: #d32f2f;
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
 }
 @media (max-width: 700px) {
   .my-bookings-section {
@@ -220,6 +490,32 @@
   .my-bookings-table th, .my-bookings-table td {
     font-size: 0.98rem;
     padding: 8px 2px;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  .hero-stats {
+    gap: 30px;
+  }
+  .stat-number {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 1.8rem;
+  }
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .content-wrapper {
+    padding: 0 15px;
+  }
+  .services-hero {
+    padding: 40px 15px;
+    margin: 15px 0;
   }
 }
 </style>
@@ -248,32 +544,69 @@
           <a href="login.html" onclick="logout()">Logout</a>
         </nav>
       </header>
-            <Hr class="lines">
-            <h1 class="title1">SERVICES</h1>
-            <Hr class="lines">
-        <br>
-        <div class="my-bookings-section">
-  <div class="section-title">My Bookings</div>
-  <table class="my-bookings-table">
-    <thead>
-      <tr>
-        <th>Product</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Quantity</th>
-        <th>Total Price</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="bookingsTable"></tbody>
-  </table>
-</div>
-        <h1 class="headslabel"><b>BUNDLE OFFERS</b></h1>
-        <main class="product-grid" id="bundlesProductGrid"></main>
-        <br>
-        <h1 class="headslabel"><b>INDIVIDUAL PRODUCTS</b></h1>
-        <main class="product-grid" id="servicesProductGrid"></main>
+            <div class="services-hero">
+              <div class="hero-content">
+                <h1 class="hero-title">🎵 Our Premium Services</h1>
+                <p class="hero-subtitle">Discover our complete range of audio and lighting equipment for your perfect event</p>
+                <div class="hero-stats">
+                  <div class="stat-item">
+                    <span class="stat-number">6+</span>
+                    <span class="stat-label">Services</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Support</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Quality</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-wrapper">
+              <div class="bookings-section">
+                <div class="section-header">
+                  <h2 class="section-title">📋 My Bookings</h2>
+                  <p class="section-description">Track your current and past reservations</p>
+                </div>
+                <div class="bookings-card">
+                  <div class="table-container">
+                    <table class="bookings-table">
+                      <thead>
+                        <tr>
+                          <th>Product</th>
+                          <th>Start Date</th>
+                          <th>End Date</th>
+                          <th>Quantity</th>
+                          <th>Total Price</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="bookingsTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="services-section">
+                <div class="section-header">
+                  <h2 class="section-title">📦 Bundle Packages</h2>
+                  <p class="section-description">Complete event solutions with multiple services included</p>
+                </div>
+                <div class="products-grid" id="bundlesProductGrid"></div>
+              </div>
+
+              <div class="services-section">
+                <div class="section-header">
+                  <h2 class="section-title">🎤 Individual Services</h2>
+                  <p class="section-description">High-quality audio and lighting equipment for your events</p>
+                </div>
+                <div class="products-grid" id="servicesProductGrid"></div>
+              </div>
+            </div>
         <br>
         <footer>
   <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
@@ -318,9 +651,12 @@
   function renderBookings(bookings, userEmail) {
     const tbody = document.getElementById('bookingsTable');
     tbody.innerHTML = '';
+    
+    let hasBookings = false;
     Object.entries(bookings).forEach(([id, b]) => {
       // Show bookings for this user and guest bookings if logged in, or just guest bookings if not logged in
       if ((userEmail && (b.customer === userEmail || b.customer === 'Guest')) || (!userEmail && b.customer === 'Guest')) {
+        hasBookings = true;
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${b.productName}</td>
@@ -336,6 +672,20 @@
         tbody.appendChild(tr);
       }
     });
+    
+    if (!hasBookings) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="fas fa-calendar-times"></i>
+              <h3>No Bookings Found</h3>
+              <p>You haven't made any bookings yet. Start by exploring our services!</p>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
   }
   firebase.auth().onAuthStateChanged(user => {
     let userEmail = user ? user.email : null;
@@ -355,50 +705,143 @@
     // Add more mappings as needed
   };
   document.addEventListener('DOMContentLoaded', async function() {
-    // Load Bundles
+    // Show loading states
     const bundlesGrid = document.getElementById('bundlesProductGrid');
+    const servicesGrid = document.getElementById('servicesProductGrid');
+    const bookingsTable = document.getElementById('bookingsTable');
+    
     if (bundlesGrid) {
-      bundlesGrid.innerHTML = '';
-      const db = firebase.database();
-      const bundlesSnap = await db.ref('bundles').once('value');
-      const bundles = bundlesSnap.val() || {};
-      Object.entries(bundles).forEach(([id, b]) => {
-        // Use the first service's image as the bundle image, or a default
-        let bundleImage = 'images/logo.png';
-        if (b.services && b.services.length > 0) {
-          const firstService = b.services[0];
-          bundleImage = serviceImages[firstService] || 'images/logo.png';
-        }
-        const div = document.createElement('div');
-        div.className = 'product';
-        div.innerHTML = `
-          <a href="Prod Description.html?bundleId=${id}"><img src="${bundleImage}" alt="${b.name}"></a>
-          <p class="product-title">${b.name}</p>
-          <p class="product-type">${(b.services||[]).join(', ')}</p>
-          <p class="product-price"><b>₱${b.price}</b></p>
-        `;
-        bundlesGrid.appendChild(div);
-      });
+      bundlesGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="loading-spinner"></div>
+          <h3>Loading Bundles...</h3>
+          <p>Please wait while we fetch our latest packages.</p>
+        </div>
+      `;
     }
-    // Load Individual Products
-    const grid = document.getElementById('servicesProductGrid');
-    if (grid) {
-      grid.innerHTML = '';
-      const db = firebase.database();
-      const servicesSnap = await db.ref('services').once('value');
-      const services = servicesSnap.val() || {};
-      Object.entries(services).forEach(([id, s]) => {
-        const imgSrc = serviceImages[s.name] || 'images/logo.png';
-        const div = document.createElement('div');
-        div.className = 'product';
-        div.innerHTML = `
-          <a href="Prod Description.html?productId=${id}"><img src="${imgSrc}" alt="${s.name}"></a>
-          <p class="product-title">${s.name}</p>
-          <p class="product-type">${s.inclusions || ''}</p>
-          <p class="product-price"><b>₱${s.price}</b></p>
+    
+    if (servicesGrid) {
+      servicesGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="loading-spinner"></div>
+          <h3>Loading Services...</h3>
+          <p>Please wait while we fetch our equipment.</p>
+        </div>
+      `;
+    }
+    
+    if (bookingsTable) {
+      bookingsTable.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 40px;">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 15px; color: #666;">Loading your bookings...</p>
+          </td>
+        </tr>
+      `;
+    }
+    
+    // Load Bundles
+    if (bundlesGrid) {
+      try {
+        const db = firebase.database();
+        const bundlesSnap = await db.ref('bundles').once('value');
+        const bundles = bundlesSnap.val() || {};
+        
+        if (Object.keys(bundles).length === 0) {
+          bundlesGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-box-open"></i>
+              <h3>No Bundles Available</h3>
+              <p>Check back later for our complete event packages.</p>
+            </div>
+          `;
+        } else {
+          bundlesGrid.innerHTML = '';
+          Object.entries(bundles).forEach(([id, b]) => {
+            // Use the first service's image as the bundle image, or a default
+            let bundleImage = 'images/logo.png';
+            if (b.services && b.services.length > 0) {
+              const firstService = b.services[0];
+              bundleImage = serviceImages[firstService] || 'images/logo.png';
+            }
+            const available = parseInt(b.available) || 0;
+            const isSoldOut = available === 0;
+            
+            const div = document.createElement('div');
+            div.className = isSoldOut ? 'product sold-out' : 'product';
+            div.innerHTML = `
+              <a href="Prod Description.html?bundleId=${id}">
+                <img src="${bundleImage}" alt="${b.name}">
+              </a>
+              <div class="product-info">
+                <p class="product-title">${b.name}</p>
+                <p class="product-type">${(b.services||[]).join(', ')}</p>
+                <p class="product-price"><b>₱${b.price}</b></p>
+              </div>
+            `;
+            bundlesGrid.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading bundles:', error);
+        bundlesGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Bundles</h3>
+            <p>Please refresh the page to try again.</p>
+          </div>
         `;
-        grid.appendChild(div);
-      });
+      }
+    }
+    
+    // Load Individual Products
+    if (servicesGrid) {
+      try {
+        const db = firebase.database();
+        const servicesSnap = await db.ref('services').once('value');
+        const services = servicesSnap.val() || {};
+        
+        if (Object.keys(services).length === 0) {
+          servicesGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-microphone-slash"></i>
+              <h3>No Services Available</h3>
+              <p>Check back later for our latest equipment offerings.</p>
+            </div>
+          `;
+        } else {
+          servicesGrid.innerHTML = '';
+          Object.entries(services).forEach(([id, s]) => {
+            const imgSrc = serviceImages[s.name] || 'images/logo.png';
+            const available = parseInt(s.available) || 0;
+            const isSoldOut = available === 0;
+            
+            const div = document.createElement('div');
+            div.className = isSoldOut ? 'product sold-out' : 'product';
+            div.innerHTML = `
+              <a href="Prod Description.html?productId=${id}">
+                <img src="${imgSrc}" alt="${s.name}">
+              </a>
+              <div class="product-info">
+                <p class="product-title">${s.name}</p>
+                <p class="product-type">${s.inclusions || ''}</p>
+                <p class="product-price"><b>₱${s.price}</b></p>
+              </div>
+            `;
+            servicesGrid.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+        servicesGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Services</h3>
+            <p>Please refresh the page to try again.</p>
+          </div>
+        `;
+      }
     }
   });
   document.addEventListener('click', async function(e) {

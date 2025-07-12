@@ -453,6 +453,30 @@
     <button id="addBundleBtn">Add Bundle</button>
   </div>
 </div>
+<div class="card">
+  <h3>Bookings</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Product</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Quantity</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="providerBookingsTbody"></tbody>
+  </table>
+  <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+    <h4 style="margin: 0 0 10px 0; color: #0047AB;">🧪 Testing Tools</h4>
+    <button onclick="testBundleCancellation()" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+      Test Bundle Cancellation
+    </button>
+    <small style="color: #666;">This will create a test booking for 2 units of a bundle and then you can cancel it to test the restoration.</small>
+  </div>
+</div>
 
 <footer>
   <p>&copy; 2025 AudioWerks. All rights reserved.</p>
@@ -527,8 +551,17 @@ async function loadServices() {
     const foundEntry = Object.entries(services).find(([id, s]) => s.name && s.name.toLowerCase() === coreName.toLowerCase());
     if (foundEntry) {
       const [id, s] = foundEntry;
+      const available = parseInt(s.available) || 0;
+      const isSoldOut = available === 0;
+      
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${s.name}</td><td>₱${s.price || ''}</td><td>${s.available !== undefined ? s.available : ''}</td><td><button class="edit-service" data-id="${id}">Edit</button></td>`;
+      tr.style.opacity = isSoldOut ? '0.6' : '1';
+      tr.innerHTML = `
+        <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">${s.name}</td>
+        <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">₱${s.price || ''}</td>
+        <td style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available}</td>
+        <td><button class="edit-service" data-id="${id}">Edit</button></td>
+      `;
       servicesTbody.appendChild(tr);
     } else {
       // Not configured yet
@@ -537,14 +570,23 @@ async function loadServices() {
       servicesTbody.appendChild(tr);
     }
   });
-  // Show any extra (custom) services
-  Object.entries(services).forEach(([id, s]) => {
-    if (!coreServices.some(core => core.toLowerCase() === (s.name||'').toLowerCase())) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${s.name || ''}</td><td>₱${s.price || ''}</td><td>${s.available !== undefined ? s.available : ''}</td><td><button class="edit-service" data-id="${id}">Edit</button> <button class="del-service" data-id="${id}">Delete</button></td>`;
-      servicesTbody.appendChild(tr);
-    }
-  });
+      // Show any extra (custom) services
+    Object.entries(services).forEach(([id, s]) => {
+      if (!coreServices.some(core => core.toLowerCase() === (s.name||'').toLowerCase())) {
+        const available = parseInt(s.available) || 0;
+        const isSoldOut = available === 0;
+        
+        const tr = document.createElement('tr');
+        tr.style.opacity = isSoldOut ? '0.6' : '1';
+        tr.innerHTML = `
+          <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">${s.name || ''}</td>
+          <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">₱${s.price || ''}</td>
+          <td style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available}</td>
+          <td><button class="edit-service" data-id="${id}">Edit</button> <button class="del-service" data-id="${id}">Delete</button></td>
+        `;
+        servicesTbody.appendChild(tr);
+      }
+    });
 }
 // Bundles logic
 async function loadBundles() {
@@ -554,8 +596,18 @@ async function loadBundles() {
   const bundlesTbody = document.getElementById('bundlesTbody');
   bundlesTbody.innerHTML = '';
   Object.entries(bundles).forEach(([id, b]) => {
+    const available = parseInt(b.available) || 0;
+    const isSoldOut = available === 0;
+    
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${b.name || ''}</td><td>₱${b.price || ''}</td><td>${(b.services||[]).join(', ')}</td><td>${b.available !== undefined ? b.available : ''}</td><td><button class="edit-bundle" data-id="${id}">Edit</button> <button class="del-bundle" data-id="${id}">Delete</button></td>`;
+    tr.style.opacity = isSoldOut ? '0.6' : '1';
+    tr.innerHTML = `
+      <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">${b.name || ''}</td>
+      <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">₱${b.price || ''}</td>
+      <td style="${isSoldOut ? 'color:#b0b6be;' : ''}">${(b.services||[]).join(', ')}</td>
+      <td style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available}</td>
+      <td><button class="edit-bundle" data-id="${id}">Edit</button> <button class="del-bundle" data-id="${id}">Delete</button></td>
+    `;
     bundlesTbody.appendChild(tr);
   });
   // Populate services checkboxes for bundle creation
@@ -764,6 +816,229 @@ document.addEventListener('click', async function(e) {
     }
   }
 });
+
+// Add this function to provider.html for booking cancellation with stock restoration
+async function cancelBooking(bookingId) {
+  try {
+    console.log('=== CANCELLING BOOKING ===');
+    console.log('Booking ID:', bookingId);
+    
+    // 1. Get booking details
+    const bookingSnap = await firebase.database().ref('bookings/' + bookingId).once('value');
+    const booking = bookingSnap.val();
+    if (!booking) {
+      console.error('❌ Booking not found:', bookingId);
+      alert('Booking not found!');
+      return;
+    }
+    
+    console.log('📋 Booking details:', booking);
+    console.log('Product ID:', booking.productId);
+    console.log('Product Type:', booking.productType);
+    console.log('Quantity:', booking.quantity);
+
+    // Check if booking has required fields
+    if (!booking.productId) {
+      console.error('❌ Booking missing productId field');
+      alert('Booking is missing product ID. Cannot restore stock.');
+      return;
+    }
+
+    // 2. Determine if it's a product or bundle
+    const isBundle = booking.productType === 'bundle';
+    const refPath = isBundle ? 'bundles/' + booking.productId : 'services/' + booking.productId;
+    console.log('🔍 Looking up product at path:', refPath);
+    console.log('📦 Is Bundle:', isBundle);
+    console.log('🆔 Product ID:', booking.productId);
+    console.log('🏷️ Product Type:', booking.productType);
+
+    // 3. Get the current available units
+    const prodSnap = await firebase.database().ref(refPath).once('value');
+    const prod = prodSnap.val();
+    if (!prod) {
+      console.error('❌ Product not found at path:', refPath);
+      alert('Product not found in database. Cannot restore stock.');
+      return;
+    }
+    
+    console.log('📦 Current product data:', prod);
+    console.log('📊 Current available units:', prod.available);
+    console.log('📈 Cancelled quantity:', booking.quantity);
+
+    // 4. Increment available units by the cancelled quantity
+    const currentAvailable = parseInt(prod.available) || 0;
+    const cancelledQuantity = parseInt(booking.quantity) || 1;
+    const newAvailable = currentAvailable + cancelledQuantity;
+    
+    console.log('🧮 Calculation:', currentAvailable, '+', cancelledQuantity, '=', newAvailable);
+    
+    await firebase.database().ref(refPath + '/available').set(newAvailable);
+    console.log('✅ Available units updated in Firebase to:', newAvailable);
+
+    // 5. Mark the booking as cancelled
+    await firebase.database().ref('bookings/' + bookingId).update({ status: 'Cancelled' });
+    console.log('✅ Booking status updated to Cancelled');
+
+    alert('✅ Booking cancelled and stock updated! New available units: ' + newAvailable);
+    
+    // Refresh the bookings table
+    loadProviderBookings();
+    
+    console.log('=== CANCELLATION COMPLETE ===');
+    
+  } catch (error) {
+    console.error('❌ Error cancelling booking:', error);
+    alert('❌ Error cancelling booking: ' + error.message);
+  }
+}
+// Example usage: call cancelBooking(bookingId) when a booking is cancelled from provider.html
+
+// Load and render bookings for provider
+async function loadProviderBookings() {
+  const bookingsSnap = await firebase.database().ref('bookings').once('value');
+  const bookings = bookingsSnap.val() || {};
+  const tbody = document.getElementById('providerBookingsTbody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  Object.entries(bookings).forEach(([id, b]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${b.customerName || b.customer || ''}</td>
+      <td>${b.productName || ''}</td>
+      <td>${b.startDate || ''}</td>
+      <td>${b.endDate || ''}</td>
+      <td>${b.quantity || 1}</td>
+      <td>${b.status || ''}</td>
+      <td>
+        <button onclick="cancelBooking('${id}')" ${b.status === 'Cancelled' ? 'disabled' : ''}>Cancel</button>
+        <button onclick="debugBooking('${id}')" style="background: #ffc107; margin-left: 5px;">Debug</button>
+        ${b.productType === 'bundle' ? `<button onclick="testBundleCancellation()" style="background: #28a745; margin-left: 5px;">Test Bundle</button>` : ''}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Debug function to inspect booking data
+async function debugBooking(bookingId) {
+  try {
+    const bookingSnap = await firebase.database().ref('bookings/' + bookingId).once('value');
+    const booking = bookingSnap.val();
+    
+    console.log('🔍 DEBUGGING BOOKING:', bookingId);
+    console.log('Full booking data:', booking);
+    
+    let debugInfo = '📋 Booking Debug Info:\n\n';
+    debugInfo += `ID: ${bookingId}\n`;
+    debugInfo += `Product Name: ${booking.productName || 'N/A'}\n`;
+    debugInfo += `Product ID: ${booking.productId || 'MISSING!'}\n`;
+    debugInfo += `Product Type: ${booking.productType || 'MISSING!'}\n`;
+    debugInfo += `Quantity: ${booking.quantity || 'N/A'}\n`;
+    debugInfo += `Status: ${booking.status || 'N/A'}\n`;
+    debugInfo += `Customer: ${booking.customerName || booking.customer || 'N/A'}\n`;
+    
+    if (booking.productId && booking.productType) {
+      const refPath = booking.productType === 'bundle' ? 'bundles/' + booking.productId : 'services/' + booking.productId;
+      const prodSnap = await firebase.database().ref(refPath).once('value');
+      const prod = prodSnap.val();
+      
+      if (prod) {
+        debugInfo += `\n📦 Product found at: ${refPath}\n`;
+        debugInfo += `Current available units: ${prod.available || 'N/A'}\n`;
+        debugInfo += `Product name: ${prod.name || 'N/A'}\n`;
+        
+        // Add specific bundle info
+        if (booking.productType === 'bundle') {
+          debugInfo += `\n📋 Bundle Details:\n`;
+          debugInfo += `Services included: ${(prod.services || []).join(', ')}\n`;
+          debugInfo += `Bundle price: ₱${prod.price || 'N/A'}\n`;
+        }
+      } else {
+        debugInfo += `\n❌ Product NOT found at: ${refPath}\n`;
+      }
+    } else {
+      debugInfo += '\n❌ Cannot look up product - missing productId or productType\n';
+    }
+    
+    alert(debugInfo);
+    
+  } catch (error) {
+    console.error('Error debugging booking:', error);
+    alert('Error debugging booking: ' + error.message);
+  }
+}
+
+// Test function to manually test bundle cancellation
+async function testBundleCancellation() {
+  try {
+    console.log('🧪 TESTING BUNDLE CANCELLATION');
+    
+    // Get all bundles
+    const bundlesSnap = await firebase.database().ref('bundles').once('value');
+    const bundles = bundlesSnap.val();
+    
+    if (!bundles || Object.keys(bundles).length === 0) {
+      alert('❌ No bundles found in database');
+      return;
+    }
+    
+    console.log('📦 Available bundles:', bundles);
+    
+    // Find Eventmaster Trio or any bundle
+    let targetBundle = null;
+    let targetBundleId = null;
+    
+    Object.entries(bundles).forEach(([id, bundle]) => {
+      if (bundle.name && bundle.name.toLowerCase().includes('eventmaster')) {
+        targetBundle = bundle;
+        targetBundleId = id;
+      }
+    });
+    
+    if (!targetBundle) {
+      // Use the first bundle if Eventmaster Trio not found
+      const firstBundle = Object.entries(bundles)[0];
+      targetBundleId = firstBundle[0];
+      targetBundle = firstBundle[1];
+    }
+    
+    console.log('🎯 Testing with bundle:', targetBundle.name, 'ID:', targetBundleId);
+    
+    // Create a test booking
+    const testBookingData = {
+      productName: targetBundle.name,
+      productId: targetBundleId,
+      productType: 'bundle',
+      quantity: 2,
+      status: 'Pending',
+      customer: 'test@example.com',
+      customerName: 'Test User',
+      startDate: '2024-01-15',
+      endDate: '2024-01-16',
+      timestamp: new Date().toISOString()
+    };
+    
+    // Save test booking
+    const bookingRef = await firebase.database().ref('bookings').push(testBookingData);
+    const bookingId = bookingRef.key;
+    
+    console.log('✅ Test booking created with ID:', bookingId);
+    
+    // Decrement bundle available units
+    const currentAvailable = parseInt(targetBundle.available) || 0;
+    const newAvailable = Math.max(0, currentAvailable - 2);
+    await firebase.database().ref(`bundles/${targetBundleId}/available`).set(newAvailable);
+    
+    console.log('📊 Bundle available units decremented from', currentAvailable, 'to', newAvailable);
+    
+    alert(`🧪 Test setup complete!\n\nBundle: ${targetBundle.name}\nAvailable units: ${newAvailable}\nTest booking ID: ${bookingId}\n\nNow try cancelling this booking to test the restoration.`);
+    
+  } catch (error) {
+    console.error('Error in test setup:', error);
+    alert('Error setting up test: ' + error.message);
+  }
+}
+document.addEventListener('DOMContentLoaded', loadProviderBookings);
 </script>
 
 </body>
