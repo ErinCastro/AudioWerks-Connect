@@ -690,43 +690,8 @@ if (typeof firebase !== 'undefined') {
 </script>
 
   <div class="section-title" id="equipments">OUR SERVICES</div>
-  <div class="services-grid">
-    <div class="service-card" data-aos="fade-up" tabindex="0">
-      <img src="images/lights-sounds.png" alt="Professional lights and sounds setup" />
-      <div class="service-title">Lights & Sounds</div>
-      <div class="service-desc">Top-tier lighting and sound systems for any event size.</div>
-      <button class="book-now-btn">Book Now</button>
-    </div>
-    <div class="service-card" data-aos="fade-up" tabindex="0">
-      <img src="images/string-lights.png" alt="String lights for events" />
-      <div class="service-title">String Lights</div>
-      <div class="service-desc">Create magical ambiances with our elegant string lighting.</div>
-      <button class="book-now-btn">Book Now</button>
-    </div>
-    <div class="service-card" data-aos="fade-up" tabindex="0">
-      <img src="images/mood-lights.png" alt="Mood lighting for parties" />
-      <div class="service-title">Mood Lights</div>
-      <div class="service-desc">Set the perfect mood with customizable color and intensity.</div>
-      <button class="book-now-btn">Book Now</button>
-    </div>
-    <div class="service-card" data-aos="fade-up" tabindex="0">
-      <img src="images/led-wall.png" alt="LED wall for events" />
-      <div class="service-title">LED Wall</div>
-      <div class="service-desc">High-resolution LED walls for dynamic visuals and presentations.</div>
-      <button class="book-now-btn">Book Now</button>
-    </div>
-    <div class="service-card" data-aos="fade-up" tabindex="0">
-      <img src="images/stage.png" alt="Stage setup" />
-      <div class="service-title">Stage</div>
-      <div class="service-desc">Sturdy, modular stages for performances, speeches, and more.</div>
-      <button class="book-now-btn">Book Now</button>
-    </div>
-    <div class="service-card" data-aos="fade-up" tabindex="0">
-      <img src="images/low-lying.jpg" alt="Low lying fog machine effect" />
-      <div class="service-title">Low Lying Fog</div>
-      <div class="service-desc">Create dramatic effects with our low-lying fog machines.</div>
-      <button class="book-now-btn">Book Now</button>
-    </div>
+  <div class="services-grid" id="homepageServicesGrid">
+    <!-- Services will be loaded dynamically from Firebase -->
   </div>
 
   <div class="carousel-container">
@@ -749,13 +714,10 @@ if (typeof firebase !== 'undefined') {
   <section class="cta-section" id="booking">
     <h2>Ready to Light Up Your Event?</h2>
     <p>Contact us now to book our services!</p>
-    <a href="#booking-form" class="cta-button">Book Now</a>
+    <a href="Services.html" class="cta-button">Book Now</a>
   </section>
 
-  <section id="booking-form" style="padding:30px 10px;text-align:center;">
-    <h3>Booking Form (Coming Soon)</h3>
-    <p>We're working on an easy way to book online. For now, please <a href="#inquire">inquire here</a>.</p>
-  </section>
+
 
   <section id="feedback" style="padding:30px 10px;text-align:center;">
     <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 18px rgba(0,34,68,0.08); padding: 36px 24px 32px 24px;">
@@ -887,6 +849,11 @@ document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopu
 
     // Carousel functionality with error handling
     document.addEventListener('DOMContentLoaded', () => {
+      // Load homepage services from Firebase
+      if (typeof firebase !== 'undefined') {
+        loadHomepageServices();
+      }
+
       const carouselTrack = document.getElementById('carouselTrack');
       if (!carouselTrack) {
         console.warn('Carousel track not found, skipping carousel initialization.');
@@ -962,6 +929,75 @@ document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopu
         // You can add booking functionality here later
       });
     });
+
+    // Map service names to image files in the images folder
+    const serviceImages = {
+      'Lights & Sounds': 'images/lights-sounds.png',
+      'Led Wall': 'images/led-wall.png',
+      'Stage': 'images/stage.png',
+      'Mood Light': 'images/mood-lights.png',
+      'String Lights': 'images/string-lights.png',
+      'Low Lying': 'images/low-lying.jpg',
+      // Add more mappings as needed
+    };
+
+    // Function to load services from Firebase and create service cards
+    async function loadHomepageServices() {
+      const servicesGrid = document.getElementById('homepageServicesGrid');
+      if (!servicesGrid) return;
+
+      // Show loading state
+      servicesGrid.innerHTML = `
+        <div style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 15px; color: #666;">Loading services...</p>
+        </div>
+      `;
+
+      try {
+        const db = firebase.database();
+        const servicesSnap = await db.ref('services').once('value');
+        const services = servicesSnap.val() || {};
+        
+        if (Object.keys(services).length === 0) {
+          servicesGrid.innerHTML = `
+            <div style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+              <i class="fas fa-microphone-slash"></i>
+              <h3>No Services Available</h3>
+              <p>Check back later for our latest equipment offerings.</p>
+            </div>
+          `;
+        } else {
+          servicesGrid.innerHTML = '';
+          Object.entries(services).forEach(([id, s]) => {
+            const imgSrc = serviceImages[s.name] || 'images/logo.png';
+            const available = parseInt(s.available) || 0;
+            const isSoldOut = available === 0;
+            
+            const div = document.createElement('div');
+            div.className = isSoldOut ? 'service-card sold-out' : 'service-card';
+            div.setAttribute('data-aos', 'fade-up');
+            div.setAttribute('tabindex', '0');
+            div.innerHTML = `
+              <img src="${imgSrc}" alt="${s.name}" />
+              <div class="service-title">${s.name}</div>
+              <div class="service-desc">${s.inclusions || 'Professional service for your events.'}</div>
+              <button class="book-now-btn" onclick="window.location.href='Prod Description.html?productId=${id}'">Book Now</button>
+            `;
+            servicesGrid.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+        servicesGrid.innerHTML = `
+          <div style="text-align: center; padding: 40px; grid-column: 1 / -1;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Services</h3>
+            <p>Please refresh the page to try again.</p>
+          </div>
+        `;
+      }
+    }
 
     function logout() {
       try {
