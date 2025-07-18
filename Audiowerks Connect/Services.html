@@ -898,6 +898,47 @@
     margin: 15px 0;
   }
 }
+.qr-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+.qr-modal-content {
+  background: #fff;
+  margin: auto;
+  padding: 64px 64px 40px 64px;
+  border-radius: 28px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 600px;
+  position: relative;
+}
+.qr-modal-content img {
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  margin-bottom: 32px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.qr-modal-content p {
+  font-size: 1.18rem;
+  margin-bottom: 28px;
+}
+.qr-modal-content button {
+  margin-top: 18px;
+}
 </style>
     </head>
 
@@ -961,6 +1002,8 @@
                           <th>End Date</th>
                           <th>Quantity</th>
                           <th>Total Price</th>
+                          <th>Payment Method</th>
+                          <th>Payment Plan</th>
                           <th>Status</th>
                           <th>Action</th>
                         </tr>
@@ -1025,9 +1068,13 @@
 
   // Manage Booking Modal Functions
   function showManageBookingModal(bookingId, bookingData) {
-    // Reset selections every time modal opens
-    window.selectedPaymentMethod = null;
-    window.selectedInstallmentPlan = null;
+    // Store the current booking ID for saving selections
+    window.currentBookingId = bookingId;
+    
+    // Load existing selections if they exist
+    window.selectedPaymentMethod = bookingData.paymentMethod || null;
+    window.selectedInstallmentPlan = bookingData.installmentPlan || null;
+    
     const modal = document.createElement('div');
     modal.className = 'manage-booking-modal';
     
@@ -1073,15 +1120,15 @@
         <div class="payment-section">
           <h4>Payment Method</h4>
           <div class="payment-methods">
-            <div class="payment-method" onclick="selectPaymentMethod(this, 'gcash')">
+            <div class="payment-method ${bookingData.paymentMethod === 'gcash' ? 'selected' : ''}" onclick="selectPaymentMethod(this, 'gcash')">
               <i class="fas fa-mobile-alt"></i>
               <span>GCash</span>
             </div>
-            <div class="payment-method" onclick="selectPaymentMethod(this, 'bank')">
+            <div class="payment-method ${bookingData.paymentMethod === 'bank' ? 'selected' : ''}" onclick="selectPaymentMethod(this, 'bank')">
               <i class="fas fa-university"></i>
               <span>Bank Transfer</span>
             </div>
-            <div class="payment-method" onclick="selectPaymentMethod(this, 'card')">
+            <div class="payment-method ${bookingData.paymentMethod === 'card' ? 'selected' : ''}" onclick="selectPaymentMethod(this, 'card')">
               <i class="fas fa-credit-card"></i>
               <span>Credit/Debit Card</span>
             </div>
@@ -1091,21 +1138,21 @@
         <div class="installment-section">
           <h4>Payment Plan</h4>
           <div class="installment-plans">
-            <div class="installment-plan" onclick="selectInstallmentPlan(this, 'full')">
+            <div class="installment-plan ${bookingData.installmentPlan === 'full' ? 'selected' : ''}" onclick="selectInstallmentPlan(this, 'full')">
               <div class="installment-plan-header">
                 <span class="installment-plan-title">Full Payment</span>
                 <span class="installment-plan-price">₱${totalPrice.toLocaleString()}</span>
               </div>
               <div class="installment-plan-details">Pay the complete amount upfront</div>
             </div>
-            <div class="installment-plan" onclick="selectInstallmentPlan(this, 'downpayment')">
+            <div class="installment-plan ${bookingData.installmentPlan === 'downpayment' ? 'selected' : ''}" onclick="selectInstallmentPlan(this, 'downpayment')">
               <div class="installment-plan-header">
                 <span class="installment-plan-title">Downpayment</span>
                 <span class="installment-plan-price">₱${(totalPrice / 2).toLocaleString()}</span>
               </div>
               <div class="installment-plan-details">Pay 50% now, remaining 50% before event</div>
             </div>
-            <div class="installment-plan" onclick="selectInstallmentPlan(this, 'three-payments')">
+            <div class="installment-plan ${bookingData.installmentPlan === 'three-payments' ? 'selected' : ''}" onclick="selectInstallmentPlan(this, 'three-payments')">
               <div class="installment-plan-header">
                 <span class="installment-plan-title">Three Payments</span>
                 <span class="installment-plan-price">₱${(totalPrice / 3).toLocaleString()}/payment</span>
@@ -1116,8 +1163,8 @@
         </div>
         
         <div class="manage-booking-actions">
-          <button class="manage-booking-btn-secondary" onclick="closeManageBookingModal()">Cancel</button>
-          <button id="update-payment-btn" type="button" class="manage-booking-btn-primary" onclick="updateBookingPayment('${bookingId}')">Update Payment</button>
+          <button class="manage-booking-btn-secondary" onclick="closeManageBookingModal()">Close</button>
+          <button class="manage-booking-btn-primary" onclick="handlePayNow()">Pay Now</button>
         </div>
       </div>
     `;
@@ -1130,9 +1177,66 @@
     if (modal) {
       modal.remove();
     }
+    // Clear the current booking ID
+    window.currentBookingId = null;
   }
 
-  function selectPaymentMethod(element, method) {
+  // --- QR Popup Functions ---
+  async function handlePayNow() {
+    const bookingId = window.currentBookingId;
+    const paymentMethod = window.selectedPaymentMethod;
+    const installmentPlan = window.selectedInstallmentPlan;
+
+    // Check if selections are made
+    if (!paymentMethod && !installmentPlan) {
+      showPopup('warning', 'Selections Required', 'Please select both a payment method and a payment plan to continue.');
+      return;
+    }
+    if (!paymentMethod) {
+      showPopup('warning', 'Payment Method Required', 'Please select a payment method to continue.');
+      return;
+    }
+    if (!installmentPlan) {
+      showPopup('warning', 'Payment Plan Required', 'Please select a payment plan to continue.');
+      return;
+    }
+
+    try {
+      // Save the selections to database
+      await firebase.database().ref(`bookings/${bookingId}`).update({
+        paymentMethod: paymentMethod,
+        installmentPlan: installmentPlan,
+        lastUpdated: new Date().toISOString()
+      });
+      
+      console.log('Payment selections saved before showing QR popup');
+      
+      // Close the booking modal and show QR popup
+      closeManageBookingModal();
+      showQrPopup();
+      
+    } catch (error) {
+      console.error('Error saving payment selections:', error);
+      showPopup('error', 'Save Failed', 'Error saving payment details. Please try again.');
+    }
+  }
+
+  function showQrPopup() {
+    const modal = document.getElementById('qr-popup-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeQrPopup() {
+    const modal = document.getElementById('qr-popup-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+  // --- End QR Popup Functions ---
+
+  async function selectPaymentMethod(element, method) {
     // Remove selection from all payment methods
     document.querySelectorAll('.payment-method').forEach(el => {
       el.classList.remove('selected');
@@ -1141,9 +1245,23 @@
     element.classList.add('selected');
     // Store the selected payment method
     window.selectedPaymentMethod = method;
+    
+    // Save to database immediately
+    const bookingId = window.currentBookingId;
+    if (bookingId) {
+      try {
+        await firebase.database().ref(`bookings/${bookingId}`).update({
+          paymentMethod: method,
+          lastUpdated: new Date().toISOString()
+        });
+        console.log('Payment method saved:', method);
+      } catch (error) {
+        console.error('Error saving payment method:', error);
+      }
+    }
   }
 
-  function selectInstallmentPlan(element, plan) {
+  async function selectInstallmentPlan(element, plan) {
     // Remove selection from all installment plans
     document.querySelectorAll('.installment-plan').forEach(el => {
       el.classList.remove('selected');
@@ -1152,6 +1270,20 @@
     element.classList.add('selected');
     // Store the selected installment plan
     window.selectedInstallmentPlan = plan;
+    
+    // Save to database immediately
+    const bookingId = window.currentBookingId;
+    if (bookingId) {
+      try {
+        await firebase.database().ref(`bookings/${bookingId}`).update({
+          installmentPlan: plan,
+          lastUpdated: new Date().toISOString()
+        });
+        console.log('Installment plan saved:', plan);
+      } catch (error) {
+        console.error('Error saving installment plan:', error);
+      }
+    }
   }
 
   // Custom Popup Functions
@@ -1233,7 +1365,7 @@
       return;
     }
     if (!installmentPlan) {
-      showPopup('warning', 'Installment Plan Required', 'Please select an installment plan to continue.');
+      showPopup('warning', 'Payment Plan Required', 'Please select a payment plan to continue.');
       return;
     }
     
@@ -1278,6 +1410,8 @@
           <td>${b.endDate}</td>
           <td>${b.quantity}</td>
           <td>${b.totalPrice}</td>
+          <td>${b.paymentMethod || 'Not Selected'}</td>
+          <td>${b.installmentPlan || 'Not Selected'}</td>
           <td><span class="status-badge ${b.status}">${b.status}</span></td>
           <td>
             <button class="manage-booking-btn" data-id="${id}">Manage</button>
@@ -1291,7 +1425,7 @@
     if (!hasBookings) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="7">
+          <td colspan="9">
             <div class="empty-state">
               <i class="fas fa-calendar-times"></i>
               <h3>No Bookings Found</h3>
@@ -1348,7 +1482,7 @@
     if (bookingsTable) {
       bookingsTable.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 40px;">
+          <td colspan="9" style="text-align: center; padding: 40px;">
             <div class="loading-spinner"></div>
             <p style="margin-top: 15px; color: #666;">Loading your bookings...</p>
           </td>
@@ -1511,6 +1645,13 @@
     }
   }
 </script>
+    <!-- QR Code Popup Modal HTML -->
+    <div id="qr-popup-modal" class="qr-modal">
+      <div class="qr-modal-content">
+        <!-- Add your QR code image here -->
+        <img src="images/qr.jpg" alt="QR Code">
+        <p>Scan to pay</p>
+        <button class="manage-booking-btn-primary" onclick="closeQrPopup()">Close</button>
+      </div>
+    </div>
 </html>
-
-

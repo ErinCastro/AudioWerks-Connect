@@ -135,6 +135,49 @@
       text-align: left;
     }
 
+    /* Scrollable table container */
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .table-container table {
+      margin-top: 0;
+    }
+
+    .table-container thead {
+      position: sticky;
+      top: 0;
+      background-color: #f8f9fa;
+      z-index: 1;
+    }
+
+    .table-container thead th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    /* Custom scrollbar styling */
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
     footer {
       background-color: #000;
       color: white;
@@ -457,26 +500,30 @@
 
   <div class="card">
     <h3>Bookings</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Customer</th>
-          <th>Product</th>
-          <th>Start Date</th>
-          <th>End Date</th>
-          <th>Venue</th>
-          <th>Location</th>
-          <th>Event Time</th>
-          <th>Quantity</th>
-          <th>Total Price</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="bookingsTableBody">
-        <!-- Bookings will be loaded here dynamically -->
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Venue</th>
+            <th>Location</th>
+            <th>Event Time</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Payment Method</th>
+            <th>Payment Plan</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTableBody">
+          <!-- Bookings will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
     <!-- New: Download CSV button and live preview table -->
     <button id="downloadCsvBtn" style="margin:16px 8px 16px 0;">Download CSV</button>
     <button id="downloadExcelBtn" style="margin:16px 0;">Download Excel</button>
@@ -609,6 +656,8 @@
         <td>${b.eventTime || 'N/A'}</td>
         <td>${b.quantity || 1}</td>
         <td>${b.totalPrice || '₱0'}</td>
+        <td>${b.paymentMethod || 'Not Selected'}</td>
+        <td>${b.installmentPlan || 'Not Selected'}</td>
         <td>
           <select class="status-select" data-id="${id}" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
             <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
@@ -671,17 +720,58 @@
     const livePreviewBody = document.getElementById('livePreviewBody');
     if (livePreviewHeader) livePreviewHeader.innerHTML = '';
     if (livePreviewBody) livePreviewBody.innerHTML = '';
-    // Get all unique keys for header
+    
+    // Define columns to exclude from live preview
+    const excludedColumns = [
+      'gcashNumber',
+      'paymentAmount', 
+      'paymentCompletedAt',
+      'paymentInitiatedAt',
+      'paymentPlan',
+      'paymentReference',
+      'paymentStatus',
+      'receiptUploaded',
+      'updatedAt'
+    ];
+    
+    // Get all unique keys for header, excluding unwanted columns
     const allKeys = new Set();
-    Object.values(bookings).forEach(b => Object.keys(b).forEach(k => allKeys.add(k)));
+    Object.values(bookings).forEach(b => {
+      Object.keys(b).forEach(k => {
+        if (!excludedColumns.includes(k)) {
+          allKeys.add(k);
+        }
+      });
+    });
     const headerKeys = Array.from(allKeys);
+    
     if (livePreviewHeader) {
       headerKeys.forEach(k => {
         const th = document.createElement('th');
-        th.textContent = k;
+        // Convert column names to more readable format
+        let displayName = k;
+        if (k === 'installmentPlan') {
+          displayName = 'Payment Plan';
+        } else if (k === 'paymentMethod') {
+          displayName = 'Payment Method';
+        } else if (k === 'productName') {
+          displayName = 'Product';
+        } else if (k === 'startDate') {
+          displayName = 'Start Date';
+        } else if (k === 'endDate') {
+          displayName = 'End Date';
+        } else if (k === 'eventTime') {
+          displayName = 'Event Time';
+        } else if (k === 'totalPrice') {
+          displayName = 'Total Price';
+        } else if (k === 'customerName') {
+          displayName = 'Customer Name';
+        }
+        th.textContent = displayName;
         livePreviewHeader.appendChild(th);
       });
     }
+    
     Object.values(bookings).forEach(b => {
       if (livePreviewBody) {
         const trPreview = document.createElement('tr');
