@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="text/html"; charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Audiowerks - Services</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+            background-blend-mode: lighten;
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .logo-container img {
+            height: 70px;
+            cursor: pointer;
+        }
+        .logo-container a {
+            display: inline-block;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+        .header-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header-icons i {
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .header-icons i:hover {
+            transform: scale(1.2);
+        }
+        .menu-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+        .menu-popup a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-popup a:hover {
+            background-color: #f0f0f0;
+        }
+        .menu-popup a:last-child {
+            background-color: #191970;
+            color: #fff;
+            border-bottom: none;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        .menu-popup a:last-child:hover {
+            background-color: #000080;
+            transform: scale(1.02);
+        }
+        .fa-bars {
+            color: #000;
+            transition: transform 0.3s;
+        }
+        .fa-bars.active {
+            transform: rotate(90deg);
+        }
+    footer {
+      background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+      color: white;
+      text-align: center;
+      padding: 25px 10px 15px;
+      margin-top: auto;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      position: relative;
+    }
+    .footer-social {
+      margin: 10px 0 5px;
+    }
+    .footer-social a {
+      color: #bccedf;
+      margin: 0 8px;
+      font-size: 1.5rem;
+      transition: color 0.2s;
+    }
+    .footer-social a:hover {
+      color: #ffc300;
+    }
+    .footer-contact span {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .footer-note {
+      margin: 8px 0 0;
+      font-size: 1rem;
+      color: #bccedf;
+    }
+    .back-to-top {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: #ffc300;
+      color: #191970;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s;
+    }
+    .back-to-top:hover {
+      background: #191970;
+      color: #ffc300;
+    }
+
+/* Polished Services Page Styles */
+.services-hero {
+  background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+  color: white;
+  padding: 60px 20px;
+  margin: 20px 0;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 71, 171, 0.3);
+  text-align: center;
+}
+
+.hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0 0 15px 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  margin: 0 0 40px 0;
+  opacity: 0.9;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #ffc300;
+}
+
+.stat-label {
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.bookings-section, .services-section {
+  margin: 50px 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #0047AB;
+  margin: 0 0 10px 0;
+}
+
+.section-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+.bookings-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  margin-bottom: 40px;
+}
+
+.table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  margin-top: 12px;
+}
+
+.bookings-table th {
+  background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+  color: white;
+  font-weight: 700;
+  padding: 18px 12px;
+  font-size: 1.1rem;
+  border-radius: 12px 12px 0 0;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.bookings-table td {
+  background: white;
+  padding: 20px 15px;
+  font-size: 1.08rem;
+  vertical-align: middle;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #f0f0f0;
+}
+
+.bookings-table tr:hover td {
+  background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 71, 171, 0.15);
+  border-color: #0047AB;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.product {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #f0f0f0;
+}
+
+.product:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0, 71, 171, 0.2);
+  border-color: #0047AB;
+}
+
+.product.sold-out {
+  opacity: 0.6;
+  filter: grayscale(30%);
+}
+
+.product.sold-out::before {
+  content: "SOLD OUT";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(220, 53, 69, 0.9);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 10px;
+  z-index: 10;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.product img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product:hover img {
+  transform: scale(1.05);
+}
+
+.product-info {
+  padding: 25px;
+}
+
+.product-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #191970;
+  margin: 0 0 10px 0;
+}
+
+.product-type {
+  font-size: 1rem;
+  color: #666;
+  margin: 0 0 15px 0;
+  line-height: 1.4;
+}
+
+.product-price {
+  font-size: 1.4rem;
+  color: #0047AB;
+  font-weight: bold;
+  margin: 0;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #0047AB;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state i {
+  font-size: 4rem;
+  color: #ccc;
+  margin-bottom: 20px;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* My Bookings Table Styles */
+.my-bookings-section {
+  margin: 40px 0 60px 0;
+  background: #f9fafb;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 32px 18px 24px 18px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.my-bookings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 8px;
+  background: transparent;
+}
+.my-bookings-table th {
+  background: #eaf1fb;
+  color: #0047AB;
+  font-weight: 700;
+  padding: 14px 8px;
+  font-size: 1.1rem;
+  border-radius: 10px 10px 0 0;
+}
+.my-bookings-table td {
+  background: #fff;
+  padding: 14px 8px;
+  font-size: 1.08rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.04);
+  text-align: center;
+}
+.my-bookings-table tr:nth-child(even) td {
+  background: #f4f7fa;
+}
+.status-badge {
+  display: inline-block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 8px 20px;
+  border-radius: 20px;
+  margin-top: 6px;
+  margin-bottom: 0;
+  background: #b0b6be;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
+.status-badge.Pending {
+  background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+.status-badge.Confirmed {
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+.status-badge.Cancelled {
+  background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+}
+.status-badge.Completed {
+  background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%);
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
+}
+.cancel-booking-btn {
+  background: linear-gradient(135deg, #f44336 0%, #c62828 100%);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.cancel-booking-btn:hover {
+  background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+}
+
+/* Manage Booking Button Styles */
+.manage-booking-btn {
+  background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 71, 171, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.manage-booking-btn:hover {
+  background: linear-gradient(135deg, #191970 0%, #0047AB 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 71, 171, 0.4);
+}
+
+/* Manage Booking Modal Styles */
+.manage-booking-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.manage-booking-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.manage-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.manage-booking-header h3 {
+  color: #0047AB;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-manage-modal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+}
+
+.close-manage-modal:hover {
+  color: #000;
+}
+
+.booking-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.booking-info h4 {
+  color: #0047AB;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.booking-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  font-size: 0.95rem;
+}
+
+.booking-detail {
+  display: flex;
+  justify-content: space-between;
+}
+
+.booking-detail strong {
+  color: #333;
+}
+
+.payment-section {
+  margin-bottom: 25px;
+}
+
+.payment-section h4 {
+  color: #0047AB;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.payment-method {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.payment-method:hover {
+  border-color: #0047AB;
+  background: #f8f9fa;
+}
+
+.payment-method.selected {
+  border-color: #0047AB;
+  background: #e8f2ff;
+}
+
+.payment-method i {
+  font-size: 2rem;
+  color: #0047AB;
+  margin-bottom: 8px;
+}
+
+.payment-method span {
+  display: block;
+  font-weight: 600;
+  color: #333;
+}
+
+.installment-section {
+  margin-bottom: 25px;
+}
+
+.installment-section h4 {
+  color: #0047AB;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.installment-plans {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.installment-plan {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.installment-plan:hover {
+  border-color: #0047AB;
+  background: #f8f9fa;
+}
+
+.installment-plan.selected {
+  border-color: #0047AB;
+  background: #e8f2ff;
+}
+
+.installment-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.installment-plan-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.installment-plan-price {
+  font-weight: 600;
+  color: #0047AB;
+}
+
+.installment-plan-details {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.manage-booking-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.manage-booking-btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.manage-booking-btn-secondary:hover {
+  background: #5a6268;
+}
+
+.manage-booking-btn-primary {
+  background: #0047AB;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.manage-booking-btn-primary:hover {
+  background: #191970;
+}
+
+@media (max-width: 768px) {
+  .manage-booking-content {
+    width: 95%;
+    padding: 20px;
+  }
+  
+  .booking-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-methods {
+    grid-template-columns: 1fr;
+  }
+  
+  .manage-booking-actions {
+    flex-direction: column;
+  }
+}
+
+/* Custom Popup Styles */
+.custom-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.popup-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: popupSlideIn 0.3s ease;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.popup-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.popup-icon.success {
+  color: #28a745;
+}
+
+.popup-icon.error {
+  color: #dc3545;
+}
+
+.popup-icon.warning {
+  color: #ffc107;
+}
+
+.popup-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.popup-message {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.popup-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.popup-btn-primary {
+  background: #0047AB;
+  color: white;
+}
+
+.popup-btn-primary:hover {
+  background: #191970;
+}
+
+.popup-btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.popup-btn-secondary:hover {
+  background: #5a6268;
+}
+
+.popup-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.popup-btn-danger:hover {
+  background: #c82333;
+}
+@media (max-width: 700px) {
+  .my-bookings-section {
+    padding: 12px 2vw 12px 2vw;
+  }
+  .my-bookings-table th, .my-bookings-table td {
+    font-size: 0.98rem;
+    padding: 8px 2px;
+  }
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  .hero-stats {
+    gap: 30px;
+  }
+  .stat-number {
+    font-size: 2rem;
+  }
+  .section-title {
+    font-size: 1.8rem;
+  }
+  .products-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  .content-wrapper {
+    padding: 0 15px;
+  }
+  .services-hero {
+    padding: 40px 15px;
+    margin: 15px 0;
+  }
+}
+.qr-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+.qr-modal-content {
+  background: #fff;
+  margin: auto;
+  padding: 64px 64px 40px 64px;
+  border-radius: 28px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 600px;
+  position: relative;
+}
+.qr-modal-content img {
+  width: 400px;
+  height: 400px;
+  object-fit: contain;
+  margin-bottom: 32px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.qr-modal-content p {
+  font-size: 1.18rem;
+  margin-bottom: 28px;
+}
+.qr-modal-content button {
+  margin-top: 18px;
+}
+</style>
+    </head>
+
+    <body class="body-bg"> 
+        
+        <header>
+        <div class="logo-container">
+          <a href="homepage.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" /></a>
+        </div>
+        <div class="header-center">
+          <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
+          <p style="font-size: 1.1rem; color: #0047AB; margin: 0;">Lights and Sounds</p>
+        </div>
+        <div class="header-icons">
+          <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+        </div>
+        <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+          <a href="homepage.html">Home</a>
+          <a href="portfolioo.html">Portfolio</a>
+          <a href="Services.html">Book Here</a>
+          <a href="User.html">User Profile</a>
+          <a href="availability.html">Equipment</a>
+          <a href="feedback.html">Feedback Dashboard</a>
+          <a href="login.html" onclick="logout()">Logout</a>
+        </nav>
+      </header>
+            <div class="services-hero">
+              <div class="hero-content">
+                <h1 class="hero-title">🎵 Our Premium Services</h1>
+                <p class="hero-subtitle">Discover our complete range of audio and lighting equipment for your perfect event</p>
+                <div class="hero-stats">
+                  <div class="stat-item">
+                    <span class="stat-number">6+</span>
+                    <span class="stat-label">Services</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Support</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Quality</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-wrapper">
+              <div class="bookings-section">
+                <div class="section-header">
+                  <h2 class="section-title">📋 My Bookings</h2>
+                  <p class="section-description">Track your current and past reservations</p>
+                </div>
+                <div class="bookings-card">
+                  <div class="table-container">
+                    <table class="bookings-table">
+                      <thead>
+                        <tr>
+                          <th>Product</th>
+                          <th>Start Date</th>
+                          <th>End Date</th>
+                          <th>Quantity</th>
+                          <th>Total Price</th>
+                          <th>Payment Method</th>
+                          <th>Payment Plan</th>
+                          <th>Status</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="bookingsTable"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="services-section">
+                <div class="section-header">
+                  <h2 class="section-title">📦 Bundle Packages</h2>
+                  <p class="section-description">Complete event solutions with multiple services included</p>
+                </div>
+                <div class="products-grid" id="bundlesProductGrid"></div>
+              </div>
+
+              <div class="services-section">
+                <div class="section-header">
+                  <h2 class="section-title">🎤 Individual Services</h2>
+                  <p class="section-description">High-quality audio and lighting equipment for your events</p>
+                </div>
+                <div class="products-grid" id="servicesProductGrid"></div>
+              </div>
+            </div>
+        <br>
+        <footer>
+  <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+  <div class="footer-social">
+    <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+  </div>
+  <div class="footer-contact">
+    <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+  </div>
+  <div class="footer-note">
+    <span>You can also contact us directly on this website.</span>
+  </div>
+  <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+</footer>
+    </body>
+    <script>
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    bars.classList.toggle('active');
+  }
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (!menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+  function logout() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "login.html";
+  }
+
+  // Manage Booking Modal Functions
+  function showManageBookingModal(bookingId, bookingData) {
+    // Store the current booking ID for saving selections
+    window.currentBookingId = bookingId;
+    
+    // Load existing selections if they exist
+    window.selectedPaymentMethod = bookingData.paymentMethod || null;
+    window.selectedInstallmentPlan = bookingData.installmentPlan || null;
+    
+    const modal = document.createElement('div');
+    modal.className = 'manage-booking-modal';
+    
+    const totalPrice = parseFloat(bookingData.totalPrice.replace('₱', '').replace(',', ''));
+    
+    modal.innerHTML = `
+      <div class="manage-booking-content">
+        <div class="manage-booking-header">
+          <h3>Manage My Booking</h3>
+          <button class="close-manage-modal" onclick="closeManageBookingModal()">&times;</button>
+        </div>
+        
+        <div class="booking-info">
+          <h4>Booking Information</h4>
+          <div class="booking-details">
+            <div class="booking-detail">
+              <strong>Product:</strong>
+              <span>${bookingData.productName}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Start Date:</strong>
+              <span>${bookingData.startDate}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>End Date:</strong>
+              <span>${bookingData.endDate}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Quantity:</strong>
+              <span>${bookingData.quantity}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Total Price:</strong>
+              <span>${bookingData.totalPrice}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Status:</strong>
+              <span class="status-badge ${bookingData.status}">${bookingData.status}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-section">
+          <h4>Payment Method</h4>
+          <div class="payment-methods">
+            <div class="payment-method ${bookingData.paymentMethod === 'gcash' ? 'selected' : ''}" onclick="selectPaymentMethod(this, 'gcash')">
+              <i class="fas fa-mobile-alt"></i>
+              <span>GCash</span>
+            </div>
+            <div class="payment-method ${bookingData.paymentMethod === 'bank' ? 'selected' : ''}" onclick="selectPaymentMethod(this, 'bank')">
+              <i class="fas fa-university"></i>
+              <span>Bank Transfer</span>
+            </div>
+            <div class="payment-method ${bookingData.paymentMethod === 'card' ? 'selected' : ''}" onclick="selectPaymentMethod(this, 'card')">
+              <i class="fas fa-credit-card"></i>
+              <span>Credit/Debit Card</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="installment-section">
+          <h4>Payment Plan</h4>
+          <div class="installment-plans">
+            <div class="installment-plan ${bookingData.installmentPlan === 'full' ? 'selected' : ''}" onclick="selectInstallmentPlan(this, 'full')">
+              <div class="installment-plan-header">
+                <span class="installment-plan-title">Full Payment</span>
+                <span class="installment-plan-price">₱${totalPrice.toLocaleString()}</span>
+              </div>
+              <div class="installment-plan-details">Pay the complete amount upfront</div>
+            </div>
+            <div class="installment-plan ${bookingData.installmentPlan === 'downpayment' ? 'selected' : ''}" onclick="selectInstallmentPlan(this, 'downpayment')">
+              <div class="installment-plan-header">
+                <span class="installment-plan-title">Downpayment</span>
+                <span class="installment-plan-price">₱${(totalPrice / 2).toLocaleString()}</span>
+              </div>
+              <div class="installment-plan-details">Pay 50% now, remaining 50% before event</div>
+            </div>
+            <div class="installment-plan ${bookingData.installmentPlan === 'three-payments' ? 'selected' : ''}" onclick="selectInstallmentPlan(this, 'three-payments')">
+              <div class="installment-plan-header">
+                <span class="installment-plan-title">Three Payments</span>
+                <span class="installment-plan-price">₱${(totalPrice / 3).toLocaleString()}/payment</span>
+              </div>
+              <div class="installment-plan-details">Pay in 3 equal installments (now, mid-term, before event)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="manage-booking-actions">
+          <button class="manage-booking-btn-secondary" onclick="closeManageBookingModal()">Close</button>
+          <button class="manage-booking-btn-primary" onclick="handlePayNow()">Pay Now</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+
+  function closeManageBookingModal() {
+    const modal = document.querySelector('.manage-booking-modal');
+    if (modal) {
+      modal.remove();
+    }
+    // Clear the current booking ID
+    window.currentBookingId = null;
+  }
+
+  // --- QR Popup Functions ---
+  async function handlePayNow() {
+    const bookingId = window.currentBookingId;
+    const paymentMethod = window.selectedPaymentMethod;
+    const installmentPlan = window.selectedInstallmentPlan;
+
+    // Check if selections are made
+    if (!paymentMethod && !installmentPlan) {
+      showPopup('warning', 'Selections Required', 'Please select both a payment method and a payment plan to continue.');
+      return;
+    }
+    if (!paymentMethod) {
+      showPopup('warning', 'Payment Method Required', 'Please select a payment method to continue.');
+      return;
+    }
+    if (!installmentPlan) {
+      showPopup('warning', 'Payment Plan Required', 'Please select a payment plan to continue.');
+      return;
+    }
+
+    try {
+      // Save the selections to database
+      await firebase.database().ref(`bookings/${bookingId}`).update({
+        paymentMethod: paymentMethod,
+        installmentPlan: installmentPlan,
+        lastUpdated: new Date().toISOString()
+      });
+      
+      console.log('Payment selections saved before showing QR popup');
+      
+      // Close the booking modal and show QR popup
+      closeManageBookingModal();
+      showQrPopup();
+      
+    } catch (error) {
+      console.error('Error saving payment selections:', error);
+      showPopup('error', 'Save Failed', 'Error saving payment details. Please try again.');
+    }
+  }
+
+  function showQrPopup() {
+    const modal = document.getElementById('qr-popup-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeQrPopup() {
+    const modal = document.getElementById('qr-popup-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+  // --- End QR Popup Functions ---
+
+  async function selectPaymentMethod(element, method) {
+    // Remove selection from all payment methods
+    document.querySelectorAll('.payment-method').forEach(el => {
+      el.classList.remove('selected');
+    });
+    // Add selection to clicked element
+    element.classList.add('selected');
+    // Store the selected payment method
+    window.selectedPaymentMethod = method;
+    
+    // Save to database immediately
+    const bookingId = window.currentBookingId;
+    if (bookingId) {
+      try {
+        await firebase.database().ref(`bookings/${bookingId}`).update({
+          paymentMethod: method,
+          lastUpdated: new Date().toISOString()
+        });
+        console.log('Payment method saved:', method);
+      } catch (error) {
+        console.error('Error saving payment method:', error);
+      }
+    }
+  }
+
+  async function selectInstallmentPlan(element, plan) {
+    // Remove selection from all installment plans
+    document.querySelectorAll('.installment-plan').forEach(el => {
+      el.classList.remove('selected');
+    });
+    // Add selection to clicked element
+    element.classList.add('selected');
+    // Store the selected installment plan
+    window.selectedInstallmentPlan = plan;
+    
+    // Save to database immediately
+    const bookingId = window.currentBookingId;
+    if (bookingId) {
+      try {
+        await firebase.database().ref(`bookings/${bookingId}`).update({
+          installmentPlan: plan,
+          lastUpdated: new Date().toISOString()
+        });
+        console.log('Installment plan saved:', plan);
+      } catch (error) {
+        console.error('Error saving installment plan:', error);
+      }
+    }
+  }
+
+  // Custom Popup Functions
+  function showPopup(type, title, message, actions = []) {
+    // Remove any existing popup first
+    closePopup();
+    const popup = document.createElement('div');
+    popup.className = 'custom-popup';
+    
+    let iconClass = '';
+    let iconSymbol = '';
+    
+    switch(type) {
+      case 'success':
+        iconClass = 'success';
+        iconSymbol = '✓';
+        break;
+      case 'error':
+        iconClass = 'error';
+        iconSymbol = '✕';
+        break;
+      case 'warning':
+        iconClass = 'warning';
+        iconSymbol = '⚠';
+        break;
+      default:
+        iconClass = 'warning';
+        iconSymbol = 'ℹ';
+    }
+    
+    let actionsHtml = '';
+    if (actions.length > 0) {
+      actionsHtml = `
+        <div class="popup-actions">
+          ${actions.map(action => `
+            <button class="popup-btn ${action.class || 'popup-btn-primary'}" onclick="${action.onclick}">
+              ${action.text}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      actionsHtml = `
+        <div class="popup-actions">
+          <button class="popup-btn popup-btn-primary" onclick="closePopup()">OK</button>
+        </div>
+      `;
+    }
+    
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-icon ${iconClass}">${iconSymbol}</div>
+        <div class="popup-title">${title}</div>
+        <div class="popup-message">${message}</div>
+        ${actionsHtml}
+      </div>
+    `;
+    
+    document.body.appendChild(popup);
+  }
+
+  function closePopup() {
+    const popup = document.querySelector('.custom-popup');
+    if (popup) {
+      popup.remove();
+    }
+  }
+
+  async function updateBookingPayment(bookingId) {
+    const paymentMethod = window.selectedPaymentMethod;
+    const installmentPlan = window.selectedInstallmentPlan;
+
+    if (!paymentMethod && !installmentPlan) {
+      showPopup('warning', 'Selections Required', 'Please select both a payment method and a payment plan to continue.');
+      return;
+    }
+    if (!paymentMethod) {
+      showPopup('warning', 'Payment Method Required', 'Please select a payment method to continue.');
+      return;
+    }
+    if (!installmentPlan) {
+      showPopup('warning', 'Payment Plan Required', 'Please select a payment plan to continue.');
+      return;
+    }
+    
+    try {
+      // Update the booking in Firebase
+      await firebase.database().ref(`bookings/${bookingId}`).update({
+        paymentMethod: paymentMethod,
+        installmentPlan: installmentPlan,
+        lastUpdated: new Date().toISOString()
+      });
+      
+      // Show success message
+      showPopup('success', 'Payment Updated', 'Payment method and installment plan updated successfully!');
+      
+      // Close the modal
+      closeManageBookingModal();
+      
+    } catch (error) {
+      console.error('Error updating booking payment:', error);
+      showPopup('error', 'Update Failed', 'Error updating payment details. Please try again.');
+    }
+  }
+</script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="firebase-config-new.js"></script>
+<script>
+  function renderBookings(bookings, userEmail) {
+    const tbody = document.getElementById('bookingsTable');
+    tbody.innerHTML = '';
+    
+    let hasBookings = false;
+    Object.entries(bookings).forEach(([id, b]) => {
+      // Show bookings for this user and guest bookings if logged in, or just guest bookings if not logged in
+      if ((userEmail && (b.customer === userEmail || b.customer === 'Guest')) || (!userEmail && b.customer === 'Guest')) {
+        hasBookings = true;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${b.productName}</td>
+          <td>${b.startDate}</td>
+          <td>${b.endDate}</td>
+          <td>${b.quantity}</td>
+          <td>${b.totalPrice}</td>
+          <td>${b.paymentMethod || 'Not Selected'}</td>
+          <td>${b.installmentPlan || 'Not Selected'}</td>
+          <td><span class="status-badge ${b.status}">${b.status}</span></td>
+          <td>
+            <button class="manage-booking-btn" data-id="${id}">Manage</button>
+            ${(b.status === 'Pending' || b.status === 'Confirmed') ? `<button class="cancel-booking-btn" data-id="${id}">Cancel</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      }
+    });
+    
+    if (!hasBookings) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9">
+            <div class="empty-state">
+              <i class="fas fa-calendar-times"></i>
+              <h3>No Bookings Found</h3>
+              <p>You haven't made any bookings yet. Start by exploring our services!</p>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+  }
+  firebase.auth().onAuthStateChanged(user => {
+    let userEmail = user ? user.email : null;
+    firebase.database().ref('bookings').on('value', snap => {
+      const bookings = snap.val() || {};
+      renderBookings(bookings, userEmail);
+    });
+  });
+  // Map service/bundle names to image files in the images folder
+  const serviceImages = {
+    'Lights & Sounds': 'images/lights-sounds.png',
+    'Led Wall': 'images/led-wall.png',
+    'Stage': 'images/stage.png',
+    'Mood Light': 'images/mood-lights.png',
+    'String Lights': 'images/string-lights.png',
+    'Low Lying': 'images/low-lying.jpg',
+    // Add more mappings as needed
+  };
+  document.addEventListener('DOMContentLoaded', async function() {
+    // Show loading states
+    const bundlesGrid = document.getElementById('bundlesProductGrid');
+    const servicesGrid = document.getElementById('servicesProductGrid');
+    const bookingsTable = document.getElementById('bookingsTable');
+    
+    if (bundlesGrid) {
+      bundlesGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="loading-spinner"></div>
+          <h3>Loading Bundles...</h3>
+          <p>Please wait while we fetch our latest packages.</p>
+        </div>
+      `;
+    }
+    
+    if (servicesGrid) {
+      servicesGrid.innerHTML = `
+        <div class="empty-state">
+          <div class="loading-spinner"></div>
+          <h3>Loading Services...</h3>
+          <p>Please wait while we fetch our equipment.</p>
+        </div>
+      `;
+    }
+    
+    if (bookingsTable) {
+      bookingsTable.innerHTML = `
+        <tr>
+          <td colspan="9" style="text-align: center; padding: 40px;">
+            <div class="loading-spinner"></div>
+            <p style="margin-top: 15px; color: #666;">Loading your bookings...</p>
+          </td>
+        </tr>
+      `;
+    }
+    
+    // Load Bundles
+    if (bundlesGrid) {
+      try {
+        const db = firebase.database();
+        const bundlesSnap = await db.ref('bundles').once('value');
+        const bundles = bundlesSnap.val() || {};
+        
+        if (Object.keys(bundles).length === 0) {
+          bundlesGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-box-open"></i>
+              <h3>No Bundles Available</h3>
+              <p>Check back later for our complete event packages.</p>
+            </div>
+          `;
+        } else {
+          bundlesGrid.innerHTML = '';
+          Object.entries(bundles).forEach(([id, b]) => {
+            // Use the first service's image as the bundle image, or a default
+            let bundleImage = 'images/logo.png';
+            if (b.services && b.services.length > 0) {
+              const firstService = b.services[0];
+              bundleImage = serviceImages[firstService] || 'images/logo.png';
+            }
+            const available = parseInt(b.available) || 0;
+            const isSoldOut = available === 0;
+            
+            const div = document.createElement('div');
+            div.className = isSoldOut ? 'product sold-out' : 'product';
+            div.innerHTML = `
+              <a href="Prod Description.html?bundleId=${id}">
+                <img src="${bundleImage}" alt="${b.name}">
+              </a>
+              <div class="product-info">
+                <p class="product-title">${b.name}</p>
+                <p class="product-type">${(b.services||[]).join(', ')}</p>
+                <p class="product-price"><b>₱${b.price}</b></p>
+              </div>
+            `;
+            bundlesGrid.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading bundles:', error);
+        bundlesGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Bundles</h3>
+            <p>Please refresh the page to try again.</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Load Individual Products
+    if (servicesGrid) {
+      try {
+        const db = firebase.database();
+        const servicesSnap = await db.ref('services').once('value');
+        const services = servicesSnap.val() || {};
+        
+        if (Object.keys(services).length === 0) {
+          servicesGrid.innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-microphone-slash"></i>
+              <h3>No Services Available</h3>
+              <p>Check back later for our latest equipment offerings.</p>
+            </div>
+          `;
+        } else {
+          servicesGrid.innerHTML = '';
+          Object.entries(services).forEach(([id, s]) => {
+            const imgSrc = serviceImages[s.name] || 'images/logo.png';
+            const available = parseInt(s.available) || 0;
+            const isSoldOut = available === 0;
+            
+            const div = document.createElement('div');
+            div.className = isSoldOut ? 'product sold-out' : 'product';
+            div.innerHTML = `
+              <a href="Prod Description.html?productId=${id}">
+                <img src="${imgSrc}" alt="${s.name}">
+              </a>
+              <div class="product-info">
+                <p class="product-title">${s.name}</p>
+                <p class="product-type">${s.inclusions || ''}</p>
+                <p class="product-price"><b>₱${s.price}</b></p>
+              </div>
+            `;
+            servicesGrid.appendChild(div);
+          });
+        }
+      } catch (error) {
+        console.error('Error loading services:', error);
+        servicesGrid.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Services</h3>
+            <p>Please refresh the page to try again.</p>
+          </div>
+        `;
+      }
+    }
+  });
+  // Event delegation for booking buttons
+  document.addEventListener('click', async function(e) {
+    // Handle cancel booking button
+    if (e.target && e.target.classList.contains('cancel-booking-btn')) {
+      const bookingId = e.target.getAttribute('data-id');
+      
+      showPopup('warning', 'Cancel Booking', 'Are you sure you want to cancel this booking?', [
+        {
+          text: 'Cancel',
+          class: 'popup-btn-secondary',
+          onclick: 'closePopup()'
+        },
+        {
+          text: 'Yes, Cancel',
+          class: 'popup-btn-danger',
+          onclick: `confirmCancelBooking('${bookingId}')`
+        }
+      ]);
+    }
+    
+    // Handle manage booking button
+    if (e.target && e.target.classList.contains('manage-booking-btn')) {
+      const bookingId = e.target.getAttribute('data-id');
+      
+      // Fetch booking data from Firebase
+      try {
+        const bookingSnapshot = await firebase.database().ref(`bookings/${bookingId}`).once('value');
+        const bookingData = bookingSnapshot.val();
+        
+        if (bookingData) {
+          showManageBookingModal(bookingId, bookingData);
+        } else {
+          showPopup('error', 'Booking Not Found', 'The booking data could not be retrieved. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error fetching booking data:', error);
+        showPopup('error', 'Error', 'Failed to load booking details. Please try again.');
+      }
+    }
+  });
+
+  async function confirmCancelBooking(bookingId) {
+    try {
+      await firebase.database().ref('bookings/' + bookingId + '/status').set('Cancelled');
+      showPopup('success', 'Booking Cancelled', 'Your booking has been cancelled successfully.');
+      closePopup();
+    } catch (error) {
+      showPopup('error', 'Cancellation Failed', 'Failed to cancel booking. Please try again.');
+      closePopup();
+    }
+  }
+</script>
+    <!-- QR Code Popup Modal HTML -->
+    <div id="qr-popup-modal" class="qr-modal">
+      <div class="qr-modal-content">
+        <!-- Add your QR code image here -->
+        <img src="images/qr.jpg" alt="QR Code">
+        <p>Scan to pay</p>
+        <button class="manage-booking-btn-primary" onclick="closeQrPopup()">Close</button>
+      </div>
+    </div>
+</html>

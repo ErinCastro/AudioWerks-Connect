@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - AudioWerks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- SheetJS for Excel export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    /* Copy header and menu styles from homepage.html */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+      background-blend-mode: lighten;
+      border-bottom: 1px solid #ddd;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      backdrop-filter: blur(8px);
+    }
+    .logo-container img {
+      height: 120px;
+      cursor: pointer;
+    }
+    .logo-container a {
+      display: inline-block;
+    }
+    .header-center {
+      text-align: center;
+      flex: 1;
+    }
+    .header-center h1 {
+      font-size: 64px;
+      font-weight: bold;
+      color: #0047AB;
+      text-shadow: 2px 2px #ffffff;
+    }
+    .header-center p {
+      font-size: 24px;
+      color: #0047AB;
+      text-shadow: 1px 1px #ffffff;
+    }
+    .header-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .header-icons i {
+      font-size: 28px;
+      color: #000;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .header-icons i:hover {
+      transform: scale(1.2);
+    }
+    .menu-popup {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      z-index: 1000;
+      min-width: 200px;
+      transition: all 0.3s ease;
+    }
+    .menu-popup a {
+      display: block;
+      padding: 10px 15px;
+      color: #000;
+      text-decoration: none;
+      border-bottom: 1px solid #eee;
+    }
+    .menu-popup a:hover {
+      background-color: #f0f0f0;
+    }
+    .menu-popup a:last-child {
+      background-color: #191970;
+      color: #fff;
+      border-bottom: none;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .menu-popup a:last-child:hover {
+      background-color: #000080;
+      transform: scale(1.02);
+    }
+    .admin-container {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #0047AB;
+      margin-bottom: 15px;
+    }
+
+    .card {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    /* Scrollable table container */
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .table-container table {
+      margin-top: 0;
+    }
+
+    .table-container thead {
+      position: sticky;
+      top: 0;
+      background-color: #f8f9fa;
+      z-index: 1;
+    }
+
+    .table-container thead th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    /* Custom scrollbar styling */
+    .table-container::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    footer {
+      background-color: #000;
+      color: white;
+      text-align: center;
+      padding: 15px 10px;
+      margin-top: 40px;
+    }
+    @media (max-width: 900px) {
+      header {
+        padding: 10px;
+      }
+      .logo-container img {
+        height: 80px;
+      }
+      .header-center h1 {
+        font-size: 2.2rem;
+      }
+      .header-center p {
+        font-size: 1.1rem;
+      }
+    }
+    @media (max-width: 700px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 8px 2vw;
+      }
+      .logo-container img {
+        height: 60px;
+      }
+      .header-center h1 {
+        font-size: 1.3rem;
+      }
+      .header-center p {
+        font-size: 0.9rem;
+      }
+      .header-icons {
+        flex-direction: row;
+        gap: 10px;
+        margin-top: 8px;
+      }
+      .menu-popup {
+        min-width: 120px;
+        right: 10px;
+        top: 60px;
+      }
+    }
+    @media (max-width: 480px) {
+      header {
+        padding: 4px 1vw;
+      }
+      .logo-container img {
+        height: 40px;
+      }
+      .header-center h1 {
+        font-size: 1rem;
+      }
+      .header-center p {
+        font-size: 0.7rem;
+      }
+      .menu-popup {
+        min-width: 90px;
+        right: 4px;
+      }
+    }
+
+        /* Animation for notification popups */
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .announcement-add-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      align-items: center;
+    }
+    .announcement-add-row input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1.5px solid #c6d2e3;
+      font-size: 1.1rem;
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #f7fafd;
+      box-shadow: 0 2px 8px rgba(30,58,138,0.06);
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .announcement-add-row input[type="text"]:focus {
+      border: 1.5px solid #0047AB;
+      outline: none;
+      box-shadow: 0 2px 12px rgba(0,71,171,0.10);
+      background: #fff;
+    }
+    .announcement-add-row button {
+      padding: 12px 28px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(90deg, #0047AB 60%, #191970 100%);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 600;
+      font-family: 'Poppins', Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .announcement-add-row button:hover, .announcement-add-row button:focus {
+      background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 4px 16px rgba(0,71,171,0.13);
+      outline: none;
+    }
+    .ann-action-btn {
+      background: none;
+      border: none;
+      color: #0047AB;
+      font-size: 1.15rem;
+      margin-left: 6px;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: background 0.18s, color 0.18s, transform 0.18s;
+      vertical-align: middle;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ann-action-btn i {
+      font-size: 0.85rem;
+    }
+    .ann-action-btn.edit {
+      color: #0047AB;
+    }
+    .ann-action-btn.delete {
+      color: #d32f2f;
+    }
+    .ann-action-btn:hover, .ann-action-btn:focus {
+      background: #eaf1fb;
+      color: #191970;
+      transform: scale(1.12);
+      outline: none;
+    }
+    .ann-action-btn.delete:hover, .ann-action-btn.delete:focus {
+      background: #ffeaea;
+      color: #b71c1c;
+    }
+    .admin-announcements-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,34,68,0.07);
+      padding: 24px 28px 18px 28px;
+      max-width: 500px;
+      margin: 32px auto 0 auto;
+    }
+    .admin-announcements-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #0047AB;
+      margin-bottom: 12px;
+    }
+    .admin-announcement-add-btn {
+      background: #ffc300;
+      color: #191970;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .admin-announcement-add-btn:hover {
+      background: #ffdb4d;
+    }
+    .admin-announcements-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 10px 0;
+    }
+    .admin-announcements-list li {
+      background: #f8f9fa;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.08rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .admin-announcement-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      margin-left: 8px;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+    .admin-announcement-actions .edit-btn { 
+      color: #1976d2; 
+      pointer-events: auto;
+      position: relative;
+      z-index: 10;
+    }
+    .admin-announcement-actions .edit-btn:hover { color: #0047AB; }
+    .admin-announcement-actions .delete-btn { 
+      color: #d32f2f; 
+      pointer-events: auto;
+      position: relative;
+      z-index: 10;
+    }
+    .admin-announcement-actions .delete-btn:hover { color: #b71c1c; }
+    .admin-announcement-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .admin-announcement-input-row textarea {
+      flex: 1;
+      border-radius: 8px;
+      border: 1.5px solid #b0b6be;
+      padding: 8px 12px;
+      font-size: 1rem;
+      resize: none;
+    }
+    .admin-announcement-input-row button {
+      background: #0047AB;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .admin-announcement-input-row .cancel-btn {
+      background: #b0b6be;
+      color: #fff;
+    }
+    /* Download buttons styling */
+    #downloadCsvBtn, #downloadExcelBtn {
+      display: inline-block;
+      min-width: 140px;
+      padding: 10px 22px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 8px rgba(0,71,171,0.07);
+      letter-spacing: 0.5px;
+    }
+    #downloadCsvBtn {
+      background: #0047AB;
+      color: #fff;
+    }
+    #downloadCsvBtn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+    #downloadExcelBtn {
+      background: #43a047;
+      color: #fff;
+    }
+    #downloadExcelBtn:hover {
+      background: #388e3c;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-container">
+    <a href="admin.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" /></a>
+  </div>
+  <div class="header-center">
+    <h1>Audiowerks</h1>
+    <p>Lights and Sounds</p>
+  </div>
+  <div class="header-icons">
+    <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+  </div>
+  <nav class="menu-popup" id="menuPopup" aria-label="Admin Navigation">
+    <a href="admin.html">Dashboard</a>
+    <a href="adminchat.html">Chat</a>
+    <a href="provider.html">Profile</a>
+    <a href="login.html" onclick="logout()">Logout</a>
+  </nav>
+</header>
+
+<div class="admin-container">
+  <h2>Admin Dashboard</h2>
+
+  <div class="card">
+    <h3>Summary</h3>
+    <p>Total Bookings: 35</p>
+    <p>Confirmed: 20 | Pending: 10 | Cancelled: 5</p>
+  </div>
+
+  <!-- Bookings Pie Chart -->
+  <div class="card">
+    <h3>Bookings by Status</h3>
+    <div id="piechart" style="width: 100%; height: 250px;"></div>
+  </div>
+
+  <div class="card">
+    <h3>Bookings</h3>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Venue</th>
+            <th>Location</th>
+            <th>Event Time</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+            <th>Payment Method</th>
+            <th>Payment Plan</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTableBody">
+          <!-- Bookings will be loaded here dynamically -->
+        </tbody>
+      </table>
+    </div>
+    <!-- New: Download CSV button and live preview table -->
+    <button id="downloadCsvBtn" style="margin:16px 8px 16px 0;">Download CSV</button>
+    <button id="downloadExcelBtn" style="margin:16px 0;">Download Excel</button>
+    <h4 style="margin-top:20px;">Live Preview of All Bookings</h4>
+    <div style="overflow-x:auto;">
+      <table id="livePreviewTable" style="width:100%;border-collapse:collapse;">
+        <thead>
+          <tr id="livePreviewHeader"></tr>
+        </thead>
+        <tbody id="livePreviewBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Replace the old Announcements section with this polished version -->
+<div class="admin-announcements-card">
+  <div class="admin-announcements-header">
+    <span>📢 Announcements</span>
+    <button class="admin-announcement-add-btn" onclick="showAdminAnnouncementInput()">
+      <i class="fas fa-plus"></i> Add
+    </button>
+  </div>
+  <ul id="adminAnnouncementsList" class="admin-announcements-list"></ul>
+  <div id="adminAnnouncementInputRow" class="admin-announcement-input-row" style="display:none;">
+    <textarea id="adminAnnouncementInput" placeholder="Type announcement..." maxlength="200"></textarea>
+    <button onclick="submitAdminAnnouncement()">Post</button>
+    <button onclick="hideAdminAnnouncementInput()" class="cancel-btn">Cancel</button>
+  </div>
+</div>
+
+<!-- Remove the Services and Bundles sections from the admin dashboard -->
+
+</div>
+
+<footer>
+  <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="firebase-config-new.js"></script>
+<script src="firebase-backend-new.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
+  // On page load, check if user is admin
+  document.addEventListener('DOMContentLoaded', async function() {
+    const user = await new Promise(resolve => {
+      firebase.auth().onAuthStateChanged(resolve);
+    });
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // Get username by searching users for a record with this user's email
+    let username = null;
+    const usersSnap = await firebase.database().ref('users').once('value');
+    const users = usersSnap.val() || {};
+    for (const [uname, udata] of Object.entries(users)) {
+      if (udata.email && udata.email.replace(/^"|"$/g, '') === user.email) {
+        username = uname;
+        break;
+      }
+    }
+    
+    if (!username) {
+      alert('Access Denied: User not found in database');
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // Check if username is in admins
+    const adminSnap = await firebase.database().ref('admins/' + username).once('value');
+    if (!adminSnap.val()) {
+      alert('Access Denied: Admins only. Username "' + username + '" is not an admin.');
+      window.location.href = 'login.html';
+      return;
+    }
+    
+    // If admin, load dashboard data
+    console.log('Admin access granted for username:', username);
+    loadDashboard();
+  });
+
+  async function loadDashboard() {
+    // Load summary
+    const bookings = await window.getAllBookings() || {};
+    let total = 0, confirmed = 0, pending = 0, cancelled = 0;
+    Object.values(bookings).forEach(b => {
+      total++;
+      if (b.status === 'Confirmed') confirmed++;
+      else if (b.status === 'Pending') pending++;
+      else if (b.status === 'Cancelled') cancelled++;
+    });
+    document.querySelector('.card h3 + p').textContent = `Total Bookings: ${total}`;
+    document.querySelector('.card h3 + p + p').textContent = `Confirmed: ${confirmed} | Pending: ${pending} | Cancelled: ${cancelled}`;
+
+    // Load bookings table
+    const bookingsTbody = document.getElementById('bookingsTableBody');
+    if (bookingsTbody) bookingsTbody.innerHTML = '';
+    // Fetch users for username lookup
+    const usersSnap = await firebase.database().ref('users').once('value');
+    const users = usersSnap.val() || {};
+    Object.entries(bookings).forEach(([id, b]) => {
+      // Set customerName to username if possible
+      let username = '';
+      if (b.customerUid && users[b.customerUid] && users[b.customerUid].name) {
+        username = users[b.customerUid].name;
+      } else if (b.customer) {
+        for (const [uname, udata] of Object.entries(users)) {
+          if (udata.email && udata.email.replace(/^"|"$/g, '') === b.customer) {
+            username = uname;
+            break;
+          }
+        }
+      }
+      b.customerName = username;
+      // If no username found, show 'Unknown User' instead of 'Guest'
+      const displayName = username || b.customerName || b.customer || 'Unknown User';
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-id', id);
+      tr.innerHTML = `
+        <td>${displayName}</td>
+        <td>${b.productName || 'Unknown'}</td>
+        <td>${b.startDate || 'N/A'}</td>
+        <td>${b.endDate || 'N/A'}</td>
+        <td>${b.venue || 'N/A'}</td>
+        <td>${b.location || 'N/A'}</td>
+        <td>${b.eventTime || 'N/A'}</td>
+        <td>${b.quantity || 1}</td>
+        <td>${b.totalPrice || '₱0'}</td>
+        <td>${b.paymentMethod || 'Not Selected'}</td>
+        <td>${b.installmentPlan || 'Not Selected'}</td>
+        <td>
+          <select class="status-select" data-id="${id}" style="padding: 4px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="Pending" ${b.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Confirmed" ${b.status === 'Confirmed' ? 'selected' : ''}>Confirmed</option>
+            <option value="Cancelled" ${b.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+            <option value="Completed" ${b.status === 'Completed' ? 'selected' : ''}>Completed</option>
+          </select>
+        </td>
+        <td>
+          <button class="view-booking" data-id="${id}" style="background: #0047AB; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin-right: 4px;">View</button>
+          <button class="delete-booking" data-id="${id}" style="background: #d32f2f; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">Delete</button>
+        </td>
+      `;
+      if (bookingsTbody) bookingsTbody.appendChild(tr);
+    });
+
+    // Load announcements
+    const announcements = await window.getAllAnnouncements() || {};
+    const annList = document.getElementById('announcementList');
+    if (annList) annList.innerHTML = '';
+    Object.entries(announcements).forEach(([id, a]) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${a.text} <button data-id="${id}" class="ann-action-btn edit" title="Edit"><i class="fas fa-pencil-alt"></i></button> <button data-id="${id}" class="ann-action-btn delete" title="Delete"><i class="fas fa-trash-alt"></i></button>`;
+      if (annList) annList.appendChild(li);
+    });
+
+    // Load services
+    const services = await window.getAllServices() || {};
+    const servicesTbody = document.querySelector('.card:nth-of-type(4) tbody');
+    if (servicesTbody) servicesTbody.innerHTML = '';
+    Object.entries(services).forEach(([id, s]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${s.name || ''}</td><td>₱${s.price || ''}</td><td><button data-id="${id}" class="edit-service">Edit</button> <button data-id="${id}" class="del-service">Delete</button></td>`;
+      if (servicesTbody) servicesTbody.appendChild(tr);
+    });
+
+    // Count bookings by status
+    let statusCounts = { Pending: 0, Confirmed: 0, Cancelled: 0, Completed: 0 };
+    Object.values(bookings).forEach(b => {
+      if (statusCounts[b.status] !== undefined) statusCounts[b.status]++;
+    });
+    // Render pie chart using Google Charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+      const data = google.visualization.arrayToDataTable([
+        ['Status', 'Count'],
+        ...Object.entries(statusCounts)
+      ]);
+      const options = {
+        pieHole: 0.4,
+        legend: { position: 'bottom' },
+        colors: ['#FF9800', '#4CAF50', '#F44336', '#2196F3']
+      };
+      const chart = new google.visualization.PieChart(document.getElementById('piechart'));
+      chart.draw(data, options);
+    }
+    // --- Live Preview Table and CSV Download ---
+    const livePreviewHeader = document.getElementById('livePreviewHeader');
+    const livePreviewBody = document.getElementById('livePreviewBody');
+    if (livePreviewHeader) livePreviewHeader.innerHTML = '';
+    if (livePreviewBody) livePreviewBody.innerHTML = '';
+    
+    // Define columns to exclude from live preview
+    const excludedColumns = [
+      'gcashNumber',
+      'paymentAmount', 
+      'paymentCompletedAt',
+      'paymentInitiatedAt',
+      'paymentPlan',
+      'paymentReference',
+      'paymentStatus',
+      'receiptUploaded',
+      'updatedAt'
+    ];
+    
+    // Get all unique keys for header, excluding unwanted columns
+    const allKeys = new Set();
+    Object.values(bookings).forEach(b => {
+      Object.keys(b).forEach(k => {
+        if (!excludedColumns.includes(k)) {
+          allKeys.add(k);
+        }
+      });
+    });
+    const headerKeys = Array.from(allKeys);
+    
+    if (livePreviewHeader) {
+      headerKeys.forEach(k => {
+        const th = document.createElement('th');
+        // Convert column names to more readable format
+        let displayName = k;
+        if (k === 'installmentPlan') {
+          displayName = 'Payment Plan';
+        } else if (k === 'paymentMethod') {
+          displayName = 'Payment Method';
+        } else if (k === 'productName') {
+          displayName = 'Product';
+        } else if (k === 'startDate') {
+          displayName = 'Start Date';
+        } else if (k === 'endDate') {
+          displayName = 'End Date';
+        } else if (k === 'eventTime') {
+          displayName = 'Event Time';
+        } else if (k === 'totalPrice') {
+          displayName = 'Total Price';
+        } else if (k === 'customerName') {
+          displayName = 'Customer Name';
+        }
+        th.textContent = displayName;
+        livePreviewHeader.appendChild(th);
+      });
+    }
+    
+    Object.values(bookings).forEach(b => {
+      if (livePreviewBody) {
+        const trPreview = document.createElement('tr');
+        headerKeys.forEach(k => {
+          const td = document.createElement('td');
+          td.textContent = b[k] !== undefined ? b[k] : '';
+          trPreview.appendChild(td);
+        });
+        livePreviewBody.appendChild(trPreview);
+      }
+    });
+    // --- CSV Download ---
+    const downloadBtn = document.getElementById('downloadCsvBtn');
+    if (downloadBtn) {
+      downloadBtn.onclick = function() {
+        const rows = [headerKeys];
+        Object.values(bookings).forEach(b => {
+          rows.push(headerKeys.map(k => b[k] !== undefined ? b[k] : ''));
+        });
+        const csvContent = rows.map(e => e.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'bookings.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+    }
+  }
+
+  async function loadBundles() {
+    const bundles = await window.getAllBundles() || {};
+    const services = await window.getAllServices() || {};
+    // Populate bundles table
+    const bundlesTbody = document.getElementById('bundlesTbody');
+    if (bundlesTbody) bundlesTbody.innerHTML = '';
+    Object.entries(bundles).forEach(([id, b]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${b.name || ''}</td><td>₱${b.price || ''}</td><td>${(b.services||[]).join(', ')}</td><td><button class="edit-bundle" data-id="${id}">Edit</button> <button class="del-bundle" data-id="${id}">Delete</button></td>`;
+      if (bundlesTbody) bundlesTbody.appendChild(tr);
+    });
+    // Populate services checkboxes for bundle creation
+    const bundleServicesSelect = document.getElementById('bundleServicesSelect');
+    if (bundleServicesSelect) bundleServicesSelect.innerHTML = '';
+    Object.values(services).forEach(s => {
+      const label = document.createElement('label');
+      label.style.marginRight = '8px';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = s.name;
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(' ' + s.name));
+      if (bundleServicesSelect) bundleServicesSelect.appendChild(label);
+    });
+  }
+
+  const origLoadDashboard = loadDashboard;
+  loadDashboard = async function() {
+    await origLoadDashboard();
+    await loadBundles();
+  }
+
+  // TODO: Add event listeners for add/edit/delete actions for announcements and services
+
+  // --- Bookings Management ---
+  document.addEventListener('change', async function(e) {
+    // Update booking status
+    if (e.target && e.target.classList.contains('status-select')) {
+      const bookingId = e.target.getAttribute('data-id');
+      const newStatus = e.target.value;
+
+      try {
+        // If status is being set to Cancelled, restore stock
+        if (newStatus === 'Cancelled') {
+          // Get booking details
+          const bookingSnap = await firebase.database().ref(`bookings/${bookingId}`).once('value');
+          const booking = bookingSnap.val();
+          if (booking) {
+            const isBundle = booking.productType === 'bundle';
+            const refPath = isBundle ? `bundles/${booking.productId}` : `services/${booking.productId}`;
+            const prodSnap = await firebase.database().ref(refPath).once('value');
+            const prod = prodSnap.val();
+            if (prod) {
+              const newAvailable = (prod.available || 0) + (booking.quantity || 1);
+              await firebase.database().ref(refPath + '/available').set(newAvailable);
+            }
+          }
+        }
+        await firebase.database().ref(`bookings/${bookingId}/status`).set(newStatus);
+        console.log(`Booking ${bookingId} status updated to ${newStatus}`);
+      } catch (error) {
+        console.error('Error updating booking status:', error);
+        alert('Error updating booking status. Please try again.');
+      }
+    }
+  });
+
+  // --- Announcements ---
+  document.addEventListener('click', async function(e) {
+    // Add announcement
+    if (e.target && e.target.textContent === 'Add' && e.target.previousElementSibling && e.target.previousElementSibling.placeholder === 'Add new announcement') {
+      const input = e.target.previousElementSibling;
+      const text = input.value.trim();
+      if (text) {
+        await window.addAnnouncement(text);
+        input.value = '';
+        loadDashboard();
+      }
+    }
+    // Edit announcement
+    if (e.target && (e.target.classList.contains('edit') || (e.target.closest('button') && e.target.closest('button').classList.contains('edit')))) {
+      const btn = e.target.closest('button');
+      const id = btn.getAttribute('data-id');
+      const currentText = btn.parentElement.firstChild.textContent.trim();
+      const newText = prompt('Edit announcement:', currentText);
+      if (newText && newText !== currentText) {
+        await window.updateAnnouncement(id, newText);
+        loadDashboard();
+      }
+    }
+    // Delete announcement
+    if (e.target && (e.target.classList.contains('delete') || (e.target.closest('button') && e.target.closest('button').classList.contains('delete')))) {
+      const btn = e.target.closest('button');
+      const id = btn.getAttribute('data-id');
+      if (confirm('Delete this announcement?')) {
+        await window.deleteAnnouncement(id);
+        loadDashboard();
+      }
+    }
+    // Add service
+    if (e.target && e.target.id === 'addServiceBtn') {
+      const name = document.getElementById('serviceName').value.trim();
+      const price = document.getElementById('servicePrice').value.trim();
+      if (name && price) {
+        await window.addService({ name, price });
+        document.getElementById('serviceName').value = '';
+        document.getElementById('servicePrice').value = '';
+        loadDashboard();
+      }
+    }
+    // Edit service
+    if (e.target && e.target.classList.contains('edit-service')) {
+      const id = e.target.getAttribute('data-id');
+      const tr = e.target.closest('tr');
+      const currentName = tr.children[0].textContent.trim();
+      const currentPrice = tr.children[1].textContent.replace('₱','').trim();
+      const newName = prompt('Edit service name:', currentName);
+      if (newName === null) return;
+      const newPrice = prompt('Edit service price:', currentPrice);
+      if (newPrice === null) return;
+      if ((newName !== currentName || newPrice !== currentPrice) && newName && newPrice) {
+        await window.updateService(id, { name: newName, price: newPrice });
+        loadDashboard();
+      }
+    }
+    // Delete service
+    if (e.target && e.target.classList.contains('del-service')) {
+      const id = e.target.getAttribute('data-id');
+      if (confirm('Delete this service?')) {
+        await window.deleteService(id);
+        loadDashboard();
+      }
+    }
+    // Add bundle
+    if (e.target && e.target.id === 'addBundleBtn') {
+      const name = document.getElementById('bundleName').value.trim();
+      const price = document.getElementById('bundlePrice').value.trim();
+      const services = Array.from(document.querySelectorAll('#bundleServicesSelect input[type=checkbox]:checked')).map(cb => cb.value);
+      if (name && price && services.length) {
+        await window.addBundle({ name, price, services });
+        document.getElementById('bundleName').value = '';
+        document.getElementById('bundlePrice').value = '';
+        document.querySelectorAll('#bundleServicesSelect input[type=checkbox]').forEach(cb => cb.checked = false);
+        loadBundles();
+      }
+    }
+    // Edit bundle
+    if (e.target && e.target.classList.contains('edit-bundle')) {
+      const id = e.target.getAttribute('data-id');
+      const bundles = await window.getAllBundles() || {};
+      const bundle = bundles[id];
+      if (!bundle) return;
+      const newName = prompt('Edit bundle name:', bundle.name);
+      if (newName === null) return;
+      const newPrice = prompt('Edit bundle price:', bundle.price);
+      if (newPrice === null) return;
+      // For services, simple prompt for comma-separated list
+      const newServices = prompt('Edit included services (comma separated):', (bundle.services||[]).join(', '));
+      if (newName && newPrice && newServices) {
+        await window.updateBundle(id, { name: newName, price: newPrice, services: newServices.split(',').map(s => s.trim()).filter(Boolean) });
+        loadBundles();
+      }
+    }
+    // Delete bundle
+    if (e.target && e.target.classList.contains('del-bundle')) {
+      const id = e.target.getAttribute('data-id');
+      if (confirm('Delete this bundle?')) {
+        await window.deleteBundle(id);
+        loadBundles();
+      }
+    }
+    // View booking details
+    if (e.target && e.target.classList.contains('view-booking')) {
+      const id = e.target.getAttribute('data-id');
+      const bookings = await window.getAllBookings() || {};
+      const booking = bookings[id];
+      if (booking) {
+        await showBookingDetails(booking);
+      }
+    }
+    // Delete booking
+    if (e.target && e.target.classList.contains('delete-booking')) {
+      e.stopPropagation(); // Prevent event from bubbling up to row click
+      const id = e.target.getAttribute('data-id');
+      showDeleteBookingConfirm(id);
+    }
+  });
+
+  // Remove the extra input row and 'Add Service' button above the main add service row
+  // Find and remove the input and button elements with placeholder 'New service name' and 'Price' and the button with text 'Add Service'
+  document.addEventListener('DOMContentLoaded', function() {
+    // Remove the extra add service row if it exists
+    const servicesCard = document.querySelector('.card:nth-of-type(4)');
+    const inputs = servicesCard.querySelectorAll('input');
+    inputs.forEach(input => {
+      if (input.placeholder === 'New service name' || input.placeholder === 'Price') {
+        input.remove();
+      }
+    });
+    const addServiceBtn = Array.from(servicesCard.querySelectorAll('button')).find(btn => btn.textContent === 'Add');
+    if (addServiceBtn) addServiceBtn.remove();
+  });
+
+  // Replace toggleMenu with homepage version
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    bars.classList.toggle('active');
+  }
+
+  function logout() {
+    // clear sessionStorage or tokens if any
+    alert("You have been logged out.");
+  }
+
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (!menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
+  // Modal for booking details
+  function showBookingModal(booking) {
+    let modal = document.getElementById('bookingModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bookingModal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(0,0,0,0.4)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '2000';
+      modal.innerHTML = `<div style="background:#fff;padding:30px 40px;border-radius:10px;min-width:300px;max-width:90vw;box-shadow:0 2px 16px #0003;position:relative;">
+        <button id="closeBookingModal" style="position:absolute;top:10px;right:10px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
+        <h3>Booking Details</h3>
+        <div id="bookingModalContent"></div>
+      </div>`;
+      document.body.appendChild(modal);
+      modal.querySelector('#closeBookingModal').onclick = () => { modal.style.display = 'none'; };
+    }
+    // Fill modal content
+    const content = modal.querySelector('#bookingModalContent');
+    content.innerHTML = Object.entries(booking).map(([k,v]) => `<b>${k}:</b> ${v}<br>`).join('');
+    modal.style.display = 'flex';
+  }
+
+  // Function to show booking details
+  async function showBookingDetails(booking) {
+    let modal = document.getElementById('bookingDetailsModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'bookingDetailsModal';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(0,0,0,0.4)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '2000';
+      document.body.appendChild(modal);
+    }
+
+    // Get customer name from users node if available
+    let customerDisplayName = booking.customerName || booking.customer || 'Unknown User';
+    if (booking.customerUid) {
+      try {
+        const userSnap = await firebase.database().ref(`users/${booking.customerUid}`).once('value');
+        const userData = userSnap.val();
+        if (userData && userData.name) {
+          customerDisplayName = userData.name;
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+
+    const bookingDate = new Date(booking.timestamp).toLocaleString();
+    modal.innerHTML = `
+      <div style="background:#fff;padding:30px 40px;border-radius:10px;min-width:400px;max-width:90vw;box-shadow:0 2px 16px #0003;position:relative;">
+        <button onclick="closeBookingDetails()" style="position:absolute;top:10px;right:10px;font-size:18px;background:none;border:none;cursor:pointer;">&times;</button>
+        <h3 style="color:#0047AB;margin-bottom:20px;">Booking Details</h3>
+        <div style="line-height:1.8;">
+          <p><strong>Customer:</strong> ${customerDisplayName}</p>
+          <p><strong>Product:</strong> ${booking.productName}</p>
+          <p><strong>Start Date:</strong> ${booking.startDate}</p>
+          <p><strong>End Date:</strong> ${booking.endDate}</p>
+          <p><strong>Venue:</strong> ${booking.venue || 'N/A'}</p>
+          <p><strong>Location:</strong> ${booking.location || 'N/A'}</p>
+          <p><strong>Event Time:</strong> ${booking.eventTime || 'N/A'}</p>
+          <p><strong>Quantity:</strong> ${booking.quantity}</p>
+          <p><strong>Total Price:</strong> ${booking.totalPrice}</p>
+          <p><strong>Status:</strong> <span style="color:${getStatusColor(booking.status)};font-weight:bold;">${booking.status}</span></p>
+          <p><strong>Booking Date:</strong> ${bookingDate}</p>
+          <p><strong>Product Type:</strong> ${booking.productType}</p>
+        </div>
+      </div>
+    `;
+    modal.style.display = 'flex';
+  }
+
+  function closeBookingDetails() {
+    const modal = document.getElementById('bookingDetailsModal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  function getStatusColor(status) {
+    switch(status) {
+      case 'Confirmed': return '#4CAF50';
+      case 'Pending': return '#FF9800';
+      case 'Cancelled': return '#F44336';
+      case 'Completed': return '#2196F3';
+      default: return '#000';
+    }
+  }
+
+  // Custom delete booking confirmation popup
+  function showDeleteBookingConfirm(bookingId) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      ">
+        <div style="margin-bottom: 20px;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff6b6b; margin-bottom: 15px;"></i>
+          <h3 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.3rem;">Delete Booking</h3>
+          <p style="margin-bottom: 20px; line-height: 1.5; color: #333;">Are you sure you want to delete this booking? This action cannot be undone.</p>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button onclick="closeDeleteBookingConfirm()" style="
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+          ">Cancel</button>
+          <button onclick="confirmDeleteBooking('${bookingId}')" style="
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+          ">Delete</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+
+  function closeDeleteBookingConfirm() {
+    const modal = document.querySelector('div[style*="position: fixed"][style*="z-index: 9999"]');
+    if (modal) modal.remove();
+  }
+
+  async function confirmDeleteBooking(bookingId) {
+    try {
+      await firebase.database().ref(`bookings/${bookingId}`).remove();
+      console.log(`Booking ${bookingId} deleted`);
+      
+      // Show success message
+      showSuccessMessage('Booking deleted successfully!');
+      
+      // Close the confirmation modal
+      closeDeleteBookingConfirm();
+      
+      // Reload dashboard
+      loadDashboard();
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      showErrorMessage('Error deleting booking. Please try again.');
+    }
+  }
+
+  // Success message popup
+  function showSuccessMessage(message) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+    `;
+    
+    modal.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.remove();
+      }
+    }, 3000);
+  }
+
+  // Error message popup
+  function showErrorMessage(message) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10000;
+      animation: slideIn 0.3s ease;
+    `;
+    
+    modal.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      if (modal.parentNode) {
+        modal.remove();
+      }
+    }, 3000);
+  }
+
+  // Function to get all bookings
+  window.getAllBookings = async function() {
+    try {
+      const snapshot = await firebase.database().ref('bookings').once('value');
+      return snapshot.val() || {};
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      return {};
+    }
+  };
+
+  // Booking row click event
+  document.addEventListener('click', function(e) {
+    // Don't trigger row click if clicking on delete button
+    if (e.target && e.target.classList.contains('delete-booking')) {
+      return;
+    }
+    
+    const tr = e.target.closest('tr[data-id]');
+    if (tr && tr.parentElement.parentElement.parentElement.previousElementSibling && tr.parentElement.parentElement.parentElement.previousElementSibling.textContent.includes('Bookings')) {
+      const bookingId = tr.getAttribute('data-id');
+      window.getAllBookings().then(bookings => {
+        if (bookings && bookings[bookingId]) {
+          showBookingDetails(bookings[bookingId]);
+        }
+      });
+    }
+  });
+</script>
+
+<script>
+let editingAnnouncementId = null;
+let isAdminLoggedIn = false;
+
+function showAdminAnnouncementInput(text = '', id = null) {
+  console.log('showAdminAnnouncementInput called with:', text, id);
+  if (!isAdminLoggedIn) {
+    console.log('Not logged in as admin');
+    return;
+  }
+  const inputRow = document.getElementById('adminAnnouncementInputRow');
+  const input = document.getElementById('adminAnnouncementInput');
+  if (!inputRow || !input) {
+    console.error('Required elements not found:', { inputRow: !!inputRow, input: !!input });
+    return;
+  }
+  inputRow.style.display = 'flex';
+  input.value = text;
+  editingAnnouncementId = id;
+  input.focus();
+  console.log('Input row shown, editing ID set to:', editingAnnouncementId);
+}
+function hideAdminAnnouncementInput() {
+  document.getElementById('adminAnnouncementInputRow').style.display = 'none';
+  document.getElementById('adminAnnouncementInput').value = '';
+  editingAnnouncementId = null;
+}
+function submitAdminAnnouncement() {
+  if (!isAdminLoggedIn) return;
+  const text = document.getElementById('adminAnnouncementInput').value.trim();
+  if (!text) return alert('Please enter an announcement.');
+  if (!window.db || !window.currentUser) return alert('Not logged in.');
+  const ref = window.db.ref('announcements');
+  if (editingAnnouncementId) {
+    ref.child(editingAnnouncementId).update({ text }).then(hideAdminAnnouncementInput);
+  } else {
+    ref.push({
+      text,
+      author: window.currentUser.displayName || window.currentUser.email,
+      authorId: window.currentUser.uid,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    }).then(hideAdminAnnouncementInput);
+  }
+}
+function deleteAdminAnnouncement(id) {
+  if (!isAdminLoggedIn) return;
+  
+  // Create custom popup
+  const popup = document.createElement('div');
+  popup.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  `;
+  
+  popup.innerHTML = `
+    <div style="
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 90%;
+    ">
+      <h3 style="color: #0047AB; margin-bottom: 20px;">Delete Announcement</h3>
+      <p style="margin-bottom: 25px; font-size: 16px;">Are you sure you want to delete this announcement?</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="yesDelete" style="
+          background: #d32f2f;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: bold;
+        ">Yes</button>
+        <button id="noDelete" style="
+          background: #6c757d;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 6px;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: bold;
+        ">No</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(popup);
+  
+  // Add event listeners
+  popup.querySelector('#yesDelete').onclick = () => {
+    window.db.ref('announcements').child(id).remove();
+    document.body.removeChild(popup);
+  };
+  
+  popup.querySelector('#noDelete').onclick = () => {
+    document.body.removeChild(popup);
+  };
+  
+  // Close on background click
+  popup.onclick = (e) => {
+    if (e.target === popup) {
+      document.body.removeChild(popup);
+    }
+  };
+}
+function editAdminAnnouncement(id, text) {
+  console.log('editAdminAnnouncement called with:', id, text);
+  if (!isAdminLoggedIn) {
+    console.log('Not logged in as admin');
+    return;
+  }
+  showAdminAnnouncementInput(text, id);
+}
+function updateAnnouncementUIState() {
+  const addBtn = document.querySelector('.admin-announcement-add-btn');
+  const inputRow = document.getElementById('adminAnnouncementInputRow');
+  if (!isAdminLoggedIn) {
+    if (addBtn) addBtn.disabled = true;
+    if (inputRow) inputRow.style.display = 'none';
+    // Hide all edit/delete buttons
+    document.querySelectorAll('.edit-btn, .delete-btn').forEach(btn => {
+      btn.style.display = 'none';
+    });
+    // Show friendly message
+    const list = document.getElementById('adminAnnouncementsList');
+    if (list && list.children.length === 0) {
+      list.innerHTML = '<li style="color:#888;text-align:center;">Log in as admin to manage announcements.</li>';
+    }
+  } else {
+    if (addBtn) addBtn.disabled = false;
+    // Show all edit/delete buttons
+    document.querySelectorAll('.edit-btn, .delete-btn').forEach(btn => {
+      btn.style.display = '';
+    });
+  }
+}
+function loadAdminAnnouncements() {
+  if (!window.db) return;
+  window.db.ref('announcements').orderByChild('timestamp').on('value', snap => {
+    const announcements = snap.val() || {};
+    const list = document.getElementById('adminAnnouncementsList');
+    list.innerHTML = '';
+    Object.entries(announcements)
+      .sort((a, b) => b[1].timestamp - a[1].timestamp)
+      .forEach(([id, ann]) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${ann.text}</span>
+          <span class="admin-announcement-actions">
+            <button class="edit-btn" title="Edit" onclick="editAdminAnnouncement('${id}', '${ann.text.replace(/'/g, "\\'")}')"><i class="fas fa-pencil-alt"></i></button>
+            <button class="delete-btn" title="Delete" onclick="deleteAdminAnnouncement('${id}')"><i class="fas fa-trash"></i></button>
+          </span>
+        `;
+        list.appendChild(li);
+      });
+    updateAnnouncementUIState();
+  });
+}
+// Listen for auth state changes and update UI accordingly
+if (window.firebase && firebase.auth) {
+  firebase.auth().onAuthStateChanged(function(user) {
+    window.currentUser = user;
+    isAdminLoggedIn = !!user;
+    updateAnnouncementUIState();
+  });
+}
+window.addEventListener('DOMContentLoaded', loadAdminAnnouncements);
+</script>
+
+<script>
+// Excel download logic
+function downloadBookingsExcel() {
+  const table = document.getElementById('livePreviewTable');
+  if (!table) return alert('No data to export.');
+  // Convert table to worksheet
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(table);
+  XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
+  XLSX.writeFile(wb, 'bookings.xlsx');
+}
+// Attach event listener after DOM is loaded
+window.addEventListener('DOMContentLoaded', function() {
+  const excelBtn = document.getElementById('downloadExcelBtn');
+  if (excelBtn) excelBtn.onclick = downloadBookingsExcel;
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-section {
+            background: #2a2a2a;
+            min-height: 25vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            width: 65px;
+            height: 65px;
+            background: rgba(173, 216, 230, 0.9);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(173, 216, 230, 1);
+            transform: scale(1.05);
+        }
+
+        .back-button::before {
+            content: '←';
+            color: #2a2a2a;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .soundwave-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .soundwave-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .form-section {
+            background: white;
+            flex: 1;
+            padding: 60px 50px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+            margin-top: -40px;
+            position: relative;
+            z-index: 5;
+            min-height: 75vh;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1e5aa8;
+            margin-bottom: 25px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 20px;
+            font-weight: 400;
+        }
+
+        .subtitle a {
+            color: #1e5aa8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .subtitle a:hover {
+            text-decoration: underline;
+        }
+
+        .form-group {
+            margin-bottom: 40px;
+        }
+
+        .form-label {
+            display: block;
+            color: #999;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 26px 32px;
+            border: none;
+            background: #b8d4f0;
+            border-radius: 30px;
+            font-size: 20px;
+            color: #333;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            background: #a8c8e8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 90, 168, 0.15);
+        }
+
+        .form-input::placeholder {
+            color: #666;
+        }
+
+        .form-input[type="date"] {
+            color: #666;
+        }
+
+        .form-input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.5);
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 28px;
+            background: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 35px;
+        }
+
+        .submit-button:hover {
+            background: #34495e;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 62, 80, 0.3);
+        }
+
+        .submit-button:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-section {
+                min-height: 20vh;
+            }
+
+            .back-button {
+                top: 20px;
+                left: 20px;
+                width: 55px;
+                height: 55px;
+            }
+
+            .back-button::before {
+                font-size: 24px;
+            }
+
+            .form-section {
+                padding: 45px 35px;
+                margin-top: -30px;
+                border-top-left-radius: 30px;
+                border-top-right-radius: 30px;
+                min-height: 80vh;
+            }
+
+            .form-container {
+                max-width: 600px;
+            }
+
+            .title {
+                font-size: 40px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .form-input {
+                padding: 22px 26px;
+                font-size: 18px;
+                border-radius: 28px;
+            }
+
+            .submit-button {
+                padding: 24px;
+                font-size: 20px;
+                border-radius: 28px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header-section {
+                min-height: 18vh;
+            }
+
+            .form-section {
+                padding: 35px 25px;
+                margin-top: -25px;
+                border-top-left-radius: 25px;
+                border-top-right-radius: 25px;
+                min-height: 82vh;
+            }
+
+            .form-container {
+                max-width: 100%;
+            }
+
+            .title {
+                font-size: 32px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 30px;
+            }
+
+            .form-input {
+                padding: 18px 22px;
+                border-radius: 20px;
+                font-size: 16px;
+            }
+
+            .submit-button {
+                padding: 20px;
+                border-radius: 20px;
+                font-size: 17px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .header-section {
+                min-height: 30vh;
+            }
+
+            .back-button {
+                width: 70px;
+                height: 70px;
+                top: 35px;
+                left: 35px;
+            }
+
+            .back-button::before {
+                font-size: 30px;
+            }
+
+            .form-section {
+                padding: 70px 60px;
+                min-height: 70vh;
+            }
+
+            .title {
+                font-size: 54px;
+            }
+
+            .subtitle {
+                font-size: 22px;
+            }
+
+            .form-container {
+                max-width: 800px;
+            }
+
+            .form-input {
+                padding: 28px 34px;
+                font-size: 21px;
+                border-radius: 32px;
+            }
+
+            .submit-button {
+                padding: 30px;
+                font-size: 24px;
+                border-radius: 32px;
+            }
+        }
+
+        /* Loading state */
+        .submit-button.loading {
+            opacity: 0.8;
+            cursor: not-allowed;
+        }
+
+        .submit-button.loading::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Focus accessibility */
+        .back-button:focus,
+        .form-input:focus,
+        .submit-button:focus {
+            outline: 2px solid #1e5aa8;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        
+        <div class="soundwave-container">
+            <img src="images/soundwavess.png" alt="Sound waves" class="soundwave-image">
+        </div>
+    </div>
+
+    <div class="form-section">
+        <div class="form-container">
+            <div class="form-header">
+                <h1 class="title">Create new<br>Account</h1>
+                <p class="subtitle">Already Registered? <a href="login.html" onclick="showLogin()">Log in here.</a></p>
+                <p style="color:#d32f2f; font-size:15px; margin-top:10px;">Note: Your email cannot be changed after registration. Please use a permanent email address.</p>
+            </div>
+            
+            <form id="signupForm">
+                <div class="form-group">
+                    <label class="form-label" for="name">USERNAME</label>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="Username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">EMAIL</label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="abc@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="phone">PHONE NUMBER</label>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 18px; color: #333;">+63</span>
+                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="9123456789" required pattern="[0-9]{10}" maxlength="10" style="flex: 1;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="password">PASSWORD</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••" required minlength="6">
+                </div>
+                
+                <button type="submit" class="submit-button" id="submitBtn">Sign up</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    function goBack() {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            alert('Going back to previous page...');
+        }
+    }
+
+    function showLogin() {
+        alert('Redirecting to login page...');
+    }
+
+    // Form validation
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.checkValidity()) {
+                this.style.background = '#a8d4a8';
+                setTimeout(() => {
+                    this.style.background = '#b8d4f0';
+                }, 1000);
+            }
+        });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            goBack();
+        }
+    });
+    </script>
+
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<!-- Firebase Auth -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<!-- Firebase Database -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
+<!-- Your Firebase config and backend logic -->
+<script src="firebase-config-new.js"></script>
+<script src="firebase-backend-new.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('signupForm');
+      if (form) {
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
+          const phone = document.getElementById('phone').value.trim();
+          const username = document.getElementById('name').value.trim();
+          const submitBtn = document.getElementById('submitBtn');
+          let errorDiv = document.getElementById('registerError');
+          if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.id = 'registerError';
+            errorDiv.style.color = '#d32f2f';
+            errorDiv.style.fontSize = '15px';
+            errorDiv.style.marginBottom = '10px';
+            form.insertBefore(errorDiv, submitBtn);
+          }
+          errorDiv.textContent = '';
+
+          // Basic validation for phone (Philippines, must be 10 digits after +63, starts with 9)
+          const phonePattern = /^9\d{9}$/;
+          if (!phonePattern.test(phone)) {
+            errorDiv.textContent = 'Please enter a valid Philippine mobile number (e.g., 9123456789).';
+            return;
+          }
+
+          submitBtn.classList.add('loading');
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Creating Account...';
+
+          // 1. Check if username is already taken
+          firebase.database().ref('users/' + username).once('value')
+            .then(snapshot => {
+              if (snapshot.exists()) {
+                throw new Error('Username already taken. Please choose another.');
+              }
+              // 2. Check if phone number is already used
+              return firebase.database().ref('users').orderByChild('phone').equalTo('+63' + phone).once('value');
+            })
+            .then(snapshot => {
+              if (snapshot.exists()) {
+                throw new Error('Phone number is already registered. Please use another phone number or log in.');
+              }
+              // 3. Register user with email/password
+              return firebase.auth().createUserWithEmailAndPassword(email, password);
+            })
+            .then(userCredential => {
+              const user = userCredential.user;
+              // Send email verification
+              return user.sendEmailVerification().then(() => {
+                // 4. Save user profile under users/{uid}
+                const userProfile = firebase.database().ref('users/' + user.uid).set({
+                  name: username,
+                  phone: '+63' + phone,
+                  email: email
+                });
+                // 5. Save username mapping for login: users/{username} → { email, phone }
+                const usernameMap = firebase.database().ref('users/' + username).set({
+                  email: email,
+                  phone: '+63' + phone
+                });
+                return Promise.all([userProfile, usernameMap]);
+              });
+            })
+            .then(() => {
+              localStorage.setItem('userPassword', password);
+              submitBtn.classList.remove('loading');
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Sign up';
+              alert('Account created successfully! A verification email has been sent. Please verify your email before logging in.');
+              window.location.href = 'login.html';
+            })
+            .catch(error => {
+              if (error.code === 'auth/email-already-in-use') {
+                errorDiv.textContent = 'Email is already registered. Please use another email or log in.';
+              } else if (error.message && error.message.includes('Username already taken')) {
+                errorDiv.textContent = 'Username already taken. Please choose another.';
+              } else if (error.message && error.message.includes('Phone number is already registered')) {
+                errorDiv.textContent = 'Phone number is already registered. Please use another phone number or log in.';
+              } else {
+                errorDiv.textContent = error.message;
+              }
+              submitBtn.classList.remove('loading');
+              submitBtn.disabled = false;
+              submitBtn.textContent = 'Sign up';
+            });
+        });
+      }
+    });
+    </script>
+</body>
+</html>

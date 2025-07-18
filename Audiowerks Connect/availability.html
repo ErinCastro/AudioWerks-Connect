@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipment Availability - Audiowerks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="floating-chat.css" />
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      background: #ffffff;
+      color: #333;
+    }
+    .header {
+        background: #002244;
+        color: #ffffff;
+        padding: 15px 30px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        position: relative;
+    }
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid #3b82f6;
+    }
+    .user-icon {
+        width: 30px;
+        height: 30px;
+        background: #1e3a8a;
+        border-radius: 50%;
+        position: relative;
+    }
+    .user-icon::before {
+        content: '';
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-radius: 50%;
+        top: 6px;
+        left: 9px;
+    }
+    .user-icon::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 10px;
+        background: white;
+        border-radius: 10px 10px 0 0;
+        bottom: 4px;
+        left: 5px;
+    }
+    .user-info h3 {
+        font-size: 16px;
+        margin-bottom: 3px;
+    }
+    .user-info p {
+        font-size: 12px;
+        opacity: 0.8;
+    }
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+        background-blend-mode: lighten;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .logo-container img {
+        height: 70px;
+        cursor: pointer;
+    }
+    .logo-container a {
+        display: inline-block;
+    }
+    .header-center {
+        text-align: center;
+        flex: 1;
+    }
+    .header-icons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .header-icons i {
+        font-size: 28px;
+        color: #000;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .header-icons i:hover {
+        transform: scale(1.2);
+    }
+    .menu-popup {
+        display: none;
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        z-index: 1000;
+        min-width: 200px;
+        transition: all 0.3s ease;
+    }
+    .menu-popup a {
+        display: block;
+        padding: 10px 15px;
+        color: #000;
+        text-decoration: none;
+        border-bottom: 1px solid #eee;
+    }
+    .menu-popup a:hover {
+        background-color: #f0f0f0;
+    }
+    .menu-popup a:last-child {
+        background-color: #191970;
+        color: #fff;
+        border-bottom: none;
+        transition: background 0.3s ease, transform 0.2s;
+    }
+    .menu-popup a:last-child:hover {
+        background-color: #000080;
+        transform: scale(1.02);
+    }
+    .fa-bars {
+        transition: transform 0.3s;
+    }
+    .fa-bars.active {
+        transform: rotate(90deg);
+    }
+    .white-divider {
+        border: none;
+        height: 6px;
+        background: #fff;
+        border-radius: 3px;
+        margin: 18px 0 28px 0;
+        width: 100%;
+        box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+    }
+    .tab-bar {
+      background: #002244;
+      display: flex;
+      align-items: center;
+      padding: 0 0 0 0;
+      height: 56px;
+      border-bottom: 4px solid #fff;
+    }
+    .tab-bar .tab {
+      font-family: 'Georgia', serif;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #fff;
+      background: none;
+      border: none;
+      outline: none;
+      margin: 0 18px 0 36px;
+      cursor: pointer;
+      padding: 0 12px;
+      transition: color 0.2s;
+    }
+    .tab-bar .tab.selected {
+      color: #fff;
+      border-bottom: 0;
+    }
+    .tab-bar .tab-light {
+      background: #b0b6be;
+      color: #fff;
+      border-radius: 22px;
+      font-size: 1.5rem;
+      margin-right: 12px;
+      padding: 4px 32px;
+      font-weight: bold;
+      border: none;
+    }
+    .tab-bar .tab-sound {
+      background: #c6ece7;
+      color: #fff;
+      border-radius: 22px;
+      font-size: 1.5rem;
+      margin-right: 12px;
+      padding: 4px 32px;
+      font-weight: bold;
+      border: none;
+    }
+    .section-title {
+      text-align: center;
+      font-size: 2.3rem;
+      font-weight: 700;
+      color: #0047AB;
+      margin: 36px 0 18px 0;
+      letter-spacing: 1px;
+    }
+
+    /* Polished Availability Page Styles */
+    .availability-header {
+      background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+      color: white;
+      padding: 40px 20px;
+      margin: 20px 0;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 71, 171, 0.3);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .main-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      margin: 0 0 10px 0;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      margin: 0 0 30px 0;
+      opacity: 0.9;
+    }
+
+    .status-legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .legend-badge {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid white;
+    }
+
+    .content-wrapper {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section-container {
+      margin: 40px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .section-description {
+      font-size: 1.1rem;
+      color: #666;
+      margin: 0;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #0047AB;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #666;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: #ccc;
+      margin-bottom: 15px;
+    }
+    .main-card, .bundle-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 18px rgba(0,34,68,0.08);
+      padding: 32px 18px 24px 18px;
+      margin: 0 auto 36px auto;
+      max-width: 1100px;
+    }
+    .main-table, .bundle-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 12px;
+      margin-top: 12px;
+    }
+    .main-table th, .bundle-table th {
+      background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+      color: white;
+      font-weight: 700;
+      padding: 18px 12px;
+      font-size: 1.1rem;
+      border-radius: 12px 12px 0 0;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .main-table td, .bundle-table td {
+      background: white;
+      padding: 20px 15px;
+      font-size: 1.08rem;
+      vertical-align: middle;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      border: 1px solid #f0f0f0;
+    }
+    .main-table tr:hover td, .bundle-table tr:hover td {
+      background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 71, 171, 0.15);
+      border-color: #0047AB;
+    }
+    .product-img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+      margin-right: 18px;
+      border: 2px solid #eaf1fb;
+      background: #e0e6ef;
+    }
+    .product-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #191970;
+      margin-bottom: 4px;
+    }
+    .product-desc {
+      font-size: 1rem;
+      color: #222;
+      margin-bottom: 0;
+    }
+    .product-title.unavailable, .product-desc.unavailable {
+      color: #b0b6be;
+      opacity: 0.7;
+    }
+    .status-badge {
+      display: inline-block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 20px;
+      border-radius: 20px;
+      margin-top: 6px;
+      margin-bottom: 0;
+      background: #b0b6be;
+      color: #fff;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+    .status-available {
+      background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+    }
+    .status-booked {
+      background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+    }
+    .status-sold-out {
+      background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+      color: #fff;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+    .status-sold-out::after {
+      content: "SOLD OUT";
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #dc3545;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 10px;
+      border: 2px solid white;
+    }
+    .sold-out-overlay {
+      position: relative;
+      opacity: 0.6;
+    }
+    .sold-out-overlay::before {
+      content: "SOLD OUT";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(220, 53, 69, 0.9);
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 8px 16px;
+      border-radius: 8px;
+      z-index: 10;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+    .status-label {
+      font-size: 0.98rem;
+      color: #0047AB;
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+    .inventory-info {
+      font-size: 1rem;
+      color: #0047AB;
+      font-weight: 600;
+    }
+    .product-image {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 3px solid #e0e0e0;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .product-image:hover {
+      transform: scale(1.15);
+      border-color: #0047AB;
+      box-shadow: 0 6px 20px rgba(0, 71, 171, 0.3);
+    }
+    .product-image.sold-out {
+      opacity: 0.5;
+      filter: grayscale(70%);
+      transform: scale(0.95);
+    }
+    footer {
+        background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+        color: white;
+        text-align: center;
+        padding: 25px 10px 15px;
+        margin-top: auto;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        position: relative;
+    }
+    .footer-social {
+        margin: 10px 0 5px;
+    }
+    .footer-social a {
+        color: #bccedf;
+        margin: 0 8px;
+        font-size: 1.5rem;
+        transition: color 0.2s;
+    }
+    .footer-social a:hover {
+        color: #ffc300;
+    }
+    .footer-contact span {
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    .footer-note {
+        margin: 8px 0 0;
+        font-size: 1rem;
+        color: #bccedf;
+    }
+    .back-to-top {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        background: #ffc300;
+        color: #191970;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: background 0.2s, color 0.2s;
+    }
+    .back-to-top:hover {
+        background: #191970;
+        color: #ffc300;
+    }
+    @media (max-width: 900px) {
+      .main-card, .bundle-card {
+        padding: 12px 2vw 12px 2vw;
+        max-width: 98vw;
+      }
+      .main-table td, .bundle-table td {
+        font-size: 0.98rem;
+        padding: 12px 4px;
+      }
+      .product-img {
+        width: 60px;
+        height: 60px;
+      }
+    }
+    @media (max-width: 600px) {
+      .main-table, .bundle-table {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+      }
+      .main-table thead, .main-table tbody, .main-table tr,
+      .bundle-table thead, .bundle-table tbody, .bundle-table tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .main-card, .bundle-card {
+        padding: 6px 0 6px 0;
+      }
+      .section-title {
+        font-size: 1.3rem;
+      }
+      .product-image {
+        width: 50px;
+        height: 50px;
+      }
+      .main-title {
+        font-size: 2rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      .status-legend {
+        gap: 15px;
+      }
+      .legend-item {
+        font-size: 0.85rem;
+      }
+      .availability-header {
+        padding: 30px 15px;
+        margin: 15px 0;
+      }
+      .content-wrapper {
+        padding: 0 15px;
+      }
+    }
+
+    /* --- FLOATING CHAT STYLES START --- */
+    /* --- FLOATING CHAT STYLES END --- */
+
+    .header {
+      background-color: #002244; /* Deep Navy Blue */
+      color: white;
+    }
+    .header-icons {
+      z-index: 2000;
+    }
+    .header-icons i {
+      pointer-events: auto;
+      z-index: 2001;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <a href="homepage.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" style="height: 70px;" /></a>
+    </div>
+    <div class="header-center">
+      <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
+      <p style="font-size: 1.1rem; color: #0047AB; margin: 0;">Lights and Sounds</p>
+    </div>
+    <div class="header-icons">
+      <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+    </div>
+    <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+      <a href="homepage.html">Home</a>
+      <a href="portfolioo.html">Portfolio</a>
+      <a href="Services.html">Book Here</a>
+      <a href="User.html">User Profile</a>
+      <a href="availability.html">Equipment</a>
+      <a href="feedback.html">Feedback Dashboard</a>
+      <a href="login.html" onclick="logout()">Logout</a>
+    </nav>
+  </header>
+  <div class="tab-bar">
+    <button class="tab selected">Equipment</button>
+  </div>
+  <div class="availability-header">
+    <div class="header-content">
+      <h1 class="main-title">🎵 Equipment Availability</h1>
+      <p class="subtitle">Real-time inventory status for all our premium audio and lighting equipment</p>
+      <div class="status-legend">
+        <div class="legend-item">
+          <span class="legend-badge status-available"></span>
+          <span>Available</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-badge status-booked"></span>
+          <span>Limited Stock</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-badge status-sold-out"></span>
+          <span>Sold Out</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">🎤 Individual Services</h2>
+        <p class="section-description">High-quality audio and lighting equipment for your events</p>
+      </div>
+      <div class="main-card">
+        <div class="table-container">
+          <table class="main-table" id="servicesTable">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Image</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Available Units</th>
+              </tr>
+            </thead>
+            <tbody id="servicesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-container">
+      <div class="section-header">
+        <h2 class="section-title">📦 Bundle Packages</h2>
+        <p class="section-description">Complete event solutions with multiple services included</p>
+      </div>
+      <div class="bundle-card">
+        <div class="table-container">
+          <table class="bundle-table">
+            <thead>
+              <tr>
+                <th>Bundle Name</th>
+                <th>Image</th>
+                <th>Price</th>
+                <th>Included Services</th>
+                <th>Available Units</th>
+              </tr>
+            </thead>
+            <tbody id="bundlesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+    <div class="footer-social">
+      <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+    </div>
+    <div class="footer-contact">
+      <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+    </div>
+    <div class="footer-note">
+      <span>You can also contact us directly on this website.</span>
+    </div>
+    <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+  </footer>
+
+<!-- Firebase libraries -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<!-- Remove this line if you don't want storage -->
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-storage-compat.js"></script>
+
+<!-- Your Firebase config (must initializeApp) -->
+<script src="firebase-config-new.js"></script>
+
+<!-- Your backend helpers (optional, but after config) -->
+<script src="firebase-backend-new.js"></script>
+
+<!-- Your chat and page logic (must be after all above) -->
+<script>
+  // Hamburger menu animation and toggle
+  function toggleMenu(btn) {
+    const menu = document.getElementById('menuPopup');
+    const bars = document.querySelector('.fa-bars');
+    if (menu && bars) {
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      bars.classList.toggle('active');
+    }
+  }
+
+  window.addEventListener('click', function (e) {
+    const menu = document.getElementById('menuPopup');
+    const button = document.querySelector('.fa-bars');
+    if (menu && button && !menu.contains(e.target) && e.target !== button) {
+      menu.style.display = 'none';
+      button.classList.remove('active');
+    }
+  });
+
+  // --- CONFIG: Set your admin UID here ---
+  const ADMIN_UID = 'NIptGOOVYPX6vP2kAo31JRNeMtl1'; // Updated to correct admin UID
+  // --- END CONFIG ---
+
+  var chatHead, chatPopup, chatInput, chatSendBtn, chatBody, db, currentUser, isAdminUser;
+
+  async function initializeChat() {
+    try {
+      console.log('Initializing chat...');
+      chatHead = document.getElementById('floatingChatHead');
+      chatPopup = document.getElementById('floatingChatPopup');
+      chatInput = document.getElementById('floatingChatInput');
+      chatSendBtn = document.getElementById('floatingChatSendBtn');
+      chatBody = document.getElementById('floatingChatPopupBody');
+
+      console.log('Chat elements found:', {
+        chatHead: !!chatHead,
+        chatPopup: !!chatPopup,
+        chatInput: !!chatInput,
+        chatSendBtn: !!chatSendBtn,
+        chatBody: !!chatBody
+      });
+
+      // Load bundles
+      const bundlesTbody = document.getElementById('bundlesTbody');
+      bundlesTbody.innerHTML = '';
+      const bundles = await window.getAllBundles ? (await window.getAllBundles()) : {};
+      if (bundles && Object.keys(bundles).length > 0) {
+        Object.values(bundles).forEach(bundle => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td style="padding:12px 10px;font-weight:bold;">${bundle.name || ''}</td>
+            <td style="padding:12px 10px;">₱${bundle.price || ''}</td>
+            <td style="padding:12px 10px;">${(bundle.services||[]).join(', ')}</td>
+            <td class="inventory-info">${bundle.available !== undefined ? bundle.available + ' units' : '0 units'}</td>
+          `;
+          bundlesTbody.appendChild(tr);
+        });
+      } else {
+        bundlesTbody.innerHTML = '<tr><td colspan="4" style="padding:12px 10px;">No bundles found.</td></tr>';
+      }
+
+      if (chatHead) {
+        console.log('Chat head styles:', {
+          position: window.getComputedStyle(chatHead).position,
+          zIndex: window.getComputedStyle(chatHead).zIndex,
+          display: window.getComputedStyle(chatHead).display,
+          pointerEvents: window.getComputedStyle(chatHead).pointerEvents,
+          cursor: window.getComputedStyle(chatHead).cursor
+        });
+      }
+
+      if (!chatHead || !chatPopup || !chatInput || !chatSendBtn || !chatBody) {
+        console.warn('Chat elements not found, skipping chat initialization');
+        return;
+      }
+
+      // --- ADDED: Make sure chat head is visible ---
+      chatHead.style.display = 'flex'; // Or 'block', 'flex' is common for icon containers
+
+      if (typeof firebase === 'undefined') {
+        console.warn('Firebase not available for chat');
+        chatBody.innerHTML = '<p>Chat temporarily unavailable.</p>';
+        return;
+      }
+
+      // Test Firebase Storage availability
+      try {
+        const testRef = firebase.storage().ref('test');
+        console.log('Firebase Storage is available');
+      } catch (error) {
+        console.error('Firebase Storage not available:', error);
+      }
+
+      db = firebase.database();
+      currentUser = null;
+      isAdminUser = false;
+
+      function determineUserRole(user) {
+        if (!user) return Promise.resolve();
+        return firebase.database().ref('admins/' + user.uid).once('value').then(snap => {
+          isAdminUser = !!snap.val();
+          window.isAdminUser = isAdminUser;
+        }).catch(error => {
+          console.warn('Failed to determine user role:', error);
+          isAdminUser = false;
+          window.isAdminUser = false;
+        });
+      }
+
+      firebase.auth().onAuthStateChanged(user => {
+        currentUser = user;
+        if (user) {
+          determineUserRole(user).then(() => {
+            db.ref('chat-messages').on('value', snap => {
+              const messages = snap.val() || {};
+              renderFloatingChatMessages(messages);
+              updateFloatingChatNotif(messages);
+            });
+          });
+        } else {
+          chatBody.innerHTML = '<p>Please log in to chat.</p>';
+        }
+      });
+
+      // Chat event listeners
+      console.log('Adding click listener to chat head...');
+      chatHead.addEventListener('click', (e) => {
+        console.log('Chat head clicked!', e);
+        chatPopup.classList.toggle('open');
+        if (chatPopup.classList.contains('open')) {
+          chatInput.focus();
+          chatBody.scrollTop = chatBody.scrollHeight;
+          updateDbReadReceipts();
+        }
+      });
+
+      chatBody.addEventListener('scroll', function() {
+        if (chatBody.scrollTop + chatBody.clientHeight >= chatBody.scrollHeight - 10) {
+          updateDbReadReceipts();
+        }
+      });
+
+      // Update send button enable/disable logic to match homepage.html
+      chatInput.addEventListener('input', function() {
+        chatSendBtn.disabled = !chatInput.value.trim();
+      });
+      // Also update after sending
+      function sendFloatingChatMsg() {
+        const msgText = chatInput.value.trim();
+        if (!msgText || !currentUser || !db) return;
+        try {
+          const role = isAdminUser ? 'admin' : 'client';
+          // If user, send to admin. If admin, send to last user (not implemented here)
+          const recipientUid = isAdminUser ? window.lastUserUid || '' : ADMIN_UID;
+          if (!recipientUid) {
+            alert('No recipient selected.');
+            return;
+          }
+          const message = {
+            uid: currentUser.uid,
+            name: currentUser.displayName || 'Anonymous',
+            text: msgText,
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            readBy: { [currentUser.uid]: true },
+            recipientUid: recipientUid
+          };
+          db.ref('chat-messages').push(message);
+          chatInput.value = '';
+          chatSendBtn.disabled = true;
+        } catch (error) {
+          console.warn('Failed to send message:', error);
+        }
+      }
+
+      chatSendBtn.addEventListener('click', sendFloatingChatMsg);
+      chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          sendFloatingChatMsg();
+        }
+      });
+
+      // Initialize file upload handlers
+      initializeFileUploads();
+
+    } catch (error) {
+      console.error('Chat initialization failed:', error);
+    }
+  }
+
+  function updateDbReadReceipts() {
+    if (!currentUser || !chatPopup.classList.contains('open') || !db) return;
+    
+    try {
+      const myRole = isAdminUser ? 'admin' : 'client';
+      const updates = {};
+      const messagesRef = db.ref('chat-messages');
+
+      messagesRef.once('value').then(snap => {
+        const allMessages = snap.val() || {};
+        Object.entries(allMessages).forEach(([msgId, msg]) => {
+          const msgIsFromOther = msg.uid !== currentUser.uid;
+          const iHaveNotRead = !(msg.readBy && msg.readBy[currentUser.uid]);
+
+          if (msgIsFromOther && iHaveNotRead) {
+            updates[`${msgId}/readBy/${currentUser.uid}`] = true;
+            updates[`${msgId}/readBy/${myRole}`] = true;
+          }
+        });
+
+        if (Object.keys(updates).length > 0) {
+          messagesRef.update(updates);
+        }
+      }).catch(error => {
+        console.warn('Failed to update read receipts:', error);
+      });
+    } catch (error) {
+      console.warn('Read receipts update failed:', error);
+    }
+  }
+
+  function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function createFloatingBubble(text, side = 'right', options = {}) {
+    const div = document.createElement('div');
+    div.className = 'floating-chat-bubble ' + side + (options.pinned ? ' pinned' : '');
+    
+    // Handle text content (only if there's text and no attachment, or if it's a non-image attachment)
+    if (text && text.trim() && (!options.attachment || options.attachment.type !== 'image')) {
+      const textNode = document.createTextNode(text);
+      div.appendChild(textNode);
+    }
+    
+    // Handle attachments
+    if (options.attachment) {
+      console.log('Creating attachment element:', options.attachment);
+      const attachment = options.attachment;
+      
+      if (attachment.type === 'image') {
+        // Create image element
+        const img = document.createElement('img');
+        img.src = attachment.url;
+        img.alt = attachment.name;
+        img.style.maxWidth = '180px';
+        img.style.maxHeight = '120px';
+        img.style.display = 'block';
+        img.style.margin = '8px 0';
+        img.style.borderRadius = '10px';
+        img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        img.style.cursor = 'pointer';
+        img.onclick = () => window.showFloatingImageModal?.(attachment.url);
+        div.appendChild(img);
+      } else {
+        // Create file element
+        const fileDiv = document.createElement('div');
+        fileDiv.style.display = 'flex';
+        fileDiv.style.alignItems = 'center';
+        fileDiv.style.gap = '8px';
+        fileDiv.style.margin = '8px 0';
+        fileDiv.style.fontSize = '1.05rem';
+        fileDiv.style.color = '#002244';
+        fileDiv.style.background = '#f5f8fa';
+        fileDiv.style.borderRadius = '8px';
+        fileDiv.style.padding = '6px 12px';
+        fileDiv.innerHTML = `<i class='fas fa-file'></i> <a href="${attachment.url}" download="${attachment.name}" target="_blank">${attachment.name}</a>`;
+        div.appendChild(fileDiv);
+      }
+    }
+
+    const ts = document.createElement('span');
+    ts.className = 'msg-timestamp';
+    ts.textContent = options.timestamp || formatTime(new Date());
+    div.appendChild(ts);
+
+    if (side === 'right') {
+      const receipt = document.createElement('span');
+      receipt.className = 'read-receipt';
+      const otherPartyRole = isAdminUser ? 'client' : 'admin';
+      if (options.readBy && options.readBy[otherPartyRole]) {
+        receipt.innerHTML = '<i class="fas fa-eye"></i>';
+      } else {
+        receipt.textContent = '✓';
+      }
+      div.appendChild(receipt);
+    }
+
+    // Actions container
+    const actions = document.createElement('span');
+    actions.className = 'msg-actions';
+
+    // Edit (only for right/sender messages)
+    if (side === 'right') {
+      const editBtn = document.createElement('button');
+      editBtn.className = 'msg-action-btn';
+      editBtn.title = 'Edit';
+      editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+      editBtn.onclick = () => {
+        // Find the text node (first text node, not attachment)
+        let textNode = null;
+        let originalText = '';
+        for (let i = 0; i < div.childNodes.length; i++) {
+          if (div.childNodes[i].nodeType === Node.TEXT_NODE && div.childNodes[i].textContent.trim()) {
+            textNode = div.childNodes[i];
+            originalText = div.childNodes[i].textContent;
+            break;
+          }
+        }
+        
+        // If no text node found, create one
+        if (!textNode) {
+          textNode = document.createTextNode('');
+          div.insertBefore(textNode, div.firstChild);
+        }
+        
+        // Create input field
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'bubble-edit-input';
+        input.value = originalText;
+        input.style.width = '100%';
+        input.style.marginBottom = '8px';
+        
+        // Create save and cancel buttons
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'msg-action-btn';
+        saveBtn.title = 'Save';
+        saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+        saveBtn.style.marginRight = '4px';
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'msg-action-btn';
+        cancelBtn.title = 'Cancel';
+        cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+        
+        // Create button container
+        const btnContainer = document.createElement('div');
+        btnContainer.style.display = 'flex';
+        btnContainer.style.gap = '4px';
+        btnContainer.appendChild(saveBtn);
+        btnContainer.appendChild(cancelBtn);
+        
+        // Replace text with input
+        div.replaceChild(input, textNode);
+        div.appendChild(btnContainer);
+        
+        // Focus input and select all text
+        input.focus();
+        input.select();
+        
+        // Save functionality
+        saveBtn.onclick = () => {
+          const newText = input.value.trim();
+          if (newText && newText !== originalText && options.msgId && db) {
+            db.ref('chat-messages/' + options.msgId).update({ text: newText });
+          } else {
+            // Restore original text
+            div.replaceChild(textNode, input);
+            div.removeChild(btnContainer);
+          }
+        };
+        
+        // Cancel functionality
+        cancelBtn.onclick = () => {
+          div.replaceChild(textNode, input);
+          div.removeChild(btnContainer);
+        };
+        
+        // Handle Enter and Escape keys
+        input.onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            saveBtn.click();
+          } else if (e.key === 'Escape') {
+            cancelBtn.click();
+          }
+        };
+      };
+      actions.appendChild(editBtn);
+    }
+
+    // Delete
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'msg-action-btn';
+    deleteBtn.title = 'Delete';
+    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    deleteBtn.onclick = () => {
+      if (options.msgId && db) {
+        db.ref('chat-messages/' + options.msgId).remove();
+      }
+    };
+    actions.appendChild(deleteBtn);
+
+    // React
+    const reactBtn = document.createElement('button');
+    reactBtn.className = 'msg-action-btn';
+    reactBtn.title = 'React';
+    reactBtn.innerHTML = '<i class="far fa-heart"></i>';
+    reactBtn.onclick = () => {
+      showReactionPicker(div, options.msgId);
+    };
+    actions.appendChild(reactBtn);
+
+    // Pin (available for both admin and client users)
+    const pinBtn = document.createElement('button');
+    pinBtn.className = 'msg-action-btn';
+    pinBtn.title = options.pinned ? 'Unpin' : 'Pin';
+    pinBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
+    pinBtn.onclick = () => {
+      if (options.msgId && db && currentUser) {
+        const newPinnedState = !options.pinned;
+        console.log(`${currentUser.email} ${newPinnedState ? 'pinning' : 'unpinning'} message:`, options.msgId);
+        db.ref('chat-messages/' + options.msgId).update({ 
+          pinned: newPinnedState,
+          pinnedBy: currentUser.uid,
+          pinnedAt: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+    };
+    actions.appendChild(pinBtn);
+
+    // Add reactions display if message has reactions
+    if (options.reactions && Object.keys(options.reactions).length > 0) {
+      const reactionsDiv = document.createElement('div');
+      reactionsDiv.className = 'reactions';
+      
+      Object.entries(options.reactions).forEach(([emoji, users]) => {
+        const reactionDiv = document.createElement('div');
+        reactionDiv.className = 'reaction';
+        if (users && users[currentUser.uid]) {
+          reactionDiv.classList.add('active');
+        }
+        reactionDiv.innerHTML = `${emoji} <span class="count">${Object.keys(users || {}).length}</span>`;
+        reactionDiv.onclick = () => {
+          toggleReaction(options.msgId, emoji, currentUser.uid);
+        };
+        reactionsDiv.appendChild(reactionDiv);
+      });
+      
+      div.appendChild(reactionsDiv);
+    }
+
+    div.appendChild(actions);
+
+    return div;
+  }
+
+  function renderFloatingChatMessages(messages) {
+    if (!chatBody) return;
+    
+    chatBody.innerHTML = '';
+    if (!currentUser) return;
+
+    try {
+      Object.entries(messages)
+        .filter(([msgId, msg]) => msg.uid === currentUser.uid || msg.recipientUid === currentUser.uid)
+        .sort((a, b) => a[1].timestamp - b[1].timestamp)
+        .forEach(([msgId, msg]) => {
+          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+          const bubble = createFloatingBubble(msg.text, side, {
+            msgId: msgId,
+            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+            readBy: msg.readBy || {},
+            pinned: msg.pinned || false,
+            reactions: msg.reactions || {},
+            attachment: msg.attachment || null
+          });
+          chatBody.appendChild(bubble);
+        });
+      chatBody.scrollTop = chatBody.scrollHeight;
+    } catch (error) {
+      console.warn('Failed to render chat messages:', error);
+    }
+  }
+
+  function updateFloatingChatNotif(messages) {
+    if (!currentUser) return;
+    const notif = document.getElementById('floatingChatNotif');
+    if (!notif) return;
+    // Only count messages where current user is recipient and has not read
+    const unreadCount = Object.values(messages).filter(msg =>
+      msg.recipientUid === currentUser.uid && msg.uid !== currentUser.uid && (!msg.readBy || !msg.readBy[currentUser.uid])
+    ).length;
+    if (unreadCount > 0) {
+      notif.textContent = unreadCount;
+      notif.style.display = 'inline-flex';
+    } else {
+      notif.textContent = '';
+      notif.style.display = 'none';
+    }
+  }
+
+  function sendFloatingChatMsg() {
+    const msgText = chatInput.value.trim();
+    if (!msgText || !currentUser || !db) return;
+
+    try {
+      const role = isAdminUser ? 'admin' : 'client';
+      const messageData = {
+        text: msgText,
+        uid: currentUser.uid,
+        name: currentUser.displayName || currentUser.email,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        readBy: {
+          [currentUser.uid]: true,
+          [role]: true
+        }
+      };
+
+      db.ref('chat-messages').push(messageData);
+      chatInput.value = '';
+    } catch (error) {
+      console.warn('Failed to send message:', error);
+    }
+  }
+
+  function initializeFileUploads() {
+    console.log('initializeFileUploads called');
+    try {
+      const attachBtn = document.querySelector('.input-btn[title="Attach"]');
+      const pinListBtn = document.querySelector('.input-btn[title="Pin"]');
+      const cameraBtn = document.querySelector('.input-btn[title="Camera"]');
+      console.log('Found buttons:', { attachBtn: !!attachBtn, pinListBtn: !!pinListBtn, cameraBtn: !!cameraBtn });
+      const floatingAttachmentInput = document.getElementById('floatingAttachmentInput');
+      const floatingCameraInput = document.getElementById('floatingCameraInput');
+      const floatingPinnedModalContainer = document.getElementById('floatingPinnedModalContainer');
+
+      if (attachBtn && floatingAttachmentInput) {
+        attachBtn.addEventListener('click', function() {
+          floatingAttachmentInput.value = '';
+          floatingAttachmentInput.click();
+        });
+      }
+
+      if (cameraBtn && floatingCameraInput) {
+        cameraBtn.addEventListener('click', function() {
+          floatingCameraInput.value = '';
+          floatingCameraInput.click();
+        });
+      }
+
+      if (floatingAttachmentInput) {
+        floatingAttachmentInput.addEventListener('change', handleFileUpload);
+      }
+
+      if (floatingCameraInput) {
+        floatingCameraInput.addEventListener('change', handleFileUpload);
+      }
+
+      if (pinListBtn && floatingPinnedModalContainer) {
+        console.log('Pin button found, adding click listener');
+        pinListBtn.addEventListener('click', function() {
+          console.log('Pin button clicked!');
+          try {
+            showPinnedMessages(floatingPinnedModalContainer);
+          } catch (error) {
+            console.error('Error calling showPinnedMessages:', error);
+            alert('Error: ' + error.message);
+          }
+        });
+      } else {
+        console.warn('Pin button or container not found:', { 
+          pinListBtn: !!pinListBtn, 
+          floatingPinnedModalContainer: !!floatingPinnedModalContainer 
+        });
+      }
+
+      // Image modal functionality
+      const floatingImageModalOverlay = document.getElementById('floatingImageModalOverlay');
+      const floatingImageModal = document.getElementById('floatingImageModal');
+      const floatingImageModalImg = floatingImageModal?.querySelector('img');
+      const floatingImageModalClose = floatingImageModal?.querySelector('.close-btn');
+
+      if (floatingImageModalClose) {
+        floatingImageModalClose.onclick = () => {
+          if (floatingImageModalOverlay) {
+            floatingImageModalOverlay.classList.remove('open');
+          }
+        };
+      }
+
+      if (floatingImageModalOverlay) {
+        floatingImageModalOverlay.onclick = e => {
+          if (e.target === floatingImageModalOverlay) {
+            floatingImageModalOverlay.classList.remove('open');
+          }
+        };
+      }
+
+      window.showFloatingImageModal = function(src) {
+        if (floatingImageModalImg && floatingImageModalOverlay) {
+          floatingImageModalImg.src = src;
+          floatingImageModalOverlay.classList.add('open');
+        }
+      };
+
+    } catch (error) {
+      console.warn('File upload initialization failed:', error);
+    }
+  }
+
+  function handleFileUpload(e) {
+    console.log('handleFileUpload called with:', e.target.files);
+    if (!e.target.files || e.target.files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
+    if (!currentUser) {
+      console.log('No current user');
+      return;
+    }
+    if (!db) {
+      console.log('No database connection');
+      return;
+    }
+    if (typeof firebase === 'undefined') {
+      console.log('Firebase not available');
+      return;
+    }
+    
+    try {
+      Array.from(e.target.files).forEach(file => {
+        // Show loading message
+        const loadingDiv = createFloatingBubble('📎 Uploading ' + file.name + '...', 'right', { timestamp: formatTime(new Date()) });
+        if (chatBody) {
+          chatBody.appendChild(loadingDiv);
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+        
+        // Create unique filename
+        const timestamp = Date.now();
+        const uniqueFileName = `${timestamp}_${file.name}`;
+        console.log('Creating file reference for:', uniqueFileName);
+        const fileRef = firebase.storage().ref(`chat-attachments/${uniqueFileName}`);
+        console.log('File reference created:', fileRef);
+        
+        // --- New: Read file as Data URL (base64) ---
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const dataUrl = event.target.result;
+
+          // --- Modified: Upload file to Firebase Storage using putString ---
+          console.log('Starting file upload via data URL...');
+          // Pass metadata to ensure correct content type is set
+          const metadata = { contentType: file.type };
+          fileRef.putString(dataUrl, 'data_url', metadata).then(snapshot => {
+            console.log('File uploaded successfully:', snapshot);
+            // Get download URL
+            return snapshot.ref.getDownloadURL();
+          }).then(downloadURL => {
+            console.log('Download URL obtained:', downloadURL);
+            // Remove loading message
+            if (chatBody && loadingDiv.parentNode) {
+              chatBody.removeChild(loadingDiv);
+            }
+
+            // Create message data
+            const role = isAdminUser ? 'admin' : 'client';
+            const isImage = file.type.startsWith('image/');
+            const messageData = {
+              text: isImage ? '' : '📎 ' + file.name, // Only include filename for non-image files
+              uid: currentUser.uid,
+              name: currentUser.displayName || currentUser.email,
+              timestamp: firebase.database.ServerValue.TIMESTAMP,
+              readBy: {
+                [currentUser.uid]: true,
+                [role]: true
+              },
+              attachment: {
+                type: isImage ? 'image' : 'file',
+                name: file.name,
+                size: file.size,
+                url: downloadURL,
+                fileName: uniqueFileName
+              }
+            };
+
+            // Save to database
+            console.log('Saving message data to database:', messageData);
+            db.ref('chat-messages').push(messageData).then(() => {
+              console.log('Message saved successfully to database');
+            }).catch(error => {
+              console.error('Failed to save message to database:', error);
+            });
+
+          }).catch(error => {
+            console.error('File upload failed:', error);
+            console.error('Error details:', {
+              code: error.code,
+              message: error.message,
+              serverResponse: error.serverResponse
+            });
+            // Remove loading message and show error
+            if (chatBody && loadingDiv.parentNode) {
+              chatBody.removeChild(loadingDiv);
+            }
+            const errorDiv = createFloatingBubble('❌ Failed to upload ' + file.name + ': ' + error.message, 'right', { timestamp: formatTime(new Date()) });
+            if (chatBody) {
+              chatBody.appendChild(errorDiv);
+              chatBody.scrollTop = chatBody.scrollHeight;
+            }
+          });
+        };
+
+        reader.onerror = (error) => {
+            console.error('Error reading file:', error);
+            if (chatBody && loadingDiv.parentNode) {
+                chatBody.removeChild(loadingDiv);
+            }
+        };
+
+        reader.readAsDataURL(file);
+      });
+    } catch (error) {
+      console.warn('File upload failed:', error);
+    }
+  }
+
+  function showPinnedMessages(container) {
+    console.log('showPinnedMessages called with:', { container: !!container, db: !!db });
+    try {
+      if (!container || !db) {
+        console.warn('Missing container or db:', { container: !!container, db: !!db });
+        alert('Missing container or db: ' + JSON.stringify({ container: !!container, db: !!db }));
+        return;
+      }
+      
+      // Set up the modal container with proper styling
+      console.log('Setting up modal container...');
+      container.style.display = 'flex';
+      container.style.position = 'fixed';
+      container.style.top = '0';
+      container.style.left = '0';
+      container.style.width = '100%';
+      container.style.height = '100%';
+      container.style.backgroundColor = 'rgba(0,0,0,0.5)';
+      container.style.zIndex = '1002';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+      
+      // Show loading state
+      console.log('Setting up loading state...');
+      container.innerHTML = `
+      <div class="pinned-modal">
+        <button class="close-btn" title="Close">&times;</button>
+        <h2>Pinned Messages</h2>
+        <div class="pinned-list">
+            <div style="color:#888;">Loading pinned messages...</div>
+        </div>
+      </div>
+    `;
+      
+      console.log('Adding show class to container...');
+      container.classList.add('show');
+      console.log('Container classes after adding show:', container.className);
+      console.log('Container display style:', container.style.display);
+      
+      // Fetch pinned messages from Firebase
+      console.log('Fetching pinned messages from Firebase...');
+      console.log('Current user:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'Not logged in');
+      console.log('Is admin user:', isAdminUser);
+      
+      db.ref('chat-messages').orderByChild('pinned').equalTo(true).once('value').then(snap => {
+        const pinnedMessages = snap.val();
+        console.log('Pinned messages fetched:', pinnedMessages);
+        
+        if (!pinnedMessages || Object.keys(pinnedMessages).length === 0) {
+          container.innerHTML = `
+            <div class="pinned-modal">
+              <button class="close-btn" title="Close">&times;</button>
+              <h2>Pinned Messages</h2>
+              <div class="pinned-list">
+                <div style="color:#888;">No pinned messages.</div>
+              </div>
+            </div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = `
+          <div class="pinned-modal">
+            <button class="close-btn" title="Close">&times;</button>
+            <h2>Pinned Messages</h2>
+            <div class="pinned-list"></div>
+          </div>
+        `;
+        
+        const pinnedList = container.querySelector('.pinned-list');
+        // Only show pinned messages that were pinned by the current user or the admin
+        const filteredMessages = Object.entries(pinnedMessages).filter(([msgId, msg]) => {
+          return (
+            msg.pinned === true &&
+            (msg.pinnedBy === currentUser.uid || msg.pinnedBy === ADMIN_UID)
+          );
+        });
+        const sortedMessages = filteredMessages.sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+        
+        sortedMessages.forEach(([msgId, msg]) => {
+          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+          const bubble = createFloatingBubble(msg.text, side, {
+            msgId: msgId,
+            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+            readBy: msg.readBy || {},
+            pinned: true,
+            reactions: msg.reactions || {},
+            attachment: msg.attachment || null
+          });
+          // Remove action buttons from pinned message display
+          const actions = bubble.querySelector('.msg-actions');
+          if (actions) actions.remove();
+          // Add pin info if available
+          if (msg.pinnedBy) {
+            const pinInfo = document.createElement('div');
+            pinInfo.style.fontSize = '0.8rem';
+            pinInfo.style.color = '#0047AB';
+            pinInfo.style.marginTop = '4px';
+            pinInfo.style.fontStyle = 'italic';
+            pinInfo.style.fontWeight = '500';
+            if (msg.pinnedBy === currentUser.uid) {
+              pinInfo.textContent = `📌 Pinned by you`;
+            } else if (msg.pinnedBy === ADMIN_UID) {
+              pinInfo.textContent = `📌 Pinned by admin`;
+            } else {
+              pinInfo.textContent = `📌 Pinned by someone`;
+            }
+            bubble.appendChild(pinInfo);
+          }
+          pinnedList.appendChild(bubble);
+        });
+        // Set up close functionality
+        container.querySelector('.close-btn').onclick = () => {
+          container.classList.remove('show');
+          container.innerHTML = '';
+        };
+        container.onclick = e => { 
+          if (e.target === container) {
+            container.classList.remove('show');
+            container.innerHTML = '';
+          }
+        };
+      }).catch(error => {
+        console.warn('Failed to fetch pinned messages:', error);
+        container.innerHTML = `
+          <div class="pinned-modal">
+            <button class="close-btn" title="Close">&times;</button>
+            <h2>Pinned Messages</h2>
+            <div class="pinned-list">
+              <div style="color:#d32f2f;">Failed to load pinned messages.</div>
+            </div>
+          </div>
+        `;
+      });
+      
+    } catch (error) {
+      console.warn('Failed to show pinned messages:', error);
+    }
+  }
+
+  // Reaction helper functions
+  function showReactionPicker(bubble, msgId) {
+    // Remove any existing reaction picker
+    const existingPicker = document.querySelector('.reaction-picker');
+    if (existingPicker) {
+      existingPicker.remove();
+    }
+
+    const reactions = ['❤️', '👍', '👎', '😂', '😮', '😢', '😡', '🎉', '🔥', '💯'];
+    
+    const picker = document.createElement('div');
+    picker.className = 'reaction-picker';
+    
+    reactions.forEach(emoji => {
+      const option = document.createElement('button');
+      option.className = 'reaction-option';
+      option.textContent = emoji;
+      option.onclick = () => {
+        addReaction(msgId, emoji, currentUser.uid);
+        picker.remove();
+      };
+      picker.appendChild(option);
+    });
+    
+    bubble.appendChild(picker);
+    
+    // Show picker
+    setTimeout(() => picker.classList.add('show'), 10);
+    
+    // Close picker when clicking outside
+    const closePicker = (e) => {
+      if (!picker.contains(e.target) && !bubble.querySelector('.msg-action-btn').contains(e.target)) {
+        picker.remove();
+        document.removeEventListener('click', closePicker);
+      }
+    };
+    
+    setTimeout(() => document.addEventListener('click', closePicker), 100);
+  }
+
+  function addReaction(msgId, emoji, userId) {
+    if (!db || !msgId) return;
+    
+    const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+    reactionRef.set(true);
+  }
+
+  function toggleReaction(msgId, emoji, userId) {
+    if (!db || !msgId) return;
+    
+    const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+    reactionRef.once('value').then(snap => {
+      if (snap.val()) {
+        // Remove reaction
+        reactionRef.remove();
+      } else {
+        // Add reaction
+        reactionRef.set(true);
+      }
+    });
+  }
+
+  // Announcement functions
+  function showAnnouncementModal() {
+    const modal = document.getElementById('announcementModal');
+    if (modal) {
+      modal.style.display = 'flex';
+      document.getElementById('announcementText').focus();
+    }
+  }
+
+  function closeAnnouncementModal() {
+    const modal = document.getElementById('announcementModal');
+    if (modal) {
+      modal.style.display = 'none';
+      document.getElementById('announcementText').value = '';
+    }
+  }
+
+  function submitAnnouncement() {
+    const text = document.getElementById('announcementText').value.trim();
+    if (!text) {
+      alert('Please enter an announcement.');
+      return;
+    }
+    
+    if (!currentUser || !db) {
+      alert('Please log in to post announcements.');
+      return;
+    }
+
+    const announcement = {
+      text: text,
+      author: currentUser.displayName || currentUser.email,
+      authorId: currentUser.uid,
+      timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    db.ref('announcements').push(announcement).then(() => {
+      closeAnnouncementModal();
+      alert('Announcement posted successfully!');
+    }).catch(error => {
+      console.error('Failed to post announcement:', error);
+      alert('Failed to post announcement. Please try again.');
+    });
+  }
+
+  function loadAnnouncements() {
+    if (!db) return;
+    
+    db.ref('announcements').orderByChild('timestamp').limitToLast(5).on('value', snap => {
+      const announcements = snap.val();
+      const container = document.getElementById('announcementsContainer');
+      
+      if (!announcements || Object.keys(announcements).length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+
+      let html = '<div style="background: #f8f9fa; border-radius: 15px; padding: 20px; margin-bottom: 20px; border-left: 5px solid #0047AB;">';
+      html += '<h3 style="color: #0047AB; margin-bottom: 15px; font-size: 1.3rem;">📢 Latest Announcements</h3>';
+      
+      Object.entries(announcements).reverse().forEach(([id, announcement]) => {
+        const date = new Date(announcement.timestamp).toLocaleString();
+        html += `
+          <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="font-weight: bold; color: #191970; margin-bottom: 5px;">${announcement.author}</div>
+            <div style="color: #333; margin-bottom: 8px;">${announcement.text}</div>
+            <div style="font-size: 0.9rem; color: #666;">${date}</div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      container.innerHTML = html;
+    });
+  }
+
+  // Initialize chat when DOM is loaded
+  window.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing chat...');
+    console.log('Firebase available:', typeof firebase !== 'undefined');
+    if (typeof firebase !== 'undefined') {
+      console.log('Firebase apps:', firebase.apps.length);
+      console.log('Firebase auth available:', !!firebase.auth);
+      console.log('Firebase database available:', !!firebase.database);
+      console.log('Firebase storage available:', !!firebase.storage);
+    }
+    
+    // Remove any debugging border from chat head
+    setTimeout(() => {
+      const chatHead = document.getElementById('floatingChatHead');
+      if (chatHead) {
+        chatHead.style.border = '';
+      }
+    }, 100);
+    
+    initializeChat();
+    loadAnnouncements();
+    
+    // Test Firebase Storage
+    /*
+    setTimeout(() => {
+      console.log('Testing Firebase Storage...');
+      if (typeof firebase !== 'undefined' && firebase.storage) {
+        try {
+          const testRef = firebase.storage().ref('test-file.txt');
+          const testBlob = new Blob(['test content'], { type: 'text/plain' });
+          testRef.put(testBlob).then(() => {
+            console.log('Firebase Storage test successful');
+            return testRef.getDownloadURL();
+          }).then(url => {
+            console.log('Test file URL:', url);
+            // Clean up test file
+            return testRef.delete();
+          }).then(() => {
+            console.log('Test file cleaned up');
+          }).catch(error => {
+            console.error('Firebase Storage test failed:', error);
+          });
+        } catch (error) {
+          console.error('Firebase Storage test error:', error);
+        }
+      } else {
+        console.warn('Firebase Storage not available for testing');
+      }
+    }, 2000);
+    */
+  });
+</script>
+
+<script>
+function toggleMenu(btn) {
+  const menu = document.getElementById('menuPopup');
+  const bars = document.querySelector('.fa-bars');
+  if (menu && bars) {
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    bars.classList.toggle('active');
+  }
+}
+</script>
+<script>
+// Hardcoded descriptions for each service
+const hardcodedDescriptions = {
+  'Lights & Sounds': 'Our core package delivers high-quality audio systems paired with dynamic lighting effects. Perfect for weddings, birthdays, and corporate events, it ensures crystal-clear sound and vibrant visual experiences that energize any crowd.',
+         'Led Wall': 'Wow your audience with our high-resolution LED wall. Perfect for live video feeds, slideshows, branding, or visual effects, it delivers stunning visuals that make a lasting impression at concerts, conferences, and big celebrations.',
+         'Stage': 'Ensure your performers and speakers have the platform they need with our professional stage setups. Designed for safety, visibility, and aesthetic appeal, our stages suit everything from intimate gatherings to large-scale productions.',
+         'Mood Light': 'Set the perfect tone with customizable mood lighting. Our LED uplights and color washes adapt to any theme, from classy and elegant to fun and vibrant, making your venue truly unforgettable.',
+         'String Lights': 'Transform your venue with warm, romantic ambience using our elegant string lights. Ideal for garden weddings and outdoor receptions, they add a charming glow that enhances every moment and photograph.',
+         'Low Lying': 'Create a dramatic "dancing on a cloud" effect with our low-lying fog machine. Perfect for first dances and grand entrances, it delivers a magical atmosphere that captivates guests and elevates your event.'
+  // Add more as needed
+};
+
+// Service images mapping
+const serviceImages = {
+  'Lights & Sounds': 'images/lights-sounds.png',
+  'Led Wall': 'images/led-wall.png',
+  'Stage': 'images/stage.png',
+  'Mood Light': 'images/mood-lights.png',
+  'String Lights': 'images/string-lights.png',
+  'Low Lying': 'images/low-lying.jpg'
+  // Add more mappings as needed
+};
+</script>
+<script>
+// Function to update services table with real-time data
+function updateServicesTable(services) {
+  const servicesTbody = document.getElementById('servicesTbody');
+  if (!servicesTbody) return;
+  
+  servicesTbody.innerHTML = '';
+  if (services && Object.keys(services).length > 0) {
+    Object.values(services).forEach(service => {
+      const desc = hardcodedDescriptions[service.name] || '';
+      const available = parseInt(service.available) || 0;
+      const isSoldOut = available === 0;
+      
+      const tr = document.createElement('tr');
+      tr.className = isSoldOut ? 'sold-out-overlay' : '';
+      const imageSrc = serviceImages[service.name] || 'images/logo.png';
+      tr.innerHTML = `
+        <td style="padding:12px 10px;font-weight:bold;${isSoldOut ? 'color:#b0b6be;' : ''}">${service.name || ''}</td>
+        <td style="padding:8px;text-align:center;">
+          <img src="${imageSrc}" alt="${service.name}" class="product-image ${isSoldOut ? 'sold-out' : ''}" />
+        </td>
+        <td style="padding:12px 10px;${isSoldOut ? 'color:#b0b6be;' : ''}">${desc}</td>
+        <td><span class="status-badge ${isSoldOut ? 'status-sold-out' : (available > 0 ? 'status-available' : 'status-booked')}">${isSoldOut ? 'Sold Out' : (available > 0 ? 'Available' : 'Booked')}</span></td>
+        <td class="inventory-info" style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available} units</td>
+      `;
+      servicesTbody.appendChild(tr);
+    });
+  } else {
+    servicesTbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <i class="fas fa-microphone-slash"></i>
+            <h3>No Services Available</h3>
+            <p>Check back later for our latest equipment offerings.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Function to update bundles table with real-time data
+function updateBundlesTable(bundles) {
+  const bundlesTbody = document.getElementById('bundlesTbody');
+  if (!bundlesTbody) return;
+  
+  bundlesTbody.innerHTML = '';
+  if (bundles && Object.keys(bundles).length > 0) {
+    Object.values(bundles).forEach(bundle => {
+      const available = parseInt(bundle.available) || 0;
+      const isSoldOut = available === 0;
+      
+      const tr = document.createElement('tr');
+      tr.className = isSoldOut ? 'sold-out-overlay' : '';
+      // Use the first service's image as the bundle image, or a default
+      let bundleImage = 'images/logo.png';
+      if (bundle.services && bundle.services.length > 0) {
+        const firstService = bundle.services[0];
+        bundleImage = serviceImages[firstService] || 'images/logo.png';
+      }
+      
+      tr.innerHTML = `
+        <td style="padding:12px 10px;font-weight:bold;${isSoldOut ? 'color:#b0b6be;' : ''}">${bundle.name || ''}</td>
+        <td style="padding:8px;text-align:center;">
+          <img src="${bundleImage}" alt="${bundle.name}" class="product-image ${isSoldOut ? 'sold-out' : ''}" />
+        </td>
+        <td style="padding:12px 10px;${isSoldOut ? 'color:#b0b6be;' : ''}">₱${bundle.price || ''}</td>
+        <td style="padding:12px 10px;${isSoldOut ? 'color:#b0b6be;' : ''}">${(bundle.services||[]).join(', ')}</td>
+        <td class="inventory-info" style="${isSoldOut ? 'color:#dc3545;font-weight:bold;' : ''}">${available} units</td>
+      `;
+      bundlesTbody.appendChild(tr);
+    });
+  } else {
+    bundlesTbody.innerHTML = `
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <i class="fas fa-box-open"></i>
+            <h3>No Bundles Available</h3>
+            <p>Check back later for our complete event packages.</p>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+}
+
+// Initialize real-time listeners for services and bundles
+function initializeRealTimeUpdates() {
+  if (typeof firebase === 'undefined' || !firebase.database) {
+    console.warn('Firebase not available for real-time updates');
+    return;
+  }
+
+  const db = firebase.database();
+  
+  // Real-time listener for services
+  db.ref('services').on('value', (snap) => {
+    const services = snap.val();
+    console.log('Services updated:', services);
+    updateServicesTable(services);
+  }, (error) => {
+    console.error('Error listening to services:', error);
+  });
+
+  // Real-time listener for bundles
+  db.ref('bundles').on('value', (snap) => {
+    const bundles = snap.val();
+    console.log('Bundles updated:', bundles);
+    updateBundlesTable(bundles);
+  }, (error) => {
+    console.error('Error listening to bundles:', error);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Show loading state
+  const servicesTbody = document.getElementById('servicesTbody');
+  const bundlesTbody = document.getElementById('bundlesTbody');
+  
+  if (servicesTbody) {
+    servicesTbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 40px;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 15px; color: #666;">Loading services...</p>
+        </td>
+      </tr>
+    `;
+  }
+  
+  if (bundlesTbody) {
+    bundlesTbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 40px;">
+          <div class="loading-spinner"></div>
+          <p style="margin-top: 15px; color: #666;">Loading bundles...</p>
+        </td>
+      </tr>
+    `;
+  }
+  
+  // Initialize real-time updates
+  initializeRealTimeUpdates();
+  
+  // Also load initial data as fallback
+  (async () => {
+    try {
+      const services = await window.getAllServices ? (await window.getAllServices()) : {};
+      const bundles = await window.getAllBundles ? (await window.getAllBundles()) : {};
+      
+      updateServicesTable(services);
+      updateBundlesTable(bundles);
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+    }
+  })();
+});
+</script>
+
+<!-- Floating Chat HTML (copied from homepage.html) -->
+<div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
+  <i class="fas fa-comment"></i>
+  <span id="floatingChatNotif" style="display:none;position:absolute;top:2px;right:2px;background:#ff4444;color:#fff;font-size:0.85em;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;z-index:10;"></span>
+</div>
+<div class="floating-chat-popup" id="floatingChatPopup">
+  <div class="floating-chat-popup-header">
+    <span style="font-weight:700; font-size:1.1rem; letter-spacing:1px;">AudioWerks</span>
+    <div class="floating-chat-header-right">
+      <button class="floating-chat-call-btn" title="Call"><i class="fas fa-phone"></i></button>
+    </div>
+  </div>
+  <div class="floating-chat-popup-body" id="floatingChatPopupBody"></div>
+  <div class="floating-chat-popup-input">
+    <div class="input-icons">
+      <button class="input-btn" title="Attach"><i class="fas fa-paperclip"></i></button>
+      <button class="input-btn" title="Pin"><i class="fas fa-thumbtack"></i></button>
+      <button class="input-btn" title="Camera"><i class="fas fa-camera"></i></button>
+    </div>
+    <input type="text" id="floatingChatInput" placeholder="Type your message here..." />
+    <button class="send-btn" id="floatingChatSendBtn" title="Send Message" disabled><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+<div id="floatingPinnedModalContainer" style="display: none;"></div>
+<input type="file" id="floatingAttachmentInput" style="display:none" multiple />
+<input type="file" id="floatingCameraInput" accept="image/*" capture="environment" style="display:none" multiple />
+<div id="floatingImageModalOverlay">
+  <div id="floatingImageModal">
+    <button class="close-btn" title="Close">&times;</button>
+    <img src="" alt="Preview" />
+  </div>
+</div>
+
+
+
+</body>
+</html>

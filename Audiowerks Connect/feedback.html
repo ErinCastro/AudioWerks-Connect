@@ -1,0 +1,2695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audiowerks - Feedback Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="floating-chat.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif;
+        }
+        body {
+            background: #fff;
+            color: #000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: url('images/lights-sounds.png') center/cover no-repeat, rgba(255,255,255,0.7);
+            background-blend-mode: lighten;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .logo-container img {
+            height: 120px;
+            cursor: pointer;
+        }
+        .logo-container a {
+            display: inline-block;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+        .header-center h1 {
+            font-size: 64px;
+            font-weight: bold;
+            color: #0047AB;
+            text-shadow: 2px 2px #ffffff;
+        }
+        .header-center p {
+            font-size: 24px;
+            color: #0047AB;
+            text-shadow: 1px 1px #ffffff;
+        }
+        .header-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header-icons i {
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .header-icons i:hover {
+            transform: scale(1.2);
+        }
+        .menu-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+            transition: all 0.3s ease;
+            animation: fadeInMenu 0.2s;
+        }
+        @keyframes fadeInMenu {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .menu-popup a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-popup a:hover {
+            background-color: #f0f0f0;
+        }
+        .menu-popup a:last-child {
+            background-color: #191970;
+            color: #fff;
+            border-bottom: none;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        .menu-popup a:last-child:hover {
+            background-color: #000080;
+            transform: scale(1.02);
+        }
+        .fa-bars {
+            transition: transform 0.3s;
+        }
+        .fa-bars.active {
+            transform: rotate(90deg);
+        }
+        footer {
+            background: linear-gradient(90deg, #191970 60%, #0047AB 100%);
+            color: white;
+            text-align: center;
+            padding: 25px 10px 15px;
+            margin-top: auto;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            position: relative;
+        }
+        .footer-social {
+            margin: 10px 0 5px;
+        }
+        .footer-social a {
+            color: #bccedf;
+            margin: 0 8px;
+            font-size: 1.5rem;
+            transition: color 0.2s;
+        }
+        .footer-social a:hover {
+            color: #ffc300;
+        }
+        .footer-contact span {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .footer-note {
+            margin: 8px 0 0;
+            font-size: 1rem;
+            color: #bccedf;
+        }
+        .back-to-top {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: #ffc300;
+            color: #191970;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: background 0.2s, color 0.2s;
+        }
+        .back-to-top:hover {
+            background: #191970;
+            color: #ffc300;
+        }
+
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            background: #1e3a8a;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .user-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            top: 6px;
+            left: 9px;
+        }
+
+        .user-icon::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: white;
+            border-radius: 10px 10px 0 0;
+            bottom: 4px;
+            left: 5px;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .dashboard-header {
+            background: #002244;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h1 {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .dashboard-content {
+            padding: 0 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .analytics-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: #002244;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .stat-card .service-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .percentage {
+            font-size: 16px;
+            font-weight: bold;
+            color: #60a5fa;
+        }
+
+        .stat-card .subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        .reviews-section {
+            background: #ffffff;
+            color: #002244;
+            padding: 40px 30px;
+            margin: 0 -30px;
+            text-align: center;
+        }
+
+        .reviews-section h2 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 36px;
+            margin-bottom: 30px;
+        }
+
+        .review-card {
+            background: #002244;
+            border: 2px solid #002244;
+            color: #ffffff;
+            padding: 28px 18px 20px 18px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 4px 18px rgba(0,34,68,0.08);
+            margin-bottom: 12px;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            background: #94a3b8;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .review-avatar::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 10px;
+            left: 15px;
+        }
+
+        .review-avatar::after {
+            content: '';
+            position: absolute;
+            width: 30px;
+            height: 15px;
+            background: white;
+            border-radius: 15px 15px 0 0;
+            bottom: 8px;
+            left: 10px;
+        }
+
+        .review-text {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 18px;
+            min-height: 60px;
+            color: #ffffff;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+        }
+
+        .star {
+            width: 20px;
+            height: 20px;
+            color: #fbbf24;
+            font-size: 16px;
+        }
+
+        .star.empty {
+            color: #64748b;
+        }
+
+        .add-review-btn {
+            background: #002244;
+            color: white;
+            border: 2px solid #3b82f6;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-review-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .review-nav-btn {
+            background: #002244;
+            color: #fff;
+            border: 2px solid #002244;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border 0.2s;
+            box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+        }
+        .review-nav-btn:hover {
+            background: #b0b6be;
+            color: #002244;
+            border-color: #b0b6be;
+        }
+
+        @media (max-width: 1200px) {
+            .analytics-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .reviews-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-content {
+                padding: 0 15px;
+            }
+            
+            .reviews-section {
+                margin: 0 -15px;
+                padding: 30px 15px;
+            }
+            
+            .reviews-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .white-divider {
+            border: none;
+            height: 6px;
+            background: #fff;
+            border-radius: 3px;
+            margin: 18px 0 28px 0;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+        }
+
+        .white-divider-full {
+            position: relative;
+            left: 50%;
+            right: 50%;
+            width: 100vw;
+            max-width: 100vw;
+            margin-left: -50vw;
+            margin-right: -50vw;
+        }
+
+        .manage-account-link {
+            color: #fff;
+            font-size: 13px;
+            opacity: 0.8;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .manage-account-link:hover {
+            color: #666;
+            opacity: 1;
+        }
+
+        .header-icons-absolute {
+            position: absolute;
+            top: 18px;
+            right: 30px;
+            z-index: 120;
+        }
+        .fa-bars {
+            font-size: 2rem;
+            color: #000;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .fa-bars:hover, .fa-bars.active {
+            color: gray;
+        }
+        .menu-popup {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 30px;
+            background: #fff;
+            color: #1e3a8a;
+            border-radius: 12px;
+            box-shadow: 0 4px 24px rgba(0,71,171,0.10);
+            min-width: 180px;
+            z-index: 200;
+            flex-direction: column;
+            padding: 10px 0;
+        }
+        .menu-popup a {
+            color: #1e3a8a;
+            text-decoration: none;
+            padding: 12px 24px;
+            display: block;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .menu-popup a:hover {
+            background: #3b82f6;
+            color: #fff;
+        }
+
+        .reviews-title-container {
+            background: #002244;
+            color: #fff;
+            padding: 24px 0 10px 0;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+            margin: 0 -30px;
+            margin-bottom: 36px;
+        }
+        .reviews-title-container h2 {
+            margin: 0;
+        }
+        .reviews-title-container .white-divider {
+            background: #fff;
+            margin-bottom: 0;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.7);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .logo-container img {
+            height: 70px;
+            cursor: pointer;
+        }
+        .logo-container a {
+            display: inline-block;
+        }
+        .header-center {
+            text-align: center;
+            flex: 1;
+        }
+        .header-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header-icons i {
+            font-size: 28px;
+            color: #000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .header-icons i:hover {
+            transform: scale(1.2);
+            /* No color change */
+        }
+        .menu-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+        .menu-popup a {
+            display: block;
+            padding: 10px 15px;
+            color: #000;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-popup a:hover {
+            background-color: #f0f0f0;
+        }
+        .menu-popup a:last-child {
+            background-color: #191970;
+            color: #fff;
+            border-bottom: none;
+            transition: background 0.3s ease, transform 0.2s;
+        }
+        .menu-popup a:last-child:hover {
+            background-color: #000080;
+            transform: scale(1.02);
+        }
+        .fa-bars {
+            transition: transform 0.3s;
+        }
+        .fa-bars.active {
+            transform: rotate(90deg);
+            /* No color change */
+        }
+
+        /* Review Filter Styles */
+        .review-filter-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .filter-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 34, 68, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .filter-wrapper:hover {
+            border-color: #0047AB;
+            box-shadow: 0 4px 12px rgba(0, 71, 171, 0.15);
+        }
+
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #0047AB;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .filter-label i {
+            font-size: 16px;
+            color: #0047AB;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            color: #334155;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #0047AB;
+            box-shadow: 0 0 0 3px rgba(0, 71, 171, 0.1);
+        }
+
+        .filter-select:hover {
+            border-color: #0047AB;
+        }
+
+        /* Review Actions Styles */
+        .review-card {
+            position: relative;
+        }
+
+        .review-header {
+            margin-bottom: 10px;
+        }
+
+        .review-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .edit-review-btn, .delete-review-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .edit-review-btn {
+            color: #ffc300;
+        }
+
+        .edit-review-btn:hover {
+            background: rgba(255, 195, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .delete-review-btn {
+            color: #ff6b6b;
+        }
+
+        .delete-review-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Responsive adjustments for filter */
+        @media (max-width: 768px) {
+            .review-filter-container {
+                justify-content: center;
+                padding: 0 15px;
+            }
+            
+            .filter-wrapper {
+                flex-direction: column;
+                gap: 8px;
+                padding: 12px 16px;
+            }
+            
+            .filter-select {
+                min-width: 120px;
+            }
+
+            .review-actions {
+                top: 5px;
+                right: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+      <div class="logo-container">
+        <a href="homepage.html"><img src="logo.png" alt="AudioWerks Logo, click to go home" style="height: 70px;" /></a>
+      </div>
+      <div class="header-center">
+        <h1 style="font-size: 2rem; font-weight: bold; color: #0047AB; margin: 0;">Audiowerks</h1>
+        <p style="font-size: 1.1rem; color: #0047AB; margin: 0;">Lights and Sounds</p>
+      </div>
+      <div class="header-icons">
+        <i class="fas fa-bars" aria-label="Menu" tabindex="0" onclick="toggleMenu(this)"></i>
+      </div>
+      <nav class="menu-popup" id="menuPopup" aria-label="Main Navigation">
+        <a href="homepage.html">Home</a>
+        <a href="portfolioo.html">Portfolio</a>
+        <a href="Services.html">Book Here</a>
+        <a href="User.html">User Profile</a>
+        <a href="availability.html">Equipment</a>
+        <a href="feedback.html">Feedback Dashboard</a>
+        <a href="login.html" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+
+    <div class="dashboard-header">
+        <h1>Feedback Dashboard</h1>
+        <hr class="white-divider white-divider-full">
+    </div>
+
+    <div class="dashboard-content">
+        <div class="analytics-section">
+            <div class="chart-container">
+                <h2 class="chart-title">Most Used Equipment</h2>
+                <div class="chart-wrapper">
+                    <canvas id="equipmentChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">Most Serviced Area</h2>
+                <div class="chart-wrapper">
+                    <canvas id="areaChart"></canvas>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Most Requested Services</h3>
+                    <div class="service-name">Lights & Sounds</div>
+                    <div class="percentage">Up to 7%</div>
+                    <div class="subtitle">From Last Month</div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Commonly Booked Event Packages</h3>
+                    <div class="service-name">Wedding</div>
+                    <div class="percentage">Up to 45%</div>
+                    <div class="subtitle">From Last Month</div>
+                </div>
+
+                <div class="stat-card" style="grid-column: 1 / -1;">
+                    <h3>Least Requested Services</h3>
+                    <div class="service-name">Low Lying</div>
+                    <div class="percentage">Up to 16%</div>
+                    <div class="subtitle">From Last Month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reviews-section">
+        <div class="reviews-title-container">
+            <h2>Reviews</h2>
+            <div class="white-divider"></div>
+        </div>
+        
+        <!-- Review Filter -->
+        <div class="review-filter-container">
+            <div class="filter-wrapper">
+                <label for="reviewFilter" class="filter-label">
+                    <i class="fas fa-filter"></i>
+                    Filter Reviews
+                </label>
+                <select id="reviewFilter" class="filter-select" onchange="filterReviews()">
+                    <option value="all">All Reviews</option>
+                    <option value="my">My Reviews</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="reviews-grid" id="reviewsGrid">
+            <!-- Reviews will be loaded dynamically -->
+        </div>
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
+            <button id="prevReviewBtn" class="review-nav-btn" style="width: 120px;"><i class="fas fa-angle-left"></i></button>
+            <button id="nextReviewBtn" class="review-nav-btn" style="width: 120px;"><i class="fas fa-angle-right"></i></button>
+        </div>
+        <div style="height: 32px;"></div>
+        <button class="review-nav-btn" onclick="addReview()">Add A Review</button>
+    </div>
+
+    <script>
+        // Global variables for charts
+        let equipmentChart, areaChart;
+        let allReviews = [];
+        let filteredReviews = [];
+        let currentPage = 0;
+        const reviewsPerPage = 5;
+        let selectedRating = 5; // Global variable for rating
+        let currentFilter = 'all'; // Track current filter
+
+        // Initialize charts with real data from Firebase
+        async function initializeChartsWithRealData() {
+            if (typeof firebase === 'undefined') {
+                console.warn('Firebase not available, using fallback data');
+                initializeChartsWithFallbackData();
+                return;
+            }
+
+            try {
+                // Fetch bookings data for equipment and area charts
+                const bookingsSnapshot = await firebase.database().ref('bookings').once('value');
+                const bookings = bookingsSnapshot.val() || {};
+                
+                // Process equipment data
+                const equipmentData = {};
+                const areaData = {};
+                const serviceData = {};
+                const eventTypeData = {};
+                
+                Object.values(bookings).forEach(booking => {
+                    // Count equipment types
+                    if (booking.productName) {
+                        const equipment = booking.productName.toLowerCase();
+                        if (equipment.includes('speaker') || equipment.includes('sound')) {
+                            equipmentData['Speakers'] = (equipmentData['Speakers'] || 0) + 1;
+                        } else if (equipment.includes('light') || equipment.includes('led')) {
+                            equipmentData['Lights'] = (equipmentData['Lights'] || 0) + 1;
+                        } else if (equipment.includes('wall')) {
+                            equipmentData['LED Wall'] = (equipmentData['LED Wall'] || 0) + 1;
+                        } else if (equipment.includes('mood')) {
+                            equipmentData['Mood Lights'] = (equipmentData['Mood Lights'] || 0) + 1;
+                        } else {
+                            equipmentData['Other Equipment'] = (equipmentData['Other Equipment'] || 0) + 1;
+                        }
+                    }
+                    
+                    // Count areas
+                    if (booking.startDate) {
+                        // Use the actual location from the booking data
+                        const area = booking.location || 'Unknown Location';
+                        areaData[area] = (areaData[area] || 0) + 1;
+                    }
+
+                    // Count services (productName)
+                    if (booking.productName) {
+                        serviceData[booking.productName] = (serviceData[booking.productName] || 0) + 1;
+                    }
+
+                    // Count event types (productType or infer from productName)
+                    let eventType = booking.productType || 'General Event';
+                    if (booking.productName) {
+                        const productName = booking.productName.toLowerCase();
+                        if (productName.includes('wedding')) eventType = 'Wedding';
+                        else if (productName.includes('birthday')) eventType = 'Birthday';
+                        else if (productName.includes('corporate')) eventType = 'Corporate';
+                        else if (productName.includes('party')) eventType = 'Party';
+                        else if (productName.includes('concert')) eventType = 'Concert';
+                        else if (productName.includes('graduation')) eventType = 'Graduation';
+                    }
+                    eventTypeData[eventType] = (eventTypeData[eventType] || 0) + 1;
+                });
+
+                // Fetch reviews data
+                const reviewsSnapshot = await firebase.database().ref('reviews').once('value');
+                const reviews = reviewsSnapshot.val() || {};
+                
+                allReviews = Object.entries(reviews).map(([key, review]) => ({
+                    key: key,
+                    text: review.text || review.review || '',
+                    stars: review.rating || review.stars || 5,
+                    author: review.author || review.customerName || 'Anonymous',
+                    authorId: review.authorId || '',
+                    timestamp: review.timestamp || Date.now()
+                })).sort((a, b) => b.timestamp - a.timestamp);
+
+                // Apply current filter
+                applyFilter();
+
+                // Update statistic cards with real data
+                updateStatisticCards(serviceData, eventTypeData);
+
+                // Initialize charts with real data
+                initializeEquipmentChart(equipmentData);
+                initializeAreaChart(areaData);
+                renderReviews();
+
+            } catch (error) {
+                console.error('Error fetching real data:', error);
+                initializeChartsWithFallbackData();
+            }
+        }
+
+        function applyFilter() {
+            const filterValue = document.getElementById('reviewFilter').value;
+            currentFilter = filterValue;
+            currentPage = 0; // Reset to first page when filtering
+
+            if (filterValue === 'my') {
+                // Filter to show only current user's reviews
+                const currentUser = firebase.auth().currentUser;
+                if (currentUser) {
+                    filteredReviews = allReviews.filter(review => 
+                        review.authorId === currentUser.uid || 
+                        review.author === currentUser.email
+                    );
+                } else {
+                    filteredReviews = [];
+                }
+            } else {
+                // Show all reviews
+                filteredReviews = [...allReviews];
+            }
+        }
+
+        function filterReviews() {
+            applyFilter();
+            renderReviews();
+        }
+
+        function updateStatisticCards(serviceData, eventTypeData) {
+            // Calculate most requested service
+            const mostRequestedService = Object.entries(serviceData)
+                .sort(([,a], [,b]) => b - a)[0] || ['No Data', 0];
+            
+            // Calculate commonly booked event package
+            const commonlyBookedEvent = Object.entries(eventTypeData)
+                .sort(([,a], [,b]) => b - a)[0] || ['No Data', 0];
+            
+            // Calculate least requested service
+            const leastRequestedService = Object.entries(serviceData)
+                .sort(([,a], [,b]) => a - b)[0] || ['No Data', 0];
+
+            // Calculate percentages
+            const totalServices = Object.values(serviceData).reduce((sum, val) => sum + val, 0);
+            const totalEvents = Object.values(eventTypeData).reduce((sum, val) => sum + val, 0);
+
+            const mostRequestedPercentage = totalServices > 0 ? Math.round((mostRequestedService[1] / totalServices) * 100) : 0;
+            const commonlyBookedPercentage = totalEvents > 0 ? Math.round((commonlyBookedEvent[1] / totalEvents) * 100) : 0;
+            const leastRequestedPercentage = totalServices > 0 ? Math.round((leastRequestedService[1] / totalServices) * 100) : 0;
+
+            // Update the statistic cards
+            const statCards = document.querySelectorAll('.stat-card');
+            
+            if (statCards[0]) {
+                statCards[0].querySelector('.service-name').textContent = mostRequestedService[0];
+                statCards[0].querySelector('.percentage').textContent = `Up to ${mostRequestedPercentage}%`;
+            }
+            
+            if (statCards[1]) {
+                statCards[1].querySelector('.service-name').textContent = commonlyBookedEvent[0];
+                statCards[1].querySelector('.percentage').textContent = `Up to ${commonlyBookedPercentage}%`;
+            }
+            
+            if (statCards[2]) {
+                statCards[2].querySelector('.service-name').textContent = leastRequestedService[0];
+                statCards[2].querySelector('.percentage').textContent = `Up to ${leastRequestedPercentage}%`;
+            }
+        }
+
+        function initializeEquipmentChart(equipmentData) {
+        const equipmentCtx = document.getElementById('equipmentChart').getContext('2d');
+            
+            // Prepare data for chart
+            const labels = Object.keys(equipmentData);
+            const data = Object.values(equipmentData);
+            const total = data.reduce((sum, val) => sum + val, 0);
+            const percentages = data.map(val => total > 0 ? Math.round((val / total) * 100 * 10) / 10 : 0);
+
+            // Destroy existing chart if it exists
+            if (equipmentChart) {
+                equipmentChart.destroy();
+            }
+
+            equipmentChart = new Chart(equipmentCtx, {
+            type: 'pie',
+            data: {
+                    labels: labels.length > 0 ? labels : ['No Data'],
+                datasets: [{
+                        data: data.length > 0 ? percentages : [100],
+                        backgroundColor: ['#1e3a8a', '#3b82f6', '#60a5fa', '#93c5fd', '#dbeafe'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                                font: { size: 12 }
+                        }
+                    }
+                }
+            }
+        });
+        }
+
+        function initializeAreaChart(areaData) {
+        const areaCtx = document.getElementById('areaChart').getContext('2d');
+            
+            // Prepare data for chart
+            const labels = Object.keys(areaData);
+            const data = Object.values(areaData);
+            const maxValue = Math.max(...data, 1);
+
+            // Destroy existing chart if it exists
+            if (areaChart) {
+                areaChart.destroy();
+            }
+
+            areaChart = new Chart(areaCtx, {
+            type: 'bar',
+            data: {
+                    labels: labels.length > 0 ? labels : ['No Data'],
+                datasets: [{
+                        data: data.length > 0 ? data : [0],
+                    backgroundColor: ['#1e3a8a', '#1e3a8a', '#3b82f6', '#1e3a8a', '#60a5fa'],
+                    borderWidth: 0,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                        legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                            max: Math.ceil(maxValue * 1.2),
+                            ticks: { stepSize: Math.ceil(maxValue / 5) }
+                    },
+                    x: {
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initializeChartsWithFallbackData() {
+            // Fallback data when Firebase is not available
+            const equipmentData = {
+                'Speakers': 15,
+                'Lights': 12,
+                'LED Wall': 8,
+                'Mood Lights': 5
+            };
+            
+            const areaData = {
+                'Tagaytay': 15,
+                'Bulacan': 9,
+                'Manila': 12,
+                'Batangas': 10,
+                'Cavite': 7
+            };
+
+            const serviceData = {
+                'Lights & Sounds': 25,
+                'LED Wall Setup': 18,
+                'Mood Lighting': 12,
+                'Sound System': 15
+            };
+
+            const eventTypeData = {
+                'Wedding': 35,
+                'Birthday': 20,
+                'Corporate': 15,
+                'Party': 18,
+                'Concert': 8
+            };
+
+            allReviews = [
+                { text: "Excellent Setup!", stars: 4, author: "Anonymous", authorId: "" },
+                { text: "The service was excellent", stars: 5, author: "Anonymous", authorId: "" },
+                { text: "The supplier was so accommodating for all our request", stars: 5, author: "Anonymous", authorId: "" },
+                { text: "They worked like magic! My event was a success", stars: 5, author: "Anonymous", authorId: "" },
+                { text: "The team was professional and efficient", stars: 4, author: "Anonymous", authorId: "" }
+            ];
+
+            // Apply current filter
+            applyFilter();
+
+            // Update statistic cards with fallback data
+            updateStatisticCards(serviceData, eventTypeData);
+
+            initializeEquipmentChart(equipmentData);
+            initializeAreaChart(areaData);
+            renderReviews();
+        }
+
+        // Review Pagination Logic
+        const reviewsGrid = document.getElementById('reviewsGrid');
+        const prevBtn = document.getElementById('prevReviewBtn');
+        const nextBtn = document.getElementById('nextReviewBtn');
+
+        function renderReviews() {
+            reviewsGrid.innerHTML = '';
+            
+            if (filteredReviews.length === 0) {
+                if (currentFilter === 'my') {
+                    reviewsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666; font-style: italic;">You haven\'t written any reviews yet. Be the first to leave a review!</div>';
+                } else {
+                    reviewsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666; font-style: italic;">No reviews yet. Be the first to leave a review!</div>';
+                }
+                return;
+            }
+            
+            const start = currentPage * reviewsPerPage;
+            const end = Math.min(start + reviewsPerPage, filteredReviews.length);
+            const currentUser = firebase.auth().currentUser;
+            
+            for (let i = start; i < end; i++) {
+                const review = filteredReviews[i];
+                const isOwnReview = currentUser && (review.authorId === currentUser.uid || review.author === currentUser.email);
+                
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                card.innerHTML = `
+                    <div class="review-avatar"></div>
+                    <div class="review-content">
+                        <div class="review-header">
+                            <div class="review-author" style="font-weight: 600; color: #0047AB; margin-bottom: 5px; font-size: 14px;">${review.author}</div>
+                        </div>
+                        ${isOwnReview ? `
+                            <div class="review-actions">
+                                <button class="edit-review-btn" onclick="editReview('${review.key || i}')" title="Edit Review">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-review-btn" onclick="deleteReview('${review.key || i}')" title="Delete Review">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                        <div class="review-text">${review.text}</div>
+                        <div class="stars">
+                            ${[...Array(5)].map((_, idx) => `<span class="star${idx < review.stars ? '' : ' empty'}">★</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                reviewsGrid.appendChild(card);
+            }
+            
+            prevBtn.disabled = currentPage === 0;
+            nextBtn.disabled = end >= filteredReviews.length;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                renderReviews();
+            }
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if ((currentPage + 1) * reviewsPerPage < filteredReviews.length) {
+                currentPage++;
+                renderReviews();
+            }
+        });
+
+        function addReview() {
+            // Check if user is logged in
+            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                // Check if user has any bookings
+                checkUserBookings();
+            } else {
+                showPopup('Please log in to add a review!', 'Login Required');
+            }
+        }
+
+        async function checkUserBookings() {
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showPopup('Please log in to add a review!', 'Login Required');
+                    return;
+                }
+
+                // Fetch all bookings
+                const bookingsSnapshot = await firebase.database().ref('bookings').once('value');
+                const bookings = bookingsSnapshot.val() || {};
+                
+                // Check if user has any bookings
+                const userBookings = Object.values(bookings).filter(booking => {
+                    return booking.customerUid === user.uid || 
+                           booking.customer === user.email ||
+                           booking.customerName === user.email;
+                });
+
+                if (userBookings.length === 0) {
+                    showPopup('You need to have a booking before you can leave a review. Please book our services first!', 'Booking Required');
+                    return;
+                }
+
+                // User has bookings, show review form
+                showReviewForm();
+                
+            } catch (error) {
+                console.error('Error checking user bookings:', error);
+                showPopup('Error checking your bookings. Please try again.', 'Error');
+            }
+        }
+
+        function showPopup(message, title = 'Notice') {
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            popup.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 400px;
+                    text-align: center;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                ">
+                    <h3 style="color: #0047AB; margin-bottom: 15px; font-size: 1.3rem;">${title}</h3>
+                    <p style="margin-bottom: 20px; line-height: 1.5; color: #333;">${message}</p>
+                    <button onclick="closePopup()" style="
+                        padding: 10px 20px;
+                        background: #0047AB;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                    ">OK</button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+        }
+
+        function closePopup() {
+            const popup = document.querySelector('div[style*="position: fixed"]');
+            if (popup) popup.remove();
+        }
+
+        function showReviewForm() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 500px;
+                ">
+                    <h3 style="color: #0047AB; margin-bottom: 20px;">Add Your Review</h3>
+                    <textarea id="reviewText" placeholder="Write your review here..." style="
+                        width: 100%;
+                        height: 100px;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                        resize: vertical;
+                    "></textarea>
+                    <div style="margin-bottom: 15px;">
+                        <label>Rating: </label>
+                        <div id="starRating" style="display: inline-block;">
+                            ${[...Array(5)].map((_, i) => `<span class="star-select" data-rating="${i+1}" style="cursor: pointer; font-size: 20px; color: #ddd;">★</span>`).join('')}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button onclick="closeReviewForm()" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: #f8f9fa;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button onclick="submitReview()" style="
+                            padding: 8px 16px;
+                            background: #0047AB;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">Submit Review</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Star rating functionality
+            const stars = modal.querySelectorAll('.star-select');
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    stars.forEach((s, i) => {
+                        s.style.color = i < selectedRating ? '#ffc300' : '#ddd';
+                    });
+                });
+            });
+            
+            // Initialize with 5 stars
+            stars.forEach((star, i) => {
+                star.style.color = i < 5 ? '#ffc300' : '#ddd';
+            });
+        }
+
+        function closeReviewForm() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) modal.remove();
+        }
+
+        async function submitReview() {
+            console.log('submitReview function called!'); // Debug log
+            const reviewText = document.getElementById('reviewText').value.trim();
+            if (!reviewText) {
+                showPopup('Please write a review!', 'Review Required');
+                return;
+            }
+
+            try {
+                // Check if Firebase is available
+                if (typeof firebase === 'undefined') {
+                    showPopup('Review system is currently unavailable. Please try again later.', 'System Unavailable');
+                    return;
+                }
+
+                // Check if user is logged in
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showPopup('Please log in to submit a review!', 'Login Required');
+                    return;
+                }
+
+                console.log('User is logged in:', user.email, 'UID:', user.uid);
+
+                // Get username from Firebase users database
+                let username = 'Anonymous';
+                try {
+                    const userSnap = await firebase.database().ref('users').once('value');
+                    const users = userSnap.val() || {};
+                    
+                    console.log('Current user:', user);
+                    console.log('Available users:', users);
+                    
+                    // Try multiple methods to find username
+                    let found = false;
+                    
+                    // Method 1: Check if user.uid is a key in users
+                    if (users[user.uid]) {
+                        username = users[user.uid].name || users[user.uid].username || user.uid;
+                        console.log('Found by UID as key:', username);
+                        found = true;
+                    }
+                    
+                    // Method 2: Search by email
+                    if (!found) {
+                        for (const [uname, userData] of Object.entries(users)) {
+                            if (userData.email && userData.email.replace(/^"|"$/g, '') === user.email) {
+                                username = uname;
+                                console.log('Found by email:', username);
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Method 3: Search by UID in userData
+                    if (!found) {
+                        for (const [uname, userData] of Object.entries(users)) {
+                            if (userData.uid === user.uid) {
+                                username = uname;
+                                console.log('Found by UID in userData:', username);
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!found) {
+                        console.log('Username not found, using email');
+                        username = user.email;
+                    }
+                    
+                    console.log('Final username:', username);
+                } catch (error) {
+                    console.warn('Could not fetch username, using email:', error);
+                    username = user.email || 'Anonymous';
+                }
+
+                const reviewData = {
+                    text: reviewText,
+                    rating: selectedRating,
+                    author: username,
+                    authorId: user.uid,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                };
+
+                console.log('Submitting review data:', reviewData);
+
+                await firebase.database().ref('reviews').push(reviewData);
+                closeReviewForm();
+                
+                // Refresh the reviews
+                await initializeChartsWithRealData();
+                
+                showPopup('Thank you for your review!', 'Review Submitted');
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                showPopup('Error submitting review. Please try again.', 'Error');
+            }
+        }
+
+        // Initialize charts when page loads
+        document.addEventListener('DOMContentLoaded', initializeChartsWithRealData);
+
+        function toggleMenu(btn) {
+          const menu = document.getElementById('menuPopup');
+          const bars = document.querySelector('.fa-bars');
+          if (menu.style.display === 'block') {
+            menu.style.display = 'none';
+            bars.classList.remove('active');
+          } else {
+            menu.style.display = 'block';
+            bars.classList.add('active');
+          }
+        }
+        // Close menu on outside click or link click
+        window.addEventListener('click', function (e) {
+          const menu = document.getElementById('menuPopup');
+          const button = document.querySelector('.fa-bars');
+          if (!menu.contains(e.target) && e.target !== button) {
+            menu.style.display = 'none';
+            button.classList.remove('active');
+          }
+        });
+        document.querySelectorAll('.menu-popup a').forEach(link => {
+          link.addEventListener('click', function() {
+            document.getElementById('menuPopup').style.display = 'none';
+            document.querySelector('.fa-bars').classList.remove('active');
+          });
+        });
+        function logout() {
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = "login.html";
+        }
+
+        // Edit Review Function
+        function editReview(reviewKey) {
+            const review = allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey]);
+            if (!review) {
+                showPopup('Review not found!', 'Error');
+                return;
+            }
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 500px;
+                ">
+                    <h3 style="color: #0047AB; margin-bottom: 20px;">Edit Your Review</h3>
+                    <textarea id="editReviewText" placeholder="Write your review here..." style="
+                        width: 100%;
+                        height: 100px;
+                        padding: 10px;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        margin-bottom: 15px;
+                        resize: vertical;
+                    ">${review.text}</textarea>
+                    <div style="margin-bottom: 15px;">
+                        <label>Rating: </label>
+                        <div id="editStarRating" style="display: inline-block;">
+                            ${[...Array(5)].map((_, i) => `<span class="edit-star-select" data-rating="${i+1}" style="cursor: pointer; font-size: 20px; color: ${i < review.stars ? '#ffc300' : '#ddd'};">★</span>`).join('')}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button onclick="closeEditReviewForm()" style="
+                            padding: 8px 16px;
+                            border: 1px solid #ddd;
+                            background: #f8f9fa;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">Cancel</button>
+                        <button onclick="updateReview('${reviewKey}')" style="
+                            padding: 8px 16px;
+                            background: #0047AB;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                        ">Update Review</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Star rating functionality
+            const stars = modal.querySelectorAll('.edit-star-select');
+            let selectedRating = review.stars;
+            
+            stars.forEach((star, index) => {
+                star.addEventListener('click', () => {
+                    selectedRating = index + 1;
+                    stars.forEach((s, i) => {
+                        s.style.color = i < selectedRating ? '#ffc300' : '#ddd';
+                    });
+                });
+            });
+        }
+
+        function closeEditReviewForm() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) modal.remove();
+        }
+
+        async function updateReview(reviewKey) {
+            const reviewText = document.getElementById('editReviewText').value.trim();
+            if (!reviewText) {
+                showPopup('Please write a review!', 'Review Required');
+                return;
+            }
+
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showPopup('Please log in to edit your review!', 'Login Required');
+                    return;
+                }
+
+                // Get the star rating
+                const stars = document.querySelectorAll('.edit-star-select');
+                let selectedRating = 5;
+                stars.forEach((star, index) => {
+                    if (star.style.color === 'rgb(255, 195, 0)') {
+                        selectedRating = index + 1;
+                    }
+                });
+
+                // Find the review in Firebase
+                const reviewsRef = firebase.database().ref('reviews');
+                const snapshot = await reviewsRef.once('value');
+                const reviews = snapshot.val() || {};
+                
+                let reviewId = null;
+                for (const [key, review] of Object.entries(reviews)) {
+                    if ((review.authorId === user.uid || review.author === user.email) && 
+                        review.text === allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey])?.text) {
+                        reviewId = key;
+                        break;
+                    }
+                }
+
+                if (!reviewId) {
+                    showPopup('Review not found or you don\'t have permission to edit it!', 'Error');
+                    return;
+                }
+
+                // Update the review
+                await reviewsRef.child(reviewId).update({
+                    text: reviewText,
+                    rating: selectedRating,
+                    stars: selectedRating,
+                    lastEdited: firebase.database.ServerValue.TIMESTAMP
+                });
+
+                closeEditReviewForm();
+                
+                // Refresh the reviews
+                await initializeChartsWithRealData();
+                
+                showPopup('Review updated successfully!', 'Success');
+            } catch (error) {
+                console.error('Error updating review:', error);
+                showPopup('Error updating review. Please try again.', 'Error');
+            }
+        }
+
+        // Delete Review Function
+        async function deleteReview(reviewKey) {
+            const review = allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey]);
+            if (!review) {
+                showPopup('Review not found!', 'Error');
+                return;
+            }
+
+            // Show confirmation popup
+            const confirmModal = document.createElement('div');
+            confirmModal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+            `;
+            
+            confirmModal.innerHTML = `
+                <div style="
+                    background: white;
+                    padding: 30px;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 400px;
+                    text-align: center;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                ">
+                    <h3 style="color: #ff6b6b; margin-bottom: 15px; font-size: 1.3rem;">Delete Review</h3>
+                    <p style="margin-bottom: 20px; line-height: 1.5; color: #333;">Are you sure you want to delete your review? This action cannot be undone.</p>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button onclick="closeDeleteConfirm()" style="
+                            padding: 10px 20px;
+                            border: 1px solid #ddd;
+                            background: #f8f9fa;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Cancel</button>
+                        <button onclick="confirmDeleteReview('${reviewKey}')" style="
+                            padding: 10px 20px;
+                            background: #ff6b6b;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Delete</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(confirmModal);
+        }
+
+        function closeDeleteConfirm() {
+            const modal = document.querySelector('div[style*="position: fixed"]');
+            if (modal) modal.remove();
+        }
+
+        async function confirmDeleteReview(reviewKey) {
+            try {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    showPopup('Please log in to delete your review!', 'Login Required');
+                    return;
+                }
+
+                // Find the review in Firebase
+                const reviewsRef = firebase.database().ref('reviews');
+                const snapshot = await reviewsRef.once('value');
+                const reviews = snapshot.val() || {};
+                
+                let reviewId = null;
+                for (const [key, review] of Object.entries(reviews)) {
+                    if ((review.authorId === user.uid || review.author === user.email) && 
+                        review.text === allReviews.find(r => r.key === reviewKey || r === allReviews[reviewKey])?.text) {
+                        reviewId = key;
+                        break;
+                    }
+                }
+
+                if (!reviewId) {
+                    showPopup('Review not found or you don\'t have permission to delete it!', 'Error');
+                    return;
+                }
+
+                // Delete the review
+                await reviewsRef.child(reviewId).remove();
+
+                closeDeleteConfirm();
+                
+                // Refresh the reviews
+                await initializeChartsWithRealData();
+                
+                showPopup('Review deleted successfully!', 'Success');
+            } catch (error) {
+                console.error('Error deleting review:', error);
+                showPopup('Error deleting review. Please try again.', 'Error');
+            }
+        }
+    </script>
+
+  <!-- Floating Chat HTML (copied from homepage.html) -->
+  <div class="floating-chat-head" id="floatingChatHead" title="Chat with us">
+    <i class="fas fa-comment"></i>
+    <span id="floatingChatNotif" style="display:none;position:absolute;top:2px;right:2px;background:#ff4444;color:#fff;font-size:0.85em;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;z-index:10;"></span>
+  </div>
+  <div class="floating-chat-popup" id="floatingChatPopup">
+    <div class="floating-chat-popup-header">
+      <span style="font-weight:700; font-size:1.1rem; letter-spacing:1px;">AudioWerks</span>
+      <div class="floating-chat-header-right">
+        <button class="floating-chat-call-btn" title="Call"><i class="fas fa-phone"></i></button>
+      </div>
+    </div>
+    <div class="floating-chat-popup-body" id="floatingChatPopupBody"></div>
+    <div class="floating-chat-popup-input">
+      <div class="input-icons">
+        <button class="input-btn" title="Attach"><i class="fas fa-paperclip"></i></button>
+        <button class="input-btn" title="Pin"><i class="fas fa-thumbtack"></i></button>
+        <button class="input-btn" title="Camera"><i class="fas fa-camera"></i></button>
+      </div>
+      <input type="text" id="floatingChatInput" placeholder="Type your message here..." />
+      <button class="send-btn" id="floatingChatSendBtn" title="Send Message"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+  <div id="floatingPinnedModalContainer" style="display: none;"></div>
+  <input type="file" id="floatingAttachmentInput" style="display:none" multiple />
+  <input type="file" id="floatingCameraInput" accept="image/*" capture="environment" style="display:none" multiple />
+  <div id="floatingImageModalOverlay">
+    <div id="floatingImageModal">
+      <button class="close-btn" title="Close">&times;</button>
+      <img src="" alt="Preview" />
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config-new.js"></script>
+  <script>
+    // --- CONFIG: Set your admin UID here ---
+    const ADMIN_UID = 'NIptGOOVYPX6vP2kAo31JRNeMtl1'; // Updated to correct admin UID
+    // Floating chat functionality with error handling
+    let chatHead, chatPopup, chatInput, chatSendBtn, chatBody, db, currentUser, isAdminUser;
+
+    function updateFloatingChatNotif(messages) {
+      if (!currentUser) return;
+      const notif = document.getElementById('floatingChatNotif');
+      if (!notif) return;
+      // Only count messages where current user is recipient and has not read
+      const unreadCount = Object.values(messages).filter(msg =>
+        msg.recipientUid === currentUser.uid && msg.uid !== currentUser.uid && (!msg.readBy || !msg.readBy[currentUser.uid])
+      ).length;
+      if (unreadCount > 0) {
+        notif.textContent = unreadCount;
+        notif.style.display = 'inline-flex';
+      } else {
+        notif.textContent = '';
+        notif.style.display = 'none';
+      }
+    }
+
+    function initializeChat() {
+      try {
+        chatHead = document.getElementById('floatingChatHead');
+        chatPopup = document.getElementById('floatingChatPopup');
+        chatInput = document.getElementById('floatingChatInput');
+        chatSendBtn = document.getElementById('floatingChatSendBtn');
+        chatBody = document.getElementById('floatingChatPopupBody');
+
+        if (!chatHead || !chatPopup || !chatInput || !chatSendBtn || !chatBody) {
+          console.warn('Chat elements not found, skipping chat initialization');
+          return;
+        }
+
+        if (typeof firebase === 'undefined') {
+          console.warn('Firebase not available for chat');
+          chatBody.innerHTML = '<p>Chat temporarily unavailable.</p>';
+          return;
+        }
+
+        // Test Firebase Storage availability
+        try {
+          const testRef = firebase.storage().ref('test');
+          console.log('Firebase Storage is available');
+        } catch (error) {
+          console.error('Firebase Storage not available:', error);
+        }
+
+        db = firebase.database();
+        currentUser = null;
+        isAdminUser = false;
+
+        function determineUserRole(user) {
+          if (!user) return Promise.resolve();
+          return firebase.database().ref('admins/' + user.uid).once('value').then(snap => {
+            isAdminUser = !!snap.val();
+            window.isAdminUser = isAdminUser;
+          }).catch(error => {
+            console.warn('Failed to determine user role:', error);
+            isAdminUser = false;
+            window.isAdminUser = false;
+          });
+        }
+
+        firebase.auth().onAuthStateChanged(user => {
+          currentUser = user;
+          if (user) {
+            determineUserRole(user).then(() => {
+              db.ref('chat-messages').on('value', snap => {
+                const messages = snap.val() || {};
+                renderFloatingChatMessages(messages);
+                updateFloatingChatNotif(messages);
+              });
+            });
+          } else {
+            chatBody.innerHTML = '<p>Please log in to chat.</p>';
+          }
+        });
+
+        // Chat event listeners
+        chatHead.addEventListener('click', () => {
+          chatPopup.classList.toggle('open');
+          if (chatPopup.classList.contains('open')) {
+            chatInput.focus();
+            chatBody.scrollTop = chatBody.scrollHeight;
+            updateDbReadReceipts();
+          }
+        });
+
+        chatBody.addEventListener('scroll', function() {
+          if (chatBody.scrollTop + chatBody.clientHeight >= chatBody.scrollHeight - 10) {
+            updateDbReadReceipts();
+          }
+        });
+
+        chatSendBtn.addEventListener('click', sendFloatingChatMsg);
+        chatInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            sendFloatingChatMsg();
+          }
+        });
+
+        // Initialize file upload handlers
+        initializeFileUploads();
+
+      } catch (error) {
+        console.error('Chat initialization failed:', error);
+      }
+    }
+
+    function updateDbReadReceipts() {
+      if (!currentUser || !chatPopup.classList.contains('open') || !db) return;
+      
+      try {
+        const myRole = isAdminUser ? 'admin' : 'client';
+        const updates = {};
+        const messagesRef = db.ref('chat-messages');
+
+        messagesRef.once('value').then(snap => {
+          const allMessages = snap.val() || {};
+          Object.entries(allMessages).forEach(([msgId, msg]) => {
+            const msgIsFromOther = msg.uid !== currentUser.uid;
+            const iHaveNotRead = !(msg.readBy && msg.readBy[currentUser.uid]);
+
+            if (msgIsFromOther && iHaveNotRead) {
+              updates[`${msgId}/readBy/${currentUser.uid}`] = true;
+              updates[`${msgId}/readBy/${myRole}`] = true;
+            }
+          });
+
+          if (Object.keys(updates).length > 0) {
+            messagesRef.update(updates);
+          }
+        }).catch(error => {
+          console.warn('Failed to update read receipts:', error);
+        });
+      } catch (error) {
+        console.warn('Read receipts update failed:', error);
+      }
+    }
+
+    function formatTime(date) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function createFloatingBubble(text, side = 'right', options = {}) {
+      const div = document.createElement('div');
+      div.className = 'floating-chat-bubble ' + side + (options.pinned ? ' pinned' : '');
+      
+      // Handle text content (only if there's text and no attachment, or if it's a non-image attachment)
+      if (text && text.trim() && (!options.attachment || options.attachment.type !== 'image')) {
+        const textNode = document.createTextNode(text);
+        div.appendChild(textNode);
+      }
+      
+      // Handle attachments
+      if (options.attachment) {
+        console.log('Creating attachment element:', options.attachment);
+        const attachment = options.attachment;
+        
+        if (attachment.type === 'image') {
+          // Create image element
+          const img = document.createElement('img');
+          img.src = attachment.url;
+          img.alt = attachment.name;
+          img.style.maxWidth = '180px';
+          img.style.maxHeight = '120px';
+          img.style.display = 'block';
+          img.style.margin = '8px 0';
+          img.style.borderRadius = '10px';
+          img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+          img.style.cursor = 'pointer';
+          img.onclick = () => window.showFloatingImageModal?.(attachment.url);
+          div.appendChild(img);
+        } else {
+          // Create file element
+          const fileDiv = document.createElement('div');
+          fileDiv.style.display = 'flex';
+          fileDiv.style.alignItems = 'center';
+          fileDiv.style.gap = '8px';
+          fileDiv.style.margin = '8px 0';
+          fileDiv.style.fontSize = '1.05rem';
+          fileDiv.style.color = '#002244';
+          fileDiv.style.background = '#f5f8fa';
+          fileDiv.style.borderRadius = '8px';
+          fileDiv.style.padding = '6px 12px';
+          fileDiv.innerHTML = `<i class='fas fa-file'></i> <a href="${attachment.url}" download="${attachment.name}" target="_blank">${attachment.name}</a>`;
+          div.appendChild(fileDiv);
+        }
+      }
+
+      const ts = document.createElement('span');
+      ts.className = 'msg-timestamp';
+      ts.textContent = options.timestamp || formatTime(new Date());
+      div.appendChild(ts);
+
+      if (side === 'right') {
+        const receipt = document.createElement('span');
+        receipt.className = 'read-receipt';
+        const otherPartyRole = isAdminUser ? 'client' : 'admin';
+        if (options.readBy && options.readBy[otherPartyRole]) {
+          receipt.innerHTML = '<i class="fas fa-eye"></i>';
+        } else {
+          receipt.textContent = '✓';
+        }
+        div.appendChild(receipt);
+      }
+
+      // Actions container
+      const actions = document.createElement('span');
+      actions.className = 'msg-actions';
+
+      // Edit (only for right/sender messages)
+      if (side === 'right') {
+        const editBtn = document.createElement('button');
+        editBtn.className = 'msg-action-btn';
+        editBtn.title = 'Edit';
+        editBtn.innerHTML = '<i class="fas fa-pencil-alt"></i>';
+        editBtn.onclick = () => {
+          // Find the text node (first text node, not attachment)
+          let textNode = null;
+          let originalText = '';
+          for (let i = 0; i < div.childNodes.length; i++) {
+            if (div.childNodes[i].nodeType === Node.TEXT_NODE && div.childNodes[i].textContent.trim()) {
+              textNode = div.childNodes[i];
+              originalText = div.childNodes[i].textContent;
+              break;
+            }
+          }
+          
+          // If no text node found, create one
+          if (!textNode) {
+            textNode = document.createTextNode('');
+            div.insertBefore(textNode, div.firstChild);
+          }
+          
+          // Create input field
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'bubble-edit-input';
+          input.value = originalText;
+          input.style.width = '100%';
+          input.style.marginBottom = '8px';
+          
+          // Create save and cancel buttons
+          const saveBtn = document.createElement('button');
+          saveBtn.className = 'msg-action-btn';
+          saveBtn.title = 'Save';
+          saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+          saveBtn.style.marginRight = '4px';
+          
+          const cancelBtn = document.createElement('button');
+          cancelBtn.className = 'msg-action-btn';
+          cancelBtn.title = 'Cancel';
+          cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+          
+          // Create button container
+          const btnContainer = document.createElement('div');
+          btnContainer.style.display = 'flex';
+          btnContainer.style.gap = '4px';
+          btnContainer.appendChild(saveBtn);
+          btnContainer.appendChild(cancelBtn);
+          
+          // Replace text with input
+          div.replaceChild(input, textNode);
+          div.appendChild(btnContainer);
+          
+          // Focus input and select all text
+          input.focus();
+          input.select();
+          
+          // Save functionality
+          saveBtn.onclick = () => {
+            const newText = input.value.trim();
+            if (newText && newText !== originalText && options.msgId && db) {
+              db.ref('chat-messages/' + options.msgId).update({ text: newText });
+            } else {
+              // Restore original text
+              div.replaceChild(textNode, input);
+              div.removeChild(btnContainer);
+            }
+          };
+          
+          // Cancel functionality
+          cancelBtn.onclick = () => {
+            div.replaceChild(textNode, input);
+            div.removeChild(btnContainer);
+          };
+          
+          // Handle Enter and Escape keys
+          input.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+              saveBtn.click();
+            } else if (e.key === 'Escape') {
+              cancelBtn.click();
+            }
+          };
+        };
+        actions.appendChild(editBtn);
+      }
+
+      // Delete
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'msg-action-btn';
+      deleteBtn.title = 'Delete';
+      deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
+      deleteBtn.onclick = () => {
+        if (options.msgId && db) {
+          db.ref('chat-messages/' + options.msgId).remove();
+        }
+      };
+      actions.appendChild(deleteBtn);
+
+      // React
+      const reactBtn = document.createElement('button');
+      reactBtn.className = 'msg-action-btn';
+      reactBtn.title = 'React';
+      reactBtn.innerHTML = '<i class="far fa-heart"></i>';
+      reactBtn.onclick = () => {
+        showReactionPicker(div, options.msgId);
+      };
+      actions.appendChild(reactBtn);
+
+      // Pin (available for both admin and client users)
+      const pinBtn = document.createElement('button');
+      pinBtn.className = 'msg-action-btn';
+      pinBtn.title = options.pinned ? 'Unpin' : 'Pin';
+      pinBtn.innerHTML = '<i class="fas fa-thumbtack"></i>';
+      pinBtn.onclick = () => {
+        if (options.msgId && db && currentUser) {
+          const newPinnedState = !options.pinned;
+          console.log(`${currentUser.email} ${newPinnedState ? 'pinning' : 'unpinning'} message:`, options.msgId);
+          db.ref('chat-messages/' + options.msgId).update({ 
+            pinned: newPinnedState,
+            pinnedBy: currentUser.uid,
+            pinnedAt: firebase.database.ServerValue.TIMESTAMP
+          });
+        }
+      };
+      actions.appendChild(pinBtn);
+
+      // Add reactions display if message has reactions
+      if (options.reactions && Object.keys(options.reactions).length > 0) {
+        const reactionsDiv = document.createElement('div');
+        reactionsDiv.className = 'reactions';
+        
+        Object.entries(options.reactions).forEach(([emoji, users]) => {
+          const reactionDiv = document.createElement('div');
+          reactionDiv.className = 'reaction';
+          if (users && users[currentUser.uid]) {
+            reactionDiv.classList.add('active');
+          }
+          reactionDiv.innerHTML = `${emoji} <span class="count">${Object.keys(users || {}).length}</span>`;
+          reactionDiv.onclick = () => {
+            toggleReaction(options.msgId, emoji, currentUser.uid);
+          };
+          reactionsDiv.appendChild(reactionDiv);
+        });
+        
+        div.appendChild(reactionsDiv);
+      }
+
+      div.appendChild(actions);
+
+      return div;
+    }
+
+    function renderFloatingChatMessages(messages) {
+      if (!chatBody) return;
+      
+      chatBody.innerHTML = '';
+      if (!currentUser) return;
+
+      try {
+        Object.entries(messages)
+          .filter(([msgId, msg]) => msg.uid === currentUser.uid || msg.recipientUid === currentUser.uid)
+          .sort((a, b) => a[1].timestamp - b[1].timestamp)
+          .forEach(([msgId, msg]) => {
+          const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+          const bubble = createFloatingBubble(msg.text, side, {
+            msgId: msgId,
+            timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+            readBy: msg.readBy || {},
+            pinned: msg.pinned || false,
+            reactions: msg.reactions || {},
+            attachment: msg.attachment || null
+          });
+          chatBody.appendChild(bubble);
+        });
+        chatBody.scrollTop = chatBody.scrollHeight;
+      } catch (error) {
+        console.warn('Failed to render chat messages:', error);
+      }
+    }
+
+    function sendFloatingChatMsg() {
+      const msgText = chatInput.value.trim();
+      if (!msgText || !currentUser || !db) return;
+
+      try {
+        const role = isAdminUser ? 'admin' : 'client';
+        const messageData = {
+          text: msgText,
+          uid: currentUser.uid,
+          name: currentUser.displayName || currentUser.email,
+          timestamp: firebase.database.ServerValue.TIMESTAMP,
+          readBy: {
+            [currentUser.uid]: true,
+            [role]: true
+          }
+        };
+
+        db.ref('chat-messages').push(messageData);
+        chatInput.value = '';
+      } catch (error) {
+        console.warn('Failed to send message:', error);
+      }
+    }
+
+    function initializeFileUploads() {
+      console.log('initializeFileUploads called');
+      try {
+        const attachBtn = document.querySelector('.input-btn[title="Attach"]');
+        const pinListBtn = document.querySelector('.input-btn[title="Pin"]');
+        const cameraBtn = document.querySelector('.input-btn[title="Camera"]');
+        console.log('Found buttons:', { attachBtn: !!attachBtn, pinListBtn: !!pinListBtn, cameraBtn: !!cameraBtn });
+        const floatingAttachmentInput = document.getElementById('floatingAttachmentInput');
+        const floatingCameraInput = document.getElementById('floatingCameraInput');
+        const floatingPinnedModalContainer = document.getElementById('floatingPinnedModalContainer');
+
+        if (attachBtn && floatingAttachmentInput) {
+          attachBtn.addEventListener('click', function() {
+            floatingAttachmentInput.value = '';
+            floatingAttachmentInput.click();
+          });
+        }
+
+        if (cameraBtn && floatingCameraInput) {
+          cameraBtn.addEventListener('click', function() {
+            floatingCameraInput.value = '';
+            floatingCameraInput.click();
+          });
+        }
+
+        if (floatingAttachmentInput) {
+          floatingAttachmentInput.addEventListener('change', handleFileUpload);
+        }
+
+        if (floatingCameraInput) {
+          floatingCameraInput.addEventListener('change', handleFileUpload);
+        }
+
+        if (pinListBtn && floatingPinnedModalContainer) {
+          console.log('Pin button found, adding click listener');
+          pinListBtn.addEventListener('click', function() {
+            console.log('Pin button clicked!');
+            try {
+              showPinnedMessages(floatingPinnedModalContainer);
+            } catch (error) {
+              console.error('Error calling showPinnedMessages:', error);
+              alert('Error: ' + error.message);
+            }
+          });
+        } else {
+          console.warn('Pin button or container not found:', { 
+            pinListBtn: !!pinListBtn, 
+            floatingPinnedModalContainer: !!floatingPinnedModalContainer 
+          });
+        }
+
+        // Image modal functionality
+        const floatingImageModalOverlay = document.getElementById('floatingImageModalOverlay');
+        const floatingImageModal = document.getElementById('floatingImageModal');
+        const floatingImageModalImg = floatingImageModal?.querySelector('img');
+        const floatingImageModalClose = floatingImageModal?.querySelector('.close-btn');
+
+        if (floatingImageModalClose) {
+          floatingImageModalClose.onclick = () => {
+            if (floatingImageModalOverlay) {
+              floatingImageModalOverlay.classList.remove('open');
+            }
+          };
+        }
+
+        if (floatingImageModalOverlay) {
+          floatingImageModalOverlay.onclick = e => {
+            if (e.target === floatingImageModalOverlay) {
+              floatingImageModalOverlay.classList.remove('open');
+            }
+          };
+        }
+
+        window.showFloatingImageModal = function(src) {
+          if (floatingImageModalImg && floatingImageModalOverlay) {
+            floatingImageModalImg.src = src;
+            floatingImageModalOverlay.classList.add('open');
+          }
+        };
+
+      } catch (error) {
+        console.warn('File upload initialization failed:', error);
+      }
+    }
+
+    function handleFileUpload(e) {
+      console.log('handleFileUpload called with:', e.target.files);
+      if (!e.target.files || e.target.files.length === 0) {
+        console.log('No files selected');
+        return;
+      }
+      if (!currentUser) {
+        console.log('No current user');
+        return;
+      }
+      if (!db) {
+        console.log('No database connection');
+        return;
+      }
+      if (typeof firebase === 'undefined') {
+        console.log('Firebase not available');
+        return;
+      }
+      
+      try {
+        Array.from(e.target.files).forEach(file => {
+          // Show loading message
+          const loadingDiv = createFloatingBubble('📎 Uploading ' + file.name + '...', 'right', { timestamp: formatTime(new Date()) });
+          if (chatBody) {
+            chatBody.appendChild(loadingDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+          }
+          
+          // Create unique filename
+          const timestamp = Date.now();
+          const uniqueFileName = `${timestamp}_${file.name}`;
+          console.log('Creating file reference for:', uniqueFileName);
+          const fileRef = firebase.storage().ref(`chat-attachments/${uniqueFileName}`);
+          console.log('File reference created:', fileRef);
+          
+          // Upload file to Firebase Storage
+          console.log('Starting file upload...');
+          fileRef.put(file).then(snapshot => {
+            console.log('File uploaded successfully:', snapshot);
+            // Get download URL
+            return snapshot.ref.getDownloadURL();
+          }).then(downloadURL => {
+            console.log('Download URL obtained:', downloadURL);
+            // Remove loading message
+            if (chatBody && loadingDiv.parentNode) {
+              chatBody.removeChild(loadingDiv);
+            }
+            
+            // Create message data
+            const role = isAdminUser ? 'admin' : 'client';
+            const isImage = file.type.startsWith('image/');
+            const messageData = {
+              text: isImage ? '' : '📎 ' + file.name, // Only include filename for non-image files
+              uid: currentUser.uid,
+              name: currentUser.displayName || currentUser.email,
+              timestamp: firebase.database.ServerValue.TIMESTAMP,
+              readBy: {
+                [currentUser.uid]: true,
+                [role]: true
+              },
+              attachment: {
+                type: isImage ? 'image' : 'file',
+                name: file.name,
+                size: file.size,
+                url: downloadURL,
+                fileName: uniqueFileName
+              }
+            };
+            
+            // Save to database
+            console.log('Saving message data to database:', messageData);
+            db.ref('chat-messages').push(messageData).then(() => {
+              console.log('Message saved successfully to database');
+            }).catch(error => {
+              console.error('Failed to save message to database:', error);
+            });
+            
+          }).catch(error => {
+            console.error('File upload failed:', error);
+            console.error('Error details:', {
+              code: error.code,
+              message: error.message,
+              serverResponse: error.serverResponse
+            });
+            // Remove loading message and show error
+            if (chatBody && loadingDiv.parentNode) {
+              chatBody.removeChild(loadingDiv);
+            }
+            const errorDiv = createFloatingBubble('❌ Failed to upload ' + file.name + ': ' + error.message, 'right', { timestamp: formatTime(new Date()) });
+            if (chatBody) {
+              chatBody.appendChild(errorDiv);
+              chatBody.scrollTop = chatBody.scrollHeight;
+            }
+          });
+        });
+      } catch (error) {
+        console.warn('File upload failed:', error);
+      }
+    }
+
+    function showPinnedMessages(container) {
+      console.log('showPinnedMessages called with:', { container: !!container, db: !!db });
+      try {
+        if (!container || !db) {
+          console.warn('Missing container or db:', { container: !!container, db: !!db });
+          alert('Missing container or db: ' + JSON.stringify({ container: !!container, db: !!db }));
+          return;
+        }
+        
+        // Set up the modal container with proper styling
+        console.log('Setting up modal container...');
+        container.style.display = 'flex';
+        container.style.position = 'fixed';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        container.style.zIndex = '1002';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
+        
+        // Show loading state
+        console.log('Setting up loading state...');
+        container.innerHTML = `
+        <div class="pinned-modal">
+          <button class="close-btn" title="Close">&times;</button>
+          <h2>Pinned Messages</h2>
+          <div class="pinned-list">
+              <div style="color:#888;">Loading pinned messages...</div>
+          </div>
+        </div>
+      `;
+        
+        console.log('Adding show class to container...');
+        container.classList.add('show');
+        console.log('Container classes after adding show:', container.className);
+        console.log('Container display style:', container.style.display);
+        
+        // Fetch pinned messages from Firebase
+        console.log('Fetching pinned messages from Firebase...');
+        console.log('Current user:', currentUser ? { uid: currentUser.uid, email: currentUser.email } : 'Not logged in');
+        console.log('Is admin user:', isAdminUser);
+        
+        db.ref('chat-messages').orderByChild('pinned').equalTo(true).once('value').then(snap => {
+          const pinnedMessages = snap.val();
+          console.log('Pinned messages fetched:', pinnedMessages);
+          
+          if (!pinnedMessages || Object.keys(pinnedMessages).length === 0) {
+            container.innerHTML = `
+              <div class="pinned-modal">
+                <button class="close-btn" title="Close">&times;</button>
+                <h2>Pinned Messages</h2>
+                <div class="pinned-list">
+                  <div style="color:#888;">No pinned messages.</div>
+                </div>
+              </div>
+            `;
+            return;
+          }
+          
+            container.innerHTML = `
+              <div class="pinned-modal">
+                <button class="close-btn" title="Close">&times;</button>
+                <h2>Pinned Messages</h2>
+                <div class="pinned-list"></div>
+              </div>
+            `;
+            
+            const pinnedList = container.querySelector('.pinned-list');
+          // Only show pinned messages that were pinned by the current user or the admin
+          const filteredMessages = Object.entries(pinnedMessages).filter(([msgId, msg]) => {
+            return (
+              msg.pinned === true &&
+              (msg.pinnedBy === currentUser.uid || msg.pinnedBy === ADMIN_UID)
+            );
+          });
+          const sortedMessages = filteredMessages.sort((a, b) => (a[1].timestamp || 0) - (b[1].timestamp || 0));
+            
+            sortedMessages.forEach(([msgId, msg]) => {
+              const side = (msg.uid === currentUser.uid) ? 'right' : 'left';
+              const bubble = createFloatingBubble(msg.text, side, {
+                msgId: msgId,
+                timestamp: msg.timestamp ? formatTime(new Date(msg.timestamp)) : '',
+                readBy: msg.readBy || {},
+                pinned: true,
+                reactions: msg.reactions || {},
+                attachment: msg.attachment || null
+              });
+              // Remove action buttons from pinned message display
+              const actions = bubble.querySelector('.msg-actions');
+              if (actions) actions.remove();
+              // Add pin info if available
+              if (msg.pinnedBy) {
+                const pinInfo = document.createElement('div');
+                pinInfo.style.fontSize = '0.8rem';
+                pinInfo.style.color = '#0047AB';
+                pinInfo.style.marginTop = '4px';
+                pinInfo.style.fontStyle = 'italic';
+                pinInfo.style.fontWeight = '500';
+              if (msg.pinnedBy === currentUser.uid) {
+                pinInfo.textContent = `📌 Pinned by you`;
+              } else if (msg.pinnedBy === ADMIN_UID) {
+                pinInfo.textContent = `📌 Pinned by admin`;
+              } else {
+                pinInfo.textContent = `📌 Pinned by someone`;
+              }
+                bubble.appendChild(pinInfo);
+              }
+              pinnedList.appendChild(bubble);
+            });
+          // Set up close functionality
+          container.querySelector('.close-btn').onclick = () => {
+            container.classList.remove('show');
+            container.innerHTML = '';
+          };
+          container.onclick = e => { 
+            if (e.target === container) {
+              container.classList.remove('show');
+              container.innerHTML = '';
+            }
+          };
+        }).catch(error => {
+          console.warn('Failed to fetch pinned messages:', error);
+          container.innerHTML = `
+            <div class="pinned-modal">
+              <button class="close-btn" title="Close">&times;</button>
+              <h2>Pinned Messages</h2>
+              <div class="pinned-list">
+                <div style="color:#d32f2f;">Failed to load pinned messages.</div>
+              </div>
+            </div>
+          `;
+        });
+        
+      } catch (error) {
+        console.warn('Failed to show pinned messages:', error);
+      }
+    }
+
+    // Reaction helper functions
+    function showReactionPicker(bubble, msgId) {
+      // Remove any existing reaction picker
+      const existingPicker = document.querySelector('.reaction-picker');
+      if (existingPicker) {
+        existingPicker.remove();
+      }
+
+      const reactions = ['❤️', '👍', '👎', '😂', '😮', '😢', '😡', '🎉', '🔥', '💯'];
+      
+      const picker = document.createElement('div');
+      picker.className = 'reaction-picker';
+      
+      reactions.forEach(emoji => {
+        const option = document.createElement('button');
+        option.className = 'reaction-option';
+        option.textContent = emoji;
+        option.onclick = () => {
+          addReaction(msgId, emoji, currentUser.uid);
+          picker.remove();
+        };
+        picker.appendChild(option);
+      });
+      
+      bubble.appendChild(picker);
+      
+      // Show picker
+      setTimeout(() => picker.classList.add('show'), 10);
+      
+      // Close picker when clicking outside
+      const closePicker = (e) => {
+        if (!picker.contains(e.target) && !bubble.querySelector('.msg-action-btn').contains(e.target)) {
+          picker.remove();
+          document.removeEventListener('click', closePicker);
+        }
+      };
+      
+      setTimeout(() => document.addEventListener('click', closePicker), 100);
+    }
+
+    function addReaction(msgId, emoji, userId) {
+      if (!db || !msgId) return;
+      
+      const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+      reactionRef.set(true);
+    }
+
+    function toggleReaction(msgId, emoji, userId) {
+      if (!db || !msgId) return;
+      
+      const reactionRef = db.ref(`chat-messages/${msgId}/reactions/${emoji}/${userId}`);
+      reactionRef.once('value').then(snap => {
+        if (snap.val()) {
+          // Remove reaction
+          reactionRef.remove();
+        } else {
+          // Add reaction
+          reactionRef.set(true);
+        }
+      });
+    }
+
+    // Initialize chat when DOM is loaded
+    window.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing chat...');
+      initializeChat();
+      
+      // Test Firebase Storage
+      setTimeout(() => {
+        console.log('Testing Firebase Storage...');
+        if (typeof firebase !== 'undefined' && firebase.storage) {
+          try {
+            const testRef = firebase.storage().ref('test-file.txt');
+            const testBlob = new Blob(['test content'], { type: 'text/plain' });
+            testRef.put(testBlob).then(() => {
+              console.log('Firebase Storage test successful');
+              return testRef.getDownloadURL();
+            }).then(url => {
+              console.log('Test file URL:', url);
+              // Clean up test file
+              return testRef.delete();
+            }).then(() => {
+              console.log('Test file cleaned up');
+            }).catch(error => {
+              console.error('Firebase Storage test failed:', error);
+            });
+          } catch (error) {
+            console.error('Firebase Storage test error:', error);
+          }
+        } else {
+          console.warn('Firebase Storage not available for testing');
+        }
+      }, 2000);
+    });
+    </script>
+    <footer>
+      <button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#8679;</button>
+      <div class="footer-social">
+        <a href="https://www.facebook.com/share/19oj3miUWN/?mibextid=wwXIfr" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+      </div>
+      <div class="footer-contact">
+        <span><i class="fas fa-phone"></i> 0932 586 1073</span>
+      </div>
+      <div class="footer-note">
+        <span>You can also contact us directly on this website.</span>
+      </div>
+      <p>&copy; 2025 AudioWerks. All rights reserved.</p>
+    </footer>
