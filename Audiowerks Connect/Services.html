@@ -1414,7 +1414,7 @@
           <td>${b.installmentPlan || 'Not Selected'}</td>
           <td><span class="status-badge ${b.status}">${b.status}</span></td>
           <td>
-            <button class="manage-booking-btn" data-id="${id}">Manage</button>
+            ${b.status !== 'Cancelled' ? `<button class="manage-booking-btn" data-id="${id}">Manage</button>` : ''}
             ${(b.status === 'Pending' || b.status === 'Confirmed') ? `<button class="cancel-booking-btn" data-id="${id}">Cancel</button>` : ''}
           </td>
         `;
