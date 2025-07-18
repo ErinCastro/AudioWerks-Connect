@@ -483,6 +483,386 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
 }
+
+/* Manage Booking Button Styles */
+.manage-booking-btn {
+  background: linear-gradient(135deg, #0047AB 0%, #191970 100%);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-right: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 71, 171, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.manage-booking-btn:hover {
+  background: linear-gradient(135deg, #191970 0%, #0047AB 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 71, 171, 0.4);
+}
+
+/* Manage Booking Modal Styles */
+.manage-booking-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.manage-booking-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.manage-booking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.manage-booking-header h3 {
+  color: #0047AB;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.close-manage-modal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+}
+
+.close-manage-modal:hover {
+  color: #000;
+}
+
+.booking-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+}
+
+.booking-info h4 {
+  color: #0047AB;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.booking-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  font-size: 0.95rem;
+}
+
+.booking-detail {
+  display: flex;
+  justify-content: space-between;
+}
+
+.booking-detail strong {
+  color: #333;
+}
+
+.payment-section {
+  margin-bottom: 25px;
+}
+
+.payment-section h4 {
+  color: #0047AB;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.payment-methods {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.payment-method {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.payment-method:hover {
+  border-color: #0047AB;
+  background: #f8f9fa;
+}
+
+.payment-method.selected {
+  border-color: #0047AB;
+  background: #e8f2ff;
+}
+
+.payment-method i {
+  font-size: 2rem;
+  color: #0047AB;
+  margin-bottom: 8px;
+}
+
+.payment-method span {
+  display: block;
+  font-weight: 600;
+  color: #333;
+}
+
+.installment-section {
+  margin-bottom: 25px;
+}
+
+.installment-section h4 {
+  color: #0047AB;
+  margin: 0 0 15px 0;
+  font-size: 1.2rem;
+}
+
+.installment-plans {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.installment-plan {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.installment-plan:hover {
+  border-color: #0047AB;
+  background: #f8f9fa;
+}
+
+.installment-plan.selected {
+  border-color: #0047AB;
+  background: #e8f2ff;
+}
+
+.installment-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.installment-plan-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.installment-plan-price {
+  font-weight: 600;
+  color: #0047AB;
+}
+
+.installment-plan-details {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.manage-booking-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.manage-booking-btn-secondary {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.manage-booking-btn-secondary:hover {
+  background: #5a6268;
+}
+
+.manage-booking-btn-primary {
+  background: #0047AB;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.manage-booking-btn-primary:hover {
+  background: #191970;
+}
+
+@media (max-width: 768px) {
+  .manage-booking-content {
+    width: 95%;
+    padding: 20px;
+  }
+  
+  .booking-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .payment-methods {
+    grid-template-columns: 1fr;
+  }
+  
+  .manage-booking-actions {
+    flex-direction: column;
+  }
+}
+
+/* Custom Popup Styles */
+.custom-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.popup-content {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  animation: popupSlideIn 0.3s ease;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.popup-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.popup-icon.success {
+  color: #28a745;
+}
+
+.popup-icon.error {
+  color: #dc3545;
+}
+
+.popup-icon.warning {
+  color: #ffc107;
+}
+
+.popup-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.popup-message {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.popup-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 100px;
+}
+
+.popup-btn-primary {
+  background: #0047AB;
+  color: white;
+}
+
+.popup-btn-primary:hover {
+  background: #191970;
+}
+
+.popup-btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.popup-btn-secondary:hover {
+  background: #5a6268;
+}
+
+.popup-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.popup-btn-danger:hover {
+  background: #c82333;
+}
 @media (max-width: 700px) {
   .my-bookings-section {
     padding: 12px 2vw 12px 2vw;
@@ -642,6 +1022,240 @@
     sessionStorage.clear();
     window.location.href = "login.html";
   }
+
+  // Manage Booking Modal Functions
+  function showManageBookingModal(bookingId, bookingData) {
+    // Reset selections every time modal opens
+    window.selectedPaymentMethod = null;
+    window.selectedInstallmentPlan = null;
+    const modal = document.createElement('div');
+    modal.className = 'manage-booking-modal';
+    
+    const totalPrice = parseFloat(bookingData.totalPrice.replace('₱', '').replace(',', ''));
+    
+    modal.innerHTML = `
+      <div class="manage-booking-content">
+        <div class="manage-booking-header">
+          <h3>Manage My Booking</h3>
+          <button class="close-manage-modal" onclick="closeManageBookingModal()">&times;</button>
+        </div>
+        
+        <div class="booking-info">
+          <h4>Booking Information</h4>
+          <div class="booking-details">
+            <div class="booking-detail">
+              <strong>Product:</strong>
+              <span>${bookingData.productName}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Start Date:</strong>
+              <span>${bookingData.startDate}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>End Date:</strong>
+              <span>${bookingData.endDate}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Quantity:</strong>
+              <span>${bookingData.quantity}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Total Price:</strong>
+              <span>${bookingData.totalPrice}</span>
+            </div>
+            <div class="booking-detail">
+              <strong>Status:</strong>
+              <span class="status-badge ${bookingData.status}">${bookingData.status}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="payment-section">
+          <h4>Payment Method</h4>
+          <div class="payment-methods">
+            <div class="payment-method" onclick="selectPaymentMethod(this, 'gcash')">
+              <i class="fas fa-mobile-alt"></i>
+              <span>GCash</span>
+            </div>
+            <div class="payment-method" onclick="selectPaymentMethod(this, 'bank')">
+              <i class="fas fa-university"></i>
+              <span>Bank Transfer</span>
+            </div>
+            <div class="payment-method" onclick="selectPaymentMethod(this, 'card')">
+              <i class="fas fa-credit-card"></i>
+              <span>Credit/Debit Card</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="installment-section">
+          <h4>Payment Plan</h4>
+          <div class="installment-plans">
+            <div class="installment-plan" onclick="selectInstallmentPlan(this, 'full')">
+              <div class="installment-plan-header">
+                <span class="installment-plan-title">Full Payment</span>
+                <span class="installment-plan-price">₱${totalPrice.toLocaleString()}</span>
+              </div>
+              <div class="installment-plan-details">Pay the complete amount upfront</div>
+            </div>
+            <div class="installment-plan" onclick="selectInstallmentPlan(this, 'downpayment')">
+              <div class="installment-plan-header">
+                <span class="installment-plan-title">Downpayment</span>
+                <span class="installment-plan-price">₱${(totalPrice / 2).toLocaleString()}</span>
+              </div>
+              <div class="installment-plan-details">Pay 50% now, remaining 50% before event</div>
+            </div>
+            <div class="installment-plan" onclick="selectInstallmentPlan(this, 'three-payments')">
+              <div class="installment-plan-header">
+                <span class="installment-plan-title">Three Payments</span>
+                <span class="installment-plan-price">₱${(totalPrice / 3).toLocaleString()}/payment</span>
+              </div>
+              <div class="installment-plan-details">Pay in 3 equal installments (now, mid-term, before event)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="manage-booking-actions">
+          <button class="manage-booking-btn-secondary" onclick="closeManageBookingModal()">Cancel</button>
+          <button id="update-payment-btn" type="button" class="manage-booking-btn-primary" onclick="updateBookingPayment('${bookingId}')">Update Payment</button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+
+  function closeManageBookingModal() {
+    const modal = document.querySelector('.manage-booking-modal');
+    if (modal) {
+      modal.remove();
+    }
+  }
+
+  function selectPaymentMethod(element, method) {
+    // Remove selection from all payment methods
+    document.querySelectorAll('.payment-method').forEach(el => {
+      el.classList.remove('selected');
+    });
+    // Add selection to clicked element
+    element.classList.add('selected');
+    // Store the selected payment method
+    window.selectedPaymentMethod = method;
+  }
+
+  function selectInstallmentPlan(element, plan) {
+    // Remove selection from all installment plans
+    document.querySelectorAll('.installment-plan').forEach(el => {
+      el.classList.remove('selected');
+    });
+    // Add selection to clicked element
+    element.classList.add('selected');
+    // Store the selected installment plan
+    window.selectedInstallmentPlan = plan;
+  }
+
+  // Custom Popup Functions
+  function showPopup(type, title, message, actions = []) {
+    // Remove any existing popup first
+    closePopup();
+    const popup = document.createElement('div');
+    popup.className = 'custom-popup';
+    
+    let iconClass = '';
+    let iconSymbol = '';
+    
+    switch(type) {
+      case 'success':
+        iconClass = 'success';
+        iconSymbol = '✓';
+        break;
+      case 'error':
+        iconClass = 'error';
+        iconSymbol = '✕';
+        break;
+      case 'warning':
+        iconClass = 'warning';
+        iconSymbol = '⚠';
+        break;
+      default:
+        iconClass = 'warning';
+        iconSymbol = 'ℹ';
+    }
+    
+    let actionsHtml = '';
+    if (actions.length > 0) {
+      actionsHtml = `
+        <div class="popup-actions">
+          ${actions.map(action => `
+            <button class="popup-btn ${action.class || 'popup-btn-primary'}" onclick="${action.onclick}">
+              ${action.text}
+            </button>
+          `).join('')}
+        </div>
+      `;
+    } else {
+      actionsHtml = `
+        <div class="popup-actions">
+          <button class="popup-btn popup-btn-primary" onclick="closePopup()">OK</button>
+        </div>
+      `;
+    }
+    
+    popup.innerHTML = `
+      <div class="popup-content">
+        <div class="popup-icon ${iconClass}">${iconSymbol}</div>
+        <div class="popup-title">${title}</div>
+        <div class="popup-message">${message}</div>
+        ${actionsHtml}
+      </div>
+    `;
+    
+    document.body.appendChild(popup);
+  }
+
+  function closePopup() {
+    const popup = document.querySelector('.custom-popup');
+    if (popup) {
+      popup.remove();
+    }
+  }
+
+  async function updateBookingPayment(bookingId) {
+    const paymentMethod = window.selectedPaymentMethod;
+    const installmentPlan = window.selectedInstallmentPlan;
+
+    if (!paymentMethod && !installmentPlan) {
+      showPopup('warning', 'Selections Required', 'Please select both a payment method and a payment plan to continue.');
+      return;
+    }
+    if (!paymentMethod) {
+      showPopup('warning', 'Payment Method Required', 'Please select a payment method to continue.');
+      return;
+    }
+    if (!installmentPlan) {
+      showPopup('warning', 'Installment Plan Required', 'Please select an installment plan to continue.');
+      return;
+    }
+    
+    try {
+      // Update the booking in Firebase
+      await firebase.database().ref(`bookings/${bookingId}`).update({
+        paymentMethod: paymentMethod,
+        installmentPlan: installmentPlan,
+        lastUpdated: new Date().toISOString()
+      });
+      
+      // Show success message
+      showPopup('success', 'Payment Updated', 'Payment method and installment plan updated successfully!');
+      
+      // Close the modal
+      closeManageBookingModal();
+      
+    } catch (error) {
+      console.error('Error updating booking payment:', error);
+      showPopup('error', 'Update Failed', 'Error updating payment details. Please try again.');
+    }
+  }
 </script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -666,6 +1280,7 @@
           <td>${b.totalPrice}</td>
           <td><span class="status-badge ${b.status}">${b.status}</span></td>
           <td>
+            <button class="manage-booking-btn" data-id="${id}">Manage</button>
             ${(b.status === 'Pending' || b.status === 'Confirmed') ? `<button class="cancel-booking-btn" data-id="${id}">Cancel</button>` : ''}
           </td>
         `;
@@ -844,18 +1459,57 @@
       }
     }
   });
+  // Event delegation for booking buttons
   document.addEventListener('click', async function(e) {
+    // Handle cancel booking button
     if (e.target && e.target.classList.contains('cancel-booking-btn')) {
       const bookingId = e.target.getAttribute('data-id');
-      if (confirm('Are you sure you want to cancel this booking?')) {
-        try {
-          await firebase.database().ref('bookings/' + bookingId + '/status').set('Cancelled');
-        } catch (error) {
-          alert('Failed to cancel booking. Please try again.');
+      
+      showPopup('warning', 'Cancel Booking', 'Are you sure you want to cancel this booking?', [
+        {
+          text: 'Cancel',
+          class: 'popup-btn-secondary',
+          onclick: 'closePopup()'
+        },
+        {
+          text: 'Yes, Cancel',
+          class: 'popup-btn-danger',
+          onclick: `confirmCancelBooking('${bookingId}')`
         }
+      ]);
+    }
+    
+    // Handle manage booking button
+    if (e.target && e.target.classList.contains('manage-booking-btn')) {
+      const bookingId = e.target.getAttribute('data-id');
+      
+      // Fetch booking data from Firebase
+      try {
+        const bookingSnapshot = await firebase.database().ref(`bookings/${bookingId}`).once('value');
+        const bookingData = bookingSnapshot.val();
+        
+        if (bookingData) {
+          showManageBookingModal(bookingId, bookingData);
+        } else {
+          showPopup('error', 'Booking Not Found', 'The booking data could not be retrieved. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error fetching booking data:', error);
+        showPopup('error', 'Error', 'Failed to load booking details. Please try again.');
       }
     }
   });
+
+  async function confirmCancelBooking(bookingId) {
+    try {
+      await firebase.database().ref('bookings/' + bookingId + '/status').set('Cancelled');
+      showPopup('success', 'Booking Cancelled', 'Your booking has been cancelled successfully.');
+      closePopup();
+    } catch (error) {
+      showPopup('error', 'Cancellation Failed', 'Failed to cancel booking. Please try again.');
+      closePopup();
+    }
+  }
 </script>
 </html>
 
