@@ -910,6 +910,237 @@
   align-items: center;
   justify-content: center;
 }
+
+.qr-modal-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 400px;
+  width: 90%;
+}
+
+.qr-modal-content img {
+  width: 250px;
+  height: 250px;
+  object-fit: contain;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.qr-modal-content p {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+/* Upload Picture Modal Styles */
+.upload-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-modal-content {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.upload-header {
+  margin-bottom: 30px;
+}
+
+.upload-header h3 {
+  color: #0047AB;
+  font-size: 1.8rem;
+  margin: 0 0 10px 0;
+}
+
+.upload-header p {
+  color: #666;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.upload-area {
+  border: 3px dashed #0047AB;
+  border-radius: 16px;
+  padding: 40px 20px;
+  margin: 25px 0;
+  background: #f8f9ff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  background: #e8f2ff;
+  border-color: #191970;
+}
+
+.upload-area.dragover {
+  background: #e8f2ff;
+  border-color: #191970;
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  font-size: 3rem;
+  color: #0047AB;
+  margin-bottom: 15px;
+}
+
+.upload-text {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.upload-subtext {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.file-input {
+  display: none;
+}
+
+.preview-container {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #e0e0e0;
+}
+
+.file-preview img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 15px;
+}
+
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.file-size {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.remove-file {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: background 0.3s ease;
+}
+
+.remove-file:hover {
+  background: #c82333;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.upload-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.upload-btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.upload-btn-secondary:hover {
+  background: #5a6268;
+}
+
+.upload-btn-primary {
+  background: #0047AB;
+  color: white;
+}
+
+.upload-btn-primary:hover {
+  background: #191970;
+}
+
+.upload-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.upload-progress {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #0047AB, #191970);
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;
+}
 .qr-modal-content {
   background: #fff;
   margin: auto;
@@ -1173,68 +1404,358 @@
   }
 
   function closeManageBookingModal() {
-    const modal = document.querySelector('.manage-booking-modal');
-    if (modal) {
-      modal.remove();
-    }
-    // Clear the current booking ID
-    window.currentBookingId = null;
+  const modal = document.querySelector('.manage-booking-modal');
+  if (modal) {
+    modal.remove();
   }
+  // Don't clear booking ID here - keep it for the payment flow
+  // window.currentBookingId = null;
+}
 
   // --- QR Popup Functions ---
-  async function handlePayNow() {
-    const bookingId = window.currentBookingId;
-    const paymentMethod = window.selectedPaymentMethod;
-    const installmentPlan = window.selectedInstallmentPlan;
+async function handlePayNow() {
+  const bookingId = window.currentBookingId;
+  const paymentMethod = window.selectedPaymentMethod;
+  const installmentPlan = window.selectedInstallmentPlan;
 
-    // Check if selections are made
-    if (!paymentMethod && !installmentPlan) {
-      showPopup('warning', 'Selections Required', 'Please select both a payment method and a payment plan to continue.');
-      return;
-    }
-    if (!paymentMethod) {
-      showPopup('warning', 'Payment Method Required', 'Please select a payment method to continue.');
-      return;
-    }
-    if (!installmentPlan) {
-      showPopup('warning', 'Payment Plan Required', 'Please select a payment plan to continue.');
-      return;
-    }
-
-    try {
-      // Save the selections to database
-      await firebase.database().ref(`bookings/${bookingId}`).update({
-        paymentMethod: paymentMethod,
-        installmentPlan: installmentPlan,
-        lastUpdated: new Date().toISOString()
-      });
-      
-      console.log('Payment selections saved before showing QR popup');
-      
-      // Close the booking modal and show QR popup
-      closeManageBookingModal();
-      showQrPopup();
-      
-    } catch (error) {
-      console.error('Error saving payment selections:', error);
-      showPopup('error', 'Save Failed', 'Error saving payment details. Please try again.');
-    }
+  // Check if selections are made
+  if (!paymentMethod && !installmentPlan) {
+    showPopup('warning', 'Selections Required', 'Please select both a payment method and a payment plan to continue.');
+    return;
+  }
+  if (!paymentMethod) {
+    showPopup('warning', 'Payment Method Required', 'Please select a payment method to continue.');
+    return;
+  }
+  if (!installmentPlan) {
+    showPopup('warning', 'Payment Plan Required', 'Please select a payment plan to continue.');
+    return;
   }
 
-  function showQrPopup() {
-    const modal = document.getElementById('qr-popup-modal');
-    if (modal) {
-      modal.style.display = 'flex';
-    }
+  try {
+    // Save the selections to database
+    await firebase.database().ref(`bookings/${bookingId}`).update({
+      paymentMethod: paymentMethod,
+      installmentPlan: installmentPlan,
+      lastUpdated: new Date().toISOString()
+    });
+    
+    console.log('Payment selections saved before showing QR popup');
+    
+    // Close the booking modal and show QR popup
+    closeManageBookingModal();
+    showQrPopup();
+    
+  } catch (error) {
+    console.error('Error saving payment selections:', error);
+    showPopup('error', 'Save Failed', 'Error saving payment details. Please try again.');
   }
+}
 
-  function closeQrPopup() {
-    const modal = document.getElementById('qr-popup-modal');
-    if (modal) {
-      modal.style.display = 'none';
-    }
+function showQrPopup() {
+  const modal = document.getElementById('qr-popup-modal');
+  if (modal) {
+    modal.style.display = 'flex';
   }
-  // --- End QR Popup Functions ---
+}
+
+function closeQrPopup() {
+  const modal = document.getElementById('qr-popup-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  // Don't clear booking ID when just closing QR popup
+  // Keep it available for upload flow
+}
+
+function proceedToUpload() {
+  // Ensure booking ID is still available
+  if (!window.currentBookingId) {
+    showPopup('error', 'Session Error', 'Booking session expired. Please start the payment process again.');
+    return;
+  }
+  
+  // Close QR popup and show upload modal
+  closeQrPopup();
+  showUploadModal();
+}
+// --- End QR Popup Functions ---
+
+// --- Upload Picture Functions ---
+let selectedFile = null;
+
+function showUploadModal() {
+  const modal = document.getElementById('upload-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    // Reset the upload form
+    resetUploadForm();
+  }
+}
+
+function closeUploadModal() {
+  const modal = document.getElementById('upload-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  // Reset form when closing
+  resetUploadForm();
+  // Only clear booking ID if user manually closes (not after successful upload)
+  if (!window.uploadCompleted) {
+    window.currentBookingId = null;
+  }
+}
+
+function resetUploadForm() {
+  selectedFile = null;
+  document.getElementById('fileInput').value = '';
+  document.getElementById('previewContainer').style.display = 'none';
+  document.getElementById('previewContainer').innerHTML = '';
+  document.getElementById('uploadProgress').style.display = 'none';
+  document.getElementById('submitUploadBtn').disabled = true;
+}
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      showPopup('error', 'Invalid File Type', 'Please select an image file (PNG, JPG, JPEG).');
+      return;
+    }
+    
+    // Validate file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      showPopup('error', 'File Too Large', 'Please select an image smaller than 5MB.');
+      return;
+    }
+    
+    selectedFile = file;
+    showFilePreview(file);
+    document.getElementById('submitUploadBtn').disabled = false;
+  }
+}
+
+function showFilePreview(file) {
+  const previewContainer = document.getElementById('previewContainer');
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    previewContainer.innerHTML = `
+      <div class="file-preview">
+        <img src="${e.target.result}" alt="Preview">
+        <div class="file-info">
+          <div class="file-name">${file.name}</div>
+          <div class="file-size">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+        </div>
+        <button class="remove-file" onclick="removeFile()">Remove</button>
+      </div>
+    `;
+    previewContainer.style.display = 'block';
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+function removeFile() {
+  resetUploadForm();
+}
+
+async function submitPaymentProof() {
+  if (!selectedFile) {
+    showPopup('error', 'No File Selected', 'Please select an image to upload.');
+    return;
+  }
+  
+  const bookingId = window.currentBookingId;
+  if (!bookingId) {
+    console.error('Booking ID not found. Current booking ID:', window.currentBookingId);
+    showPopup('error', 'Booking Error', 'Booking session expired. Please close this dialog and try the payment process again.');
+    return;
+  }
+  
+  // Show progress
+  document.getElementById('uploadProgress').style.display = 'block';
+  document.getElementById('submitUploadBtn').disabled = true;
+  
+  try {
+    // Simulate upload progress
+    await simulateUploadProgress();
+    
+    // Get booking details for the notification
+    const bookingSnapshot = await firebase.database().ref(`bookings/${bookingId}`).once('value');
+    const bookingData = bookingSnapshot.val();
+    
+    // Convert file to base64 for sending to chat
+    const fileBase64 = await convertFileToBase64(selectedFile);
+    
+    // In a real implementation, you would upload to Firebase Storage or another service
+    // For now, we'll just save the file info to the database
+    const paymentProofData = {
+      fileName: selectedFile.name,
+      fileSize: selectedFile.size,
+      fileType: selectedFile.type,
+      uploadedAt: new Date().toISOString(),
+      status: 'uploaded',
+      base64Data: fileBase64 // Store base64 for chat notification
+    };
+    
+    // Update booking with payment proof info
+    await firebase.database().ref(`bookings/${bookingId}`).update({
+      paymentProof: paymentProofData,
+      status: 'Payment Proof Submitted',
+      lastUpdated: new Date().toISOString()
+    });
+    
+    // Send automatic notification to admin chat
+    await sendPaymentProofToAdminChat(bookingData, paymentProofData, fileBase64);
+    
+    // Mark upload as completed
+    window.uploadCompleted = true;
+    
+    // Show success message
+    closeUploadModal();
+    showPopup('success', 'Payment Proof Uploaded!', 'Your payment proof has been submitted successfully and sent to admin. We will review it and update your booking status shortly.');
+    
+    // Clear the booking ID after successful upload
+    window.currentBookingId = null;
+    window.uploadCompleted = false;
+    
+  } catch (error) {
+    console.error('Error uploading payment proof:', error);
+    showPopup('error', 'Upload Failed', 'Failed to upload payment proof. Please try again.');
+    document.getElementById('submitUploadBtn').disabled = false;
+    document.getElementById('uploadProgress').style.display = 'none';
+  }
+}
+
+function simulateUploadProgress() {
+  return new Promise((resolve) => {
+    let progress = 0;
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    
+    const interval = setInterval(() => {
+      progress += Math.random() * 15;
+      if (progress > 100) progress = 100;
+      
+      progressFill.style.width = progress + '%';
+      progressText.textContent = `Uploading... ${Math.round(progress)}%`;
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        progressText.textContent = 'Upload complete!';
+        setTimeout(resolve, 500);
+      }
+    }, 200);
+  });
+}
+
+// Add drag and drop functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const uploadArea = document.querySelector('.upload-area');
+  
+  if (uploadArea) {
+    uploadArea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const file = files[0];
+        document.getElementById('fileInput').files = files;
+        handleFileSelect({ target: { files: [file] } });
+      }
+    });
+  }
+});
+// Helper function to convert file to base64
+function convertFileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Function to send payment proof notification to admin chat
+async function sendPaymentProofToAdminChat(bookingData, paymentProofData, fileBase64) {
+  try {
+    // Get current user info
+    const currentUser = firebase.auth().currentUser;
+    const customerName = currentUser ? (currentUser.displayName || currentUser.email || 'Customer') : 'Guest Customer';
+    const customerUid = currentUser ? currentUser.uid : 'guest';
+    
+    // Admin UID (should match the one in adminchat.html)
+    const ADMIN_UID = 'NIptGOOVYPX6vP2kAo31JRNeMtl1';
+    
+    // Create notification message with booking details
+    const notificationText = `🔔 NEW PAYMENT PROOF SUBMITTED\n\n` +
+      `📋 Booking Details:\n` +
+      `• Product: ${bookingData.productName}\n` +
+      `• Customer: ${customerName}\n` +
+      `• Total: ${bookingData.totalPrice}\n` +
+      `• Payment Method: ${bookingData.paymentMethod}\n` +
+      `• Payment Plan: ${bookingData.installmentPlan}\n` +
+      `• Date: ${bookingData.startDate} - ${bookingData.endDate}\n\n` +
+      `📸 Payment proof image attached below.`;
+    
+    // Send text notification first
+    const textMessage = {
+      uid: customerUid,
+      recipientUid: ADMIN_UID,
+      name: customerName,
+      text: notificationText,
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      isAdmin: false,
+      isPaymentProofNotification: true,
+      bookingId: window.currentBookingId
+    };
+    
+    await firebase.database().ref('chat-messages').push(textMessage);
+    
+    // Send image attachment message
+    const imageMessage = {
+      uid: customerUid,
+      recipientUid: ADMIN_UID,
+      name: customerName,
+      text: '',
+      timestamp: firebase.database.ServerValue.TIMESTAMP,
+      isAdmin: false,
+      isPaymentProofNotification: true,
+      bookingId: window.currentBookingId,
+      attachment: {
+        url: fileBase64, // Using base64 data as URL for now
+        name: paymentProofData.fileName,
+        size: paymentProofData.fileSize,
+        type: 'image',
+        status: 'completed'
+      }
+    };
+    
+    await firebase.database().ref('chat-messages').push(imageMessage);
+    
+    console.log('Payment proof notification sent to admin chat successfully');
+    
+  } catch (error) {
+    console.error('Error sending payment proof to admin chat:', error);
+    // Don't throw error here as the main upload was successful
+    // Just log the error for debugging
+  }
+}
+
+// --- End Upload Picture Functions ---
 
   async function selectPaymentMethod(element, method) {
     // Remove selection from all payment methods
@@ -1651,7 +2172,44 @@
         <!-- Add your QR code image here -->
         <img src="images/qr.jpg" alt="QR Code">
         <p>Scan to pay</p>
-        <button class="manage-booking-btn-primary" onclick="closeQrPopup()">Close</button>
+        <div style="display: flex; gap: 15px; justify-content: center;">
+          <button class="manage-booking-btn-secondary" onclick="closeQrPopup()">Cancel</button>
+          <button class="manage-booking-btn-primary" onclick="proceedToUpload()">I've Paid</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Picture Modal HTML -->
+    <div id="upload-modal" class="upload-modal">
+      <div class="upload-modal-content">
+        <div class="upload-header">
+          <h3>📸 Upload Payment Proof</h3>
+          <p>Please upload a screenshot or photo of your payment confirmation</p>
+        </div>
+        
+        <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <div class="upload-text">Click to upload or drag & drop</div>
+          <div class="upload-subtext">PNG, JPG, JPEG up to 5MB</div>
+        </div>
+        
+        <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+        
+        <div id="previewContainer" class="preview-container" style="display: none;"></div>
+        
+        <div id="uploadProgress" class="upload-progress" style="display: none;">
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <div id="progressText" class="progress-text">Uploading...</div>
+        </div>
+        
+        <div class="upload-actions">
+          <button class="upload-btn upload-btn-secondary" onclick="closeUploadModal()">Cancel</button>
+          <button id="submitUploadBtn" class="upload-btn upload-btn-primary" onclick="submitPaymentProof()" disabled>Submit Proof</button>
+        </div>
       </div>
     </div>
 </html>
