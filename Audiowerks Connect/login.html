@@ -547,11 +547,16 @@
                   window.location.href = 'homepage.html';
                 }
               } catch (error) {
-                if (error.code === 'auth/wrong-password') {
+                if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                   passwordError.textContent = 'Incorrect password.';
                   passwordError.style.display = 'block';
                 } else {
-                  loginError.textContent = error.message;
+                  // Remove "Firebase: Error (auth/...)" prefix from error messages
+                  let errorMessage = error.message;
+                  if (errorMessage.includes('Firebase: Error (')) {
+                    errorMessage = errorMessage.replace(/^Firebase: Error \(auth\/[^)]+\)\.\s*/, '');
+                  }
+                  loginError.textContent = errorMessage;
                   loginError.style.display = 'block';
                 }
                 loginBtn.classList.remove('loading');
