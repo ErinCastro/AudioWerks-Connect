@@ -403,7 +403,7 @@
                     <label class="form-label" for="password">PASSWORD</label>
                     <input type="password" id="password" name="password" class="form-input" placeholder="••••••••" required minlength="8">
                     <div id="passwordRequirements" style="font-size: 12px; color: #666; margin-top: 8px;">
-                        Password must be at least 8 characters long and contain at least one special character (!@#$%^&*)
+                        Password must be at least 8 characters with special characters (!@#$%^&*)
                     </div>
                 </div>
                 
@@ -477,7 +477,7 @@
           }
           errorDiv.textContent = '';
 
-          // Password validation - at least 8 characters and one special character
+          // Password validation - at least 8 characters with special characters
           const passwordPattern = /^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
           if (!passwordPattern.test(password)) {
             errorDiv.textContent = 'Password must be at least 8 characters long and contain at least one special character (!@#$%^&*).';

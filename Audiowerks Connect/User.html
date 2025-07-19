@@ -859,8 +859,8 @@
       if (!pw) {
         newPasswordError.textContent = "This field is required";
         valid = false;
-      } else if (!/^.*(?=.*[a-zA-Z])(?=.*\d).{8,}.*$/.test(pw)) {
-        newPasswordError.textContent = "Password must be at least 8 characters, include letters and numbers";
+      } else if (!/^(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/.test(pw)) {
+        newPasswordError.textContent = "Password must be at least 8 characters long and contain at least one special character (!@#$%^&*)";
         valid = false;
       }
       // 3. Check confirmation
