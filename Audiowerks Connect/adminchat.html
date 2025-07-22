@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1291,7 +1290,7 @@
   
   <script>
     // --- CONFIG: Set your admin UID here ---
-    const ADMIN_UID = 'NIptGOOVYPX6vP2kAo31JRNeMtl1'; // Updated to correct admin UID
+    const ADMIN_UID = 'pvRWCVzBiuNSbFRrE7KspEK9zsC2'; // Updated to correct admin UID
     
     // Firebase services are already initialized in firebase-config-new.js
     
@@ -1338,26 +1337,27 @@
       }
 
       // Attachment icon
-      if (attachBtn && attachmentInput) {
-        attachBtn.addEventListener('click', function() {
-          console.log('[DEBUG] Attachment icon clicked');
-          attachmentInput.value = '';
-          attachmentInput.click();
-        });
-      } else {
-        console.error('[ERROR] Attachment icon or input not found');
-      }
+      // Remove attachment and camera button logic for admin chat
+      // if (attachBtn && attachmentInput) {
+      //   attachBtn.addEventListener('click', function() {
+      //     console.log('[DEBUG] Attachment icon clicked');
+      //     attachmentInput.value = '';
+      //     attachmentInput.click();
+      //   });
+      // } else {
+      //   console.error('[ERROR] Attachment icon or input not found');
+      // }
 
       // Camera icon
-      if (cameraBtn && cameraInput) {
-        cameraBtn.addEventListener('click', function() {
-          console.log('[DEBUG] Camera icon clicked');
-          cameraInput.value = '';
-          cameraInput.click();
-        });
-      } else {
-        console.error('[ERROR] Camera icon or input not found');
-      }
+      // if (cameraBtn && cameraInput) {
+      //   cameraBtn.addEventListener('click', function() {
+      //     console.log('[DEBUG] Camera icon clicked');
+      //     cameraInput.value = '';
+      //     cameraInput.click();
+      //   });
+      // } else {
+      //   console.error('[ERROR] Camera icon or input not found');
+      // }
 
       // Add preview modal logic
       const attachmentPreviewModal = document.getElementById('attachmentPreviewModal');
@@ -1977,7 +1977,12 @@
       }
 
       function sendMessage() {
-        if (chatInput.disabled || chatInput.value.trim() === '' || !selectedChatId) return;
+        if (chatInput.disabled || chatInput.value.trim() === '' || !selectedChatId) {
+          if (!selectedChatId) {
+            alert('Please select a chat before sending a message.');
+          }
+          return;
+        }
         const text = chatInput.value.trim();
         let recipientUid;
         if (currentUser.uid === ADMIN_UID) {
@@ -1987,6 +1992,12 @@
           // User sending to admin
           recipientUid = ADMIN_UID;
         }
+        console.log('Sending message:', {
+          from: currentUser.uid,
+          to: recipientUid,
+          selectedChatId: selectedChatId,
+          text: text
+        });
         const message = {
           uid: currentUser.uid,
           recipientUid: recipientUid,

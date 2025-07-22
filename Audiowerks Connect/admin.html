@@ -120,27 +120,39 @@
       margin-bottom: 20px;
     }
 
-    table {
+    table, .standard-table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      font-size: 1rem;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
     }
 
-    table, th, td {
-      border: 1px solid #ccc;
-    }
-
-    th, td {
-      padding: 10px;
+    .standard-table th, .standard-table td, th, td {
+      padding: 12px 14px;
       text-align: left;
+      border: 1px solid #ccc;
+      font-size: 1rem;
     }
 
-    /* Scrollable table container */
+    .standard-table thead th, thead th {
+      background-color: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
     .table-container {
+      max-width: 100%;
+      width: 100%;
       max-height: 500px;
       overflow-y: auto;
       border: 1px solid #ccc;
       border-radius: 8px;
+      background: #fff;
+      margin-bottom: 20px;
     }
 
     .table-container table {
@@ -709,7 +721,7 @@
   <div class="card">
     <h3>Bookings</h3>
     <div class="table-container">
-      <table>
+      <table class="standard-table">
         <thead>
           <tr>
             <th>Customer</th>
@@ -785,8 +797,8 @@
   <div class="card">
     <h3>Bookings</h3>
     <h4 style="margin-top:20px;">Live Preview of All Bookings</h4>
-    <div style="overflow-x:auto;">
-      <table id="livePreviewTable" style="width:100%;border-collapse:collapse;">
+    <div class="table-container">
+      <table id="livePreviewTable" class="standard-table">
         <thead>
           <tr id="livePreviewHeader"></tr>
         </thead>
@@ -2212,17 +2224,86 @@ class BackupRestoreSystem {
   }
 
   deleteHistoryBackup(timestamp) {
-    if (confirm('Are you sure you want to delete this backup from history?')) {
+    this.showDeleteBackupConfirm(timestamp);
+  }
+
+  showDeleteBackupConfirm(timestamp) {
+    // Remove any existing modal
+    const existing = document.getElementById('deleteBackupModal');
+    if (existing) existing.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'deleteBackupModal';
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    `;
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        max-width: 400px;
+        width: 90%;
+      ">
+        <h3 style=\"color: #0047AB; margin-bottom: 20px;\">Delete Backup</h3>
+        <p style=\"margin-bottom: 25px; font-size: 16px;\">Are you sure you want to delete this backup from history?</p>
+        <div style=\"display: flex; gap: 15px; justify-content: center;\">
+          <button id=\"yesDeleteBackup\" style=\"
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+          \">Yes</button>
+          <button id=\"noDeleteBackup\" style=\"
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+          \">No</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    // Yes button
+    modal.querySelector('#yesDeleteBackup').onclick = () => {
       this.backupHistory = this.backupHistory.filter(b => b.timestamp !== timestamp);
       localStorage.setItem('backupHistory', JSON.stringify(this.backupHistory));
-      
       // Also remove from scheduled backups if applicable
       const scheduledBackups = JSON.parse(localStorage.getItem('scheduledBackups') || '[]');
       const updatedScheduled = scheduledBackups.filter(b => b.timestamp !== timestamp);
       localStorage.setItem('scheduledBackups', JSON.stringify(updatedScheduled));
-      
       this.loadBackupHistory();
-    }
+      modal.remove();
+    };
+    // No button
+    modal.querySelector('#noDeleteBackup').onclick = () => {
+      modal.remove();
+    };
+    // Close on background click
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    };
   }
 }
 
