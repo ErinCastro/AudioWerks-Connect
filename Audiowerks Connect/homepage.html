@@ -662,9 +662,16 @@ function renderHomepageAnnouncements(announcements) {
     container.innerHTML = '';
     return;
   }
+  const now = Date.now();
+  // Filter out expired announcements
+  const filtered = Object.entries(announcements).filter(([id, ann]) => !ann.expiresAt || ann.expiresAt > now);
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
   let html = '<div style="background:#fffbe6;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.07);padding:24px 20px 18px 20px;">';
   html += '<h3 style="color:#0047AB;margin-bottom:12px;font-size:1.2rem;">📢 Latest Announcements</h3>';
-  Object.entries(announcements)
+  filtered
     .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0))
     .slice(0, 5)
     .forEach(([id, ann]) => {
@@ -1080,8 +1087,13 @@ document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopu
         const announcements = snap.val();
         console.log('[AnnouncementModal] Fetched announcements:', announcements);
         if (announcements) {
-          // Sort all announcements by timestamp ascending (oldest first)
-          const all = Object.values(announcements).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+          // Filter out expired announcements and sort by timestamp (oldest first)
+          const now = Date.now();
+          const all = Object.values(announcements)
+            .filter(ann => !ann.expiresAt || ann.expiresAt > now) // Only include non-expired announcements
+            .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+          
+          console.log(`[AnnouncementModal] Found ${all.length} active announcements`);
           let idx = 0;
           function showNextAnnouncement() {
             if (idx >= all.length) return;
@@ -1091,18 +1103,36 @@ document.getElementById('announcementPopupClose').onclick = hideAnnouncementPopu
               const content = document.getElementById('announcementModalContent');
               content.textContent = ann.text;
               modal.style.display = 'flex';
-              // Close button
-              document.getElementById('closeAnnouncementModal').onclick = () => {
+              
+              // Function to close and move to next announcement
+              const closeAndNext = () => {
                 modal.style.display = 'none';
                 idx++;
                 setTimeout(showNextAnnouncement, 200); // Small delay for smoothness
               };
+              
+              // Calculate time until expiration or use default 10 seconds
+              const now = Date.now();
+              const expiresAt = ann.expiresAt || (now + 10000); // Default to 10 seconds if no expiration
+              const timeUntilExpire = Math.max(0, expiresAt - now);
+              
+              // Auto-close when announcement expires or after 10 seconds
+              const autoCloseTimer = setTimeout(() => {
+                console.log(`[AnnouncementModal] Auto-closing announcement after ${timeUntilExpire/1000} seconds`);
+                closeAndNext();
+              }, timeUntilExpire);
+              
+              // Close button
+              document.getElementById('closeAnnouncementModal').onclick = () => {
+                clearTimeout(autoCloseTimer); // Clear the auto-close timer
+                closeAndNext();
+              };
+              
               // Also close on background click
               modal.onclick = (e) => {
                 if (e.target === modal) {
-                  modal.style.display = 'none';
-                  idx++;
-                  setTimeout(showNextAnnouncement, 200);
+                  clearTimeout(autoCloseTimer); // Clear the auto-close timer
+                  closeAndNext();
                 }
               };
               console.log('[AnnouncementModal] Showing announcement', idx+1, 'of', all.length);

@@ -1820,14 +1820,12 @@ const serviceImages = {
 function updateServicesTable(services) {
   const servicesTbody = document.getElementById('servicesTbody');
   if (!servicesTbody) return;
-  
   servicesTbody.innerHTML = '';
   if (services && Object.keys(services).length > 0) {
     Object.values(services).forEach(service => {
       const desc = hardcodedDescriptions[service.name] || '';
       const available = parseInt(service.available) || 0;
       const isSoldOut = available === 0;
-      
       const tr = document.createElement('tr');
       tr.className = isSoldOut ? 'sold-out-overlay' : '';
       const imageSrc = serviceImages[service.name] || 'images/logo.png';
@@ -1861,22 +1859,18 @@ function updateServicesTable(services) {
 function updateBundlesTable(bundles) {
   const bundlesTbody = document.getElementById('bundlesTbody');
   if (!bundlesTbody) return;
-  
   bundlesTbody.innerHTML = '';
   if (bundles && Object.keys(bundles).length > 0) {
     Object.values(bundles).forEach(bundle => {
       const available = parseInt(bundle.available) || 0;
       const isSoldOut = available === 0;
-      
       const tr = document.createElement('tr');
       tr.className = isSoldOut ? 'sold-out-overlay' : '';
-      // Use the first service's image as the bundle image, or a default
       let bundleImage = 'images/logo.png';
       if (bundle.services && bundle.services.length > 0) {
         const firstService = bundle.services[0];
         bundleImage = serviceImages[firstService] || 'images/logo.png';
       }
-      
       tr.innerHTML = `
         <td style="padding:12px 10px;font-weight:bold;${isSoldOut ? 'color:#b0b6be;' : ''}">${bundle.name || ''}</td>
         <td style="padding:8px;text-align:center;">
