@@ -758,12 +758,48 @@
         </tbody>
       </table>
     </div>
-    <!-- Download Buttons -->
+    <!-- Export Data Section -->
   <div class="card">
     <h3>Export Data</h3>
-    <button id="downloadCsvBtn">Download CSV</button>
-    <button id="downloadExcelBtn">Download Excel</button>
+    <div style="display: flex; gap: 12px; margin-top: 15px;">
+      <button id="downloadCsvBtn" class="export-btn" style="background-color: #1976d2; color: white;" onclick="downloadBookingsCSV()">
+        <i class="fas fa-file-csv"></i> Export as CSV
+      </button>
+      <button id="downloadExcelBtn" class="export-btn" style="background-color: #1d6f42; color: white;" onclick="downloadBookingsExcel()">
+        <i class="fas fa-file-excel"></i> Export to Excel
+      </button>
+    </div>
   </div>
+  
+  <style>
+    .export-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .export-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    .export-btn:active {
+      transform: translateY(0);
+    }
+    .export-btn i {
+      font-size: 16px;
+    }
+    .export-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  </style>
 
   <div class="card">
     <h3>Bookings</h3>
@@ -1849,14 +1885,86 @@ window.addEventListener('DOMContentLoaded', loadAdminAnnouncements);
 
 <script>
 // Excel download logic
-function downloadBookingsExcel() {
-  const table = document.getElementById('livePreviewTable');
-  if (!table) return alert('No data to export.');
-  // Convert table to worksheet
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.table_to_sheet(table);
-  XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
-  XLSX.writeFile(wb, 'bookings.xlsx');
+async function downloadBookingsExcel() {
+  try {
+    // Show loading state
+    const downloadBtn = document.getElementById('downloadExcelBtn');
+    const originalText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Excel...';
+    downloadBtn.disabled = true;
+
+    // Get all bookings from Firebase
+    const bookings = await getAllBookings();
+    if (!bookings || Object.keys(bookings).length === 0) {
+      showErrorMessage('No booking data available to export.');
+      downloadBtn.innerHTML = originalText;
+      downloadBtn.disabled = false;
+      return;
+    }
+
+    // Format data for Excel
+    const data = [
+      ['ID', 'Customer Name', 'Email', 'Phone', 'Service', 'Event Date', 'Event Time', 'Status', 'Payment Status', 'Total Amount', 'Date Booked']
+    ];
+
+    // Add each booking to the data array
+    Object.entries(bookings).forEach(([id, booking]) => {
+      data.push([
+        id,
+        booking.customerName || 'N/A',
+        booking.email || 'N/A',
+        booking.phone || 'N/A',
+        booking.service || 'N/A',
+        booking.eventDate || 'N/A',
+        booking.eventTime || 'N/A',
+        booking.status || 'Pending',
+        booking.paymentStatus || 'Unpaid',
+        booking.totalAmount ? `₱${parseFloat(booking.totalAmount).toFixed(2)}` : '₱0.00',
+        booking.timestamp ? new Date(booking.timestamp).toLocaleString() : 'N/A'
+      ]);
+    });
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    
+    // Set column widths
+    const colWidths = [
+      { wch: 20 }, // ID
+      { wch: 25 }, // Customer Name
+      { wch: 30 }, // Email
+      { wch: 20 }, // Phone
+      { wch: 30 }, // Service
+      { wch: 15 }, // Event Date
+      { wch: 15 }, // Event Time
+      { wch: 15 }, // Status
+      { wch: 15 }, // Payment Status
+      { wch: 15 }, // Total Amount
+      { wch: 20 }  // Date Booked
+    ];
+    ws['!cols'] = colWidths;
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Bookings');
+
+    // Generate Excel file
+    const date = new Date().toISOString().split('T')[0];
+    XLSX.writeFile(wb, `AudioWerks_Bookings_${date}.xlsx`);
+    
+    // Show success message
+    showSuccessMessage('Excel file downloaded successfully!');
+    
+  } catch (error) {
+    console.error('Error exporting to Excel:', error);
+    showErrorMessage('Failed to export bookings to Excel. Please try again.');
+  } finally {
+    // Reset button state
+    const downloadBtn = document.getElementById('downloadExcelBtn');
+    if (downloadBtn) {
+      downloadBtn.innerHTML = '<i class="fas fa-file-excel"></i> Export to Excel';
+      downloadBtn.disabled = false;
+    }
+  }
 }
 
 // === BACKUP & RESTORE SYSTEM POLISHED + HISTORY (SESSION DOWNLOAD/DELETE) ===
@@ -2095,6 +2203,103 @@ function downloadBookingsExcel() {
     saveBackupHistory();
   };
 })();
+
+// CSV download logic
+async function downloadBookingsCSV() {
+  try {
+    // Show loading state
+    const downloadBtn = document.getElementById('downloadCsvBtn');
+    const originalText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing CSV...';
+    downloadBtn.disabled = true;
+
+    // Get all bookings from Firebase
+    const bookings = await getAllBookings();
+    if (!bookings || Object.keys(bookings).length === 0) {
+      showErrorMessage('No booking data available to export.');
+      downloadBtn.innerHTML = originalText;
+      downloadBtn.disabled = false;
+      return;
+    }
+
+    // Define CSV headers and data structure
+    const headers = [
+      'ID',
+      'Customer Name',
+      'Email',
+      'Phone',
+      'Service',
+      'Event Date',
+      'Event Time',
+      'Venue',
+      'Location',
+      'Quantity',
+      'Total Amount',
+      'Payment Method',
+      'Payment Plan',
+      'Status',
+      'Date Booked',
+      'Notes'
+    ];
+
+    // Format data for CSV
+    const csvRows = [];
+    
+    // Add header row
+    csvRows.push(headers.join(','));
+    
+    // Add data rows
+    for (const [id, booking] of Object.entries(bookings)) {
+      const row = [
+        `"${id}"`,
+        `"${(booking.customerName || '').replace(/"/g, '""')}"`,
+        `"${(booking.email || '').replace(/"/g, '""')}"`,
+        `"${(booking.phone || '').replace(/"/g, '""')}"`,
+        `"${(booking.productName || '').replace(/"/g, '""')}"`,
+        `"${booking.eventDate || ''}"`,
+        `"${booking.eventTime || ''}"`,
+        `"${(booking.venue || '').replace(/"/g, '""')}"`,
+        `"${(booking.location || '').replace(/"/g, '""')}"`,
+        `"${booking.quantity || 1}"`,
+        `"₱${(parseFloat(booking.totalPrice) || 0).toFixed(2)}"`,
+        `"${booking.paymentMethod || 'N/A'}"`,
+        `"${booking.paymentPlan || 'N/A'}"`,
+        `"${booking.status || 'Pending'}"`,
+        `"${booking.timestamp ? new Date(booking.timestamp).toLocaleString() : 'N/A'}"`,
+        `"${(booking.notes || '').replace(/"/g, '""')}"`
+      ];
+      csvRows.push(row.join(','));
+    }
+
+    // Create CSV content
+    const csvContent = csvRows.join('\n');
+    
+    // Create download link
+    const date = new Date().toISOString().split('T')[0];
+    const blob = new Blob([﻿ + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `AudioWerks_Bookings_${date}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Show success message
+    showSuccessMessage('CSV file downloaded successfully!');
+    
+  } catch (error) {
+    console.error('Error exporting to CSV:', error);
+    showErrorMessage('Failed to export bookings to CSV. Please try again.');
+  } finally {
+    // Reset button state
+    const downloadBtn = document.getElementById('downloadCsvBtn');
+    if (downloadBtn) {
+      downloadBtn.innerHTML = '<i class="fas fa-file-csv"></i> Export as CSV';
+      downloadBtn.disabled = false;
+    }
+  }
+}
 
 // === NOTIFICATIONS SYSTEM (with bell) ===
 let notifications = [];
